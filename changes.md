@@ -68,3 +68,13 @@ This file tracks significant changes to the project setup that are not easily re
     dotnet add protoc-gen-delphi.tests reference protoc-gen-delphi
     ```
 
+12. Added first protobuf reference using `dotnet-grpc` to the `protoc-gen-delphi` project. Further reference additions do not need to be tracked here. Note that this tool silently fails when invoked from the top level with `--project` reference (we consider this a bug). Upgraded implicitly added package reference to current version.
+
+    ```powershell
+    cd protoc-gen-delphi
+    dotnet grpc add-file --services None --access Public ../proto/google/protobuf/compiler/plugin.proto
+    cd ..
+    dotnet add protoc-gen-delphi package Google.Protobuf --version 3.13.0
+    dotnet add protoc-gen-delphi package Grpc.Tools --version 2.23.0
+    ```
+
