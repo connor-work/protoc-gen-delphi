@@ -1,0 +1,25 @@
+{
+    "fileToGenerate": ["namespace1/my-namespace2/empty_schema.proto" ],
+    "compilerVersion": {
+        "major": 3,
+        "minor": 13,
+        "patch": 0,
+        "suffix": ""
+    },
+    "protoFile": [ {
+        "name": "namespace1/my-namespace2/empty_schema.proto",
+        "package": "namespace1.my_namespace2",
+        "sourceCodeInfo": {
+            "location": [ {
+                "span": [ 0, 0, 2, 33 ]
+            }, {
+                "path": [ 12 ],
+                "span": [ 0, 0, 18 ]
+            }, {
+                "path": [ 2 ],
+                "span": [ 2, 0, 33 ]
+            } ]
+        },
+        "syntax": "proto3"
+    } ]
+}

@@ -1,0 +1,3 @@
+syntax = "proto3";
+
+package namespace1.my_namespace2;

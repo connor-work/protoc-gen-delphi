@@ -1,0 +1,6 @@
+{
+    "file": [ {
+        "name": "Namespace1/MyNamespace2/uEmptySchema.pas",
+        "content": "unit Namespace1.MyNamespace2.uEmptySchema;\n\ninterface\n\nimplementation\n\nend."
+    } ]
+}
