@@ -30,12 +30,12 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Tests
         public static readonly string protobufJsonFileExtension = "pb.json";
 
         /// <summary>
-        /// File name extension (without leading dot) for JSON-encoded <see cref="CodeGeneratorRequest">s in test data
+        /// File name extension (without leading dot) for JSON-encoded <see cref="CodeGeneratorRequest"/>s in test data
         /// </summary>
         public static readonly string requestFileExtension = "request." + protobufJsonFileExtension;
 
         /// <summary>
-        /// File name extension (without leading dot) for JSON-encoded <see cref="CodeGeneratorResponse">s in test data
+        /// File name extension (without leading dot) for JSON-encoded <see cref="CodeGeneratorResponse"/>s in test data
         /// </summary>
         public static readonly string responseFileExtension = "response." + protobufJsonFileExtension;
 
