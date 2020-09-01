@@ -1,3 +1,18 @@
+/// Copyright 2020 Connor Roehricht (connor.work)
+/// Copyright 2020 Sotax AG
+/// 
+/// Licensed under the Apache License, Version 2.0 (the "License");
+/// you may not use this file except in compliance with the License.
+/// You may obtain a copy of the License at
+/// 
+///     http://www.apache.org/licenses/LICENSE-2.0
+/// 
+/// Unless required by applicable law or agreed to in writing, software
+/// distributed under the License is distributed on an "AS IS" BASIS,
+/// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+/// See the License for the specific language governing permissions and
+/// limitations under the License.
+
 using Google.Protobuf;
 using Google.Protobuf.Compiler;
 using Google.Protobuf.Reflection;
@@ -30,12 +45,12 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Tests
         public static readonly string protobufJsonFileExtension = "pb.json";
 
         /// <summary>
-        /// File name extension (without leading dot) for JSON-encoded <see cref="CodeGeneratorRequest">s in test data
+        /// File name extension (without leading dot) for JSON-encoded <see cref="CodeGeneratorRequest"/>s in test data
         /// </summary>
         public static readonly string requestFileExtension = "request." + protobufJsonFileExtension;
 
         /// <summary>
-        /// File name extension (without leading dot) for JSON-encoded <see cref="CodeGeneratorResponse">s in test data
+        /// File name extension (without leading dot) for JSON-encoded <see cref="CodeGeneratorResponse"/>s in test data
         /// </summary>
         public static readonly string responseFileExtension = "response." + protobufJsonFileExtension;
 
