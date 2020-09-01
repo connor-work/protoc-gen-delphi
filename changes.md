@@ -78,3 +78,9 @@ This file tracks significant changes to the project setup that are not easily re
     dotnet add protoc-gen-delphi package Grpc.Tools --version 2.23.0
     ```
 
+13. Upgraded fixed .NET Core SDK version.
+
+    ```powershell
+    dotnet new globaljson --sdk-version $(($(dotnet --list-sdks | tail -1) -split ' ')[0]) --force
+    ```
+
