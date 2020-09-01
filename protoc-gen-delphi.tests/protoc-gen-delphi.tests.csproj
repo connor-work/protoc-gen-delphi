@@ -18,4 +18,9 @@
     <ProjectReference Include="..\protoc-gen-delphi\protoc-gen-delphi.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Include="known-answer-test-vectors\*.request.pb.json" />
+    <EmbeddedResource Include="known-answer-test-vectors\*.response.pb.json" />
+  </ItemGroup>
+
 </Project>
