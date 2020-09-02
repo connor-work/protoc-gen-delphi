@@ -15,8 +15,13 @@
 
 using Google.Protobuf;
 using Google.Protobuf.Compiler;
+using Google.Protobuf.Reflection;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using Work.Connor.Delphi;
+using Work.Connor.Delphi.CodeWriter;
 
 namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
 {
@@ -34,6 +39,11 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// File name extension (without leading dot) for generated Delphi unit source files
         /// </summary>
         public static readonly string unitSourceFileExtension = "pas";
+
+        /// <summary>
+        /// Path separator used in protobuf file names.
+        /// </summary>
+        public static readonly string protoFileNamePathSeparator = "/";
 
         static void Main(string[] args)
         {
@@ -54,7 +64,52 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// <returns>The response to <c>protoc</c></returns>
         public CodeGeneratorResponse HandleRequest(CodeGeneratorRequest request)
         {
-            throw new NotImplementedException();
+            CodeGeneratorResponse response = new CodeGeneratorResponse();
+            // Generate one source code file for each .proto file
+            foreach (string protoFileName in request.FileToGenerate) response.File.Add(GenerateSourceFile(request.ProtoFile.First(file => file.Name == protoFileName)));
+            return response;
         }
+
+        /// <summary>
+        /// Generates a Delphi source code file for a protobuf schema definition.
+        /// </summary>
+        /// <param name="protoFile">The .proto file defining the schema</param>
+        /// <returns>The source code file in the format expected by <c>protoc</c></returns>
+        private CodeGeneratorResponse.Types.File GenerateSourceFile(FileDescriptorProto protoFile)
+        {
+            // Generate a new Delphi unit
+            Unit unit = GenerateUnit(protoFile);
+            return new CodeGeneratorResponse.Types.File()
+            {
+                Name = string.Join(protoFileNamePathSeparator, unit.ToSourceFilePath()),
+                Content = unit.ToSourceCode()
+            };
+        }
+
+        /// <summary>
+        /// Generates a Delphi unit for a protobuf schema definition.
+        /// </summary>
+        /// <param name="protoFile">The .proto file defining the schema</param>
+        /// <returns>The unit</returns>
+        private Unit GenerateUnit(FileDescriptorProto protoFile)
+        {
+            return new Unit()
+            {
+                Heading = GenerateUnitIdentifier(protoFile),
+                Interface = new Interface(),
+                Implementation = new Implementation()
+            };
+        }
+
+        /// <summary>
+        /// Generates a Delphi unit identifer for a protobuf schema definition.
+        /// </summary>
+        /// <param name="protoFile">The .proto file defining the schema</param>
+        /// <returns>The unit identifier</returns>
+        private UnitIdentifier GenerateUnitIdentifier(FileDescriptorProto protoFile) => new UnitIdentifier()
+        {
+            // Use .proto file filename without extensions as identifier
+            Unit = $"u{protoFile.Name.Split(protoFileNamePathSeparator)[^1].Split(".")[0].ToPascalCase()}"
+        };
     }
 }
