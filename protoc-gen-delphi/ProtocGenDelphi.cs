@@ -41,7 +41,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         public static readonly string unitSourceFileExtension = "pas";
 
         /// <summary>
-        /// Path separator used in protobuf file names.
+        /// Path separator used in protobuf file names
         /// </summary>
         public static readonly string protoFileNamePathSeparator = "/";
 
