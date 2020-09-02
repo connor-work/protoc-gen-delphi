@@ -45,6 +45,16 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// </summary>
         public static readonly string protoFileNamePathSeparator = "/";
 
+        /// <summary>
+        /// Support definition for the targetted protobuf runtime
+        /// </summary>
+        private static readonly IRuntimeSupport runtime = new IRuntimeSupport.Default();
+
+        /// <summary>
+        /// Name of the root base class of all generated Delphi classes for message
+        /// </summary>
+        private static readonly string messageRootClass = "TProtobufMessage";
+
         static void Main(string[] args)
         {
             // protoc communicates with the plug-in through stdin and stdout
