@@ -11,6 +11,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="Work.Connor.Delphi.CodeWriter" Version="1.0.0" />
   </ItemGroup>
   <ItemGroup>
     <Protobuf Include="../proto/google/protobuf/compiler\plugin.proto" GrpcServices="None" Link="Protos\plugin.proto" />
