@@ -17,6 +17,7 @@ using Google.Protobuf;
 using Google.Protobuf.Compiler;
 using Google.Protobuf.Reflection;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Work.Connor.Delphi;
@@ -74,8 +75,9 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         public CodeGeneratorResponse HandleRequest(CodeGeneratorRequest request)
         {
             CodeGeneratorResponse response = new CodeGeneratorResponse();
+            FileDescriptorProto lookupProtoFile(string name) => request.ProtoFile.First(file => file.Name == name);
             // Generate one source code file for each .proto file
-            foreach (string protoFileName in request.FileToGenerate) response.File.Add(GenerateSourceFile(request.ProtoFile.First(file => file.Name == protoFileName)));
+            foreach (string protoFileName in request.FileToGenerate) response.File.Add(GenerateSourceFile(lookupProtoFile(protoFileName), lookupProtoFile));
             return response;
         }
 
@@ -84,10 +86,14 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// </summary>
         /// <param name="protoFile">The .proto file defining the schema</param>
         /// <returns>The source code file in the format expected by <c>protoc</c></returns>
-        private CodeGeneratorResponse.Types.File GenerateSourceFile(FileDescriptorProto protoFile)
+        private CodeGeneratorResponse.Types.File GenerateSourceFile(FileDescriptorProto protoFile, Func<string, FileDescriptorProto> lookupProtoFile)
         {
+            IEnumerable<FileDescriptorProto> dependencies()
+            {
+                foreach (string dependency in protoFile.Dependency) yield return lookupProtoFile.Invoke(dependency);
+            }
             // Generate a new Delphi unit
-            Unit unit = GenerateUnit(protoFile);
+            Unit unit = GenerateUnit(protoFile, dependencies());
             return new CodeGeneratorResponse.Types.File()
             {
                 Name = string.Join(protoFileNamePathSeparator, unit.ToSourceFilePath()),
@@ -100,7 +106,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// </summary>
         /// <param name="protoFile">The .proto file defining the schema</param>
         /// <returns>The unit</returns>
-        private Unit GenerateUnit(FileDescriptorProto protoFile)
+        private Unit GenerateUnit(FileDescriptorProto protoFile, IEnumerable<FileDescriptorProto> dependencies)
         {
             Unit delphiUnit = new Unit()
             {
@@ -109,6 +115,9 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
                 Implementation = new Implementation()
             };
             void dependencyHandler(UnitReference dependency) => InjectInterfaceDependency(dependency, delphiUnit.Interface);
+            // Compile protobuf dependencies (imports)
+            foreach (FileDescriptorProto dependency in dependencies) CompileDependency(dependency, dependencyHandler);
+            // Compile message types
             foreach (DescriptorProto messageType in protoFile.MessageType) CompileMessage(messageType, delphiUnit.Interface, dependencyHandler);
             return delphiUnit;
         }
@@ -121,6 +130,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         private UnitIdentifier GenerateUnitIdentifier(FileDescriptorProto protoFile) => new UnitIdentifier()
         {
             // Use .proto file filename without extensions as identifier
+            // TODO namespaces
             Unit = $"u{protoFile.Name.Split(protoFileNamePathSeparator)[^1].Split(".")[0].ToPascalCase()}"
         };
 
@@ -140,6 +150,16 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
             if (delphiInterface.UsesClause.Any(existingReference => existingReference.Unit.Equals(delphiUnitReference.Unit))) return;
             delphiInterface.UsesClause.Add(delphiUnitReference);
         }
+
+        /// <summary>
+        /// Compiles a protobuf dependency by creating Delphi interface dependencies.
+        /// </summary>
+        /// <param name="dependency">The .proto file of the protobuf dependency</param>
+        /// <param name="dependencyHandler"> Action to perform when a new Delphi interface dependency has been detected</param>
+        private void CompileDependency(FileDescriptorProto dependency, Action<UnitReference> dependencyHandler) => dependencyHandler.Invoke(new UnitReference()
+        {
+            Unit = GenerateUnitIdentifier(dependency)
+        });
 
         /// <summary>
         /// Compiles a protobuf message type by injecting code into a Delphi interface section.
