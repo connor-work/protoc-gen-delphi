@@ -17,7 +17,6 @@ using Google.Protobuf;
 using Google.Protobuf.Compiler;
 using Google.Protobuf.Reflection;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Work.Connor.Delphi;
