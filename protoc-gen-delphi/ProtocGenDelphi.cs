@@ -103,16 +103,19 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// <returns>The unit</returns>
         private Unit GenerateUnit(FileDescriptorProto protoFile)
         {
-            return new Unit()
+            Unit delphiUnit = new Unit()
             {
                 Heading = GenerateUnitIdentifier(protoFile),
-                Interface = new Interface(),
+                Interface = GenerateInterface(),
                 Implementation = new Implementation()
             };
+            void dependencyHandler(UnitReference dependency) => InjectInterfaceDependency(dependency, delphiUnit.Interface);
+            foreach (DescriptorProto messageType in protoFile.MessageType) CompileMessage(messageType, delphiUnit.Interface, dependencyHandler);
+            return delphiUnit;
         }
 
         /// <summary>
-        /// Generates a Delphi unit identifer for a protobuf schema definition.
+        /// Generates a Delphi unit identifier for a protobuf schema definition.
         /// </summary>
         /// <param name="protoFile">The .proto file defining the schema</param>
         /// <returns>The unit identifier</returns>
@@ -120,6 +123,50 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         {
             // Use .proto file filename without extensions as identifier
             Unit = $"u{protoFile.Name.Split(protoFileNamePathSeparator)[^1].Split(".")[0].ToPascalCase()}"
+        };
+
+        /// <summary>
+        /// Generates an incomplete Delphi interface section for a protobuf schema definition, ignoring schema types.
+        /// </summary>
+        /// <returns>The basic Delphi interface section</returns>
+        private Interface GenerateInterface() => new Interface();
+
+        /// <summary>
+        /// Injects a Delphi interface dependency into a Delphi interface section.
+        /// </summary>
+        /// <param name="delphiUnitReference">Unit reference for the dependency</param>
+        /// <param name="delphiInterface">The Delphi interface section</param>
+        private void InjectInterfaceDependency(UnitReference delphiUnitReference, Interface delphiInterface)
+        {
+            if (delphiInterface.UsesClause.Any(existingReference => existingReference.Unit.Equals(delphiUnitReference.Unit))) return;
+            delphiInterface.UsesClause.Add(delphiUnitReference);
+        }
+
+        /// <summary>
+        /// Compiles a protobuf message type by injecting code into a Delphi interface section.
+        /// </summary>
+        /// <param name="messageType">The message type</param>
+        /// <param name="delphiInterface">The Delphi interface section</param>
+        /// <param name="dependencyHandler"> Action to perform when a new Delphi interface dependency has been detected</param>
+        private void CompileMessage(DescriptorProto messageType, Interface delphiInterface, Action<UnitReference> dependencyHandler)
+        {
+            dependencyHandler.Invoke(runtime.GetMessageDependency());
+            delphiInterface.Declarations.Add(new InterfaceDeclaration()
+            {
+                ClassDeclaration = GenerateClass(messageType)
+            });
+        }
+
+        /// <summary>
+        /// Generates a Delphi class declaration for a protobuf message type.
+        /// </summary>
+        /// <param name="messageType">The message type</param>
+        /// <returns>The Delphi class declaration</returns>
+        private ClassDeclaration GenerateClass(DescriptorProto messageType) => new ClassDeclaration()
+        {
+            // TODO handling of absent name?
+            Name = $"T{messageType.Name.ToPascalCase()}",
+            Ancestor = messageRootClass
         };
     }
 }
