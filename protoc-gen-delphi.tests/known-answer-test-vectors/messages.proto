@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+message MessageX {
+
+}
+
+message MessageY {
+
+}
