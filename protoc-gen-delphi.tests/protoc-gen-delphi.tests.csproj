@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Google.Protobuf.Tools" Version="3.13.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.5.0" />
     <PackageReference Include="xunit" Version="2.4.0" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.0" />
@@ -25,6 +26,13 @@
            Targets="Publish"
            Properties="PublishDir=$([System.IO.Path]::GetFullPath($(OutDir)));PublishReadyToRun=false"
            BuildInParallel="$(BuildInParallel)" />
+  </Target>
+
+  <Target Name="CopyProtobufTools" AfterTargets="Build">
+    <ItemGroup>
+      <ProtobufTools Include="$(PkgGoogle_Protobuf_Tools)/tools/**/*.*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(ProtobufTools)" DestinationFolder="$(TargetDir)/Google.Protobuf.Tools/tools/%(RecursiveDir)" SkipUnchangedFiles="true" />
   </Target>
 
   <ItemGroup>
