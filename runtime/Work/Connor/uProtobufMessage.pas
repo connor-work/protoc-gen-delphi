@@ -53,7 +53,7 @@ type
     /// Encodes the message using the protobuf binary wire format and writes it to a stream.
     /// </summary>
     /// <param name="aDest">The stream that the encoded message is written to</param>
-    procedure Encode(aDest: TStream);
+    procedure Encode(aDest: TStream); virtual;
 
     /// <summary>
     /// Fills the message's protobuf fields by decoding the message using the protobuf binary wire format from data that is read from a stream.
@@ -64,7 +64,7 @@ type
     /// This may cause the destruction of transitively owned objects (this is also the case when a present fields overwrites a previous value).
     /// Developers must ensure that no shared ownership of current field values or further nested embedded objects is held.
     /// </remarks>
-    procedure Decode(aSource: TStream);
+    procedure Decode(aSource: TStream); virtual;
   end;
 
 implementation
