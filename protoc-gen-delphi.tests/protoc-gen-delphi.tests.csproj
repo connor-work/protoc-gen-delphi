@@ -36,8 +36,10 @@
   </Target>
 
   <ItemGroup>
-    <EmbeddedResource Include="known-answer-test-vectors\*.request.pb.json" />
-    <EmbeddedResource Include="known-answer-test-vectors\*.response.pb.json" />
+    <EmbeddedResource Include="known-answer-test-vectors\**\*.request.pb.json" />
+    <EmbeddedResource Include="known-answer-test-vectors\**\*.response.pb.json" />
+    <EmbeddedResource Include="known-answer-test-vectors\**\*.proto" />
+    <EmbeddedResource Include="known-answer-test-vectors\**\*.output_folder\**\*" />
   </ItemGroup>
 
 </Project>
