@@ -1,8 +1,0 @@
-{
-    "file": [
-        {
-            "name": "uMessages.pas",
-            "content": "unit uMessages;\n\ninterface\n\nuses\n  Com.GitHub.Pikaju.Protobuf.Delphi.uMessage;\n\ntype\n  TMessageX = class(TProtobufMessage)\n  end;\n\ntype\n  TMessageY = class(TProtobufMessage)\n  end;\n\nimplementation\n\nend.\n"
-        }
-    ]
-}
