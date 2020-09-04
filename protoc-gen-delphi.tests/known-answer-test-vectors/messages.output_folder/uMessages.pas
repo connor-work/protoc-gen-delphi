@@ -7,28 +7,24 @@ uses
 
 type
   TMessageX = class(TProtobufMessage)
+  public constructor Create; override;
 
-  public
-    constructor Create; override;
+  public procedure Clear; override;
 
-    procedure Clear; override;
+  public procedure Encode(aDest: TStream); override;
 
-    procedure Encode(aDest: TStream); override;
-
-    procedure Decode(aSource: TStream); override;
+  public procedure Decode(aSource: TStream); override;
   end;
 
 type
   TMessageY = class(TProtobufMessage)
+  public constructor Create; override;
 
-  public
-    constructor Create; override;
+  public procedure Clear; override;
 
-    procedure Clear; override;
+  public procedure Encode(aDest: TStream); override;
 
-    procedure Encode(aDest: TStream); override;
-
-    procedure Decode(aSource: TStream); override;
+  public procedure Decode(aSource: TStream); override;
   end;
 
 implementation
