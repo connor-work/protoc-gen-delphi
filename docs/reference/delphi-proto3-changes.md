@@ -1,4 +1,4 @@
-# Delphi-specific changes to the Language Guide (proto3)
+# Delphi-Specific Changes to the Language Guide (proto3)
 
 ## Note
 This document describes Delphi-specific extensions to the [Language Guide (proto3)](https://developers.google.com/protocol-buffers/docs/proto3).
