@@ -112,13 +112,13 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
             {
                 Heading = GenerateUnitIdentifier(protoFile),
                 Interface = GenerateInterface(),
-                Implementation = new Implementation()
+                Implementation = GenerateImplementation()
             };
             void dependencyHandler(UnitReference dependency) => InjectInterfaceDependency(dependency, delphiUnit.Interface);
             // Compile protobuf dependencies (imports)
             foreach (FileDescriptorProto dependency in dependencies) CompileDependency(dependency, dependencyHandler);
             // Compile message types
-            foreach (DescriptorProto messageType in protoFile.MessageType) CompileMessage(messageType, delphiUnit.Interface, dependencyHandler);
+            foreach (DescriptorProto messageType in protoFile.MessageType) CompileMessage(messageType, delphiUnit.Interface, delphiUnit.Implementation, dependencyHandler);
             return delphiUnit;
         }
 
@@ -139,6 +139,12 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// </summary>
         /// <returns>The basic Delphi interface section</returns>
         private Interface GenerateInterface() => new Interface();
+
+        /// <summary>
+        /// Generates an incomplete Delphi implementation section for a protobuf schema definition, ignoring schema types.
+        /// </summary>
+        /// <returns>The basic Delphi implementation section</returns>
+        private Implementation GenerateImplementation() => new Implementation();
 
         /// <summary>
         /// Injects a Delphi interface dependency into a Delphi interface section.
@@ -162,30 +168,168 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         });
 
         /// <summary>
-        /// Compiles a protobuf message type by injecting code into a Delphi interface section.
+        /// Compiles a protobuf message type by injecting code into a Delphi interface section and a Delphi implementation section.
         /// </summary>
         /// <param name="messageType">The message type</param>
         /// <param name="delphiInterface">The Delphi interface section</param>
+        /// <param name="delphiImplementation">The Delphi implementation section</param>
         /// <param name="dependencyHandler"> Action to perform when a new Delphi interface dependency has been detected</param>
-        private void CompileMessage(DescriptorProto messageType, Interface delphiInterface, Action<UnitReference> dependencyHandler)
+        private void CompileMessage(DescriptorProto messageType, Interface delphiInterface, Implementation delphiImplementation, Action<UnitReference> dependencyHandler)
         {
             dependencyHandler.Invoke(runtime.GetMessageDependency());
+            ClassDeclaration delphiClass = GenerateClass(messageType);
             delphiInterface.Declarations.Add(new InterfaceDeclaration()
             {
-                ClassDeclaration = GenerateClass(messageType)
+                ClassDeclaration = delphiClass
             });
+            MessageClassSkeleton skeleton = new MessageClassSkeleton(delphiClass.Name);
+            InjectMessageClassSkeleton(skeleton, delphiClass, delphiImplementation);
+            // TODO fields
         }
 
         /// <summary>
-        /// Generates a Delphi class declaration for a protobuf message type.
+        /// Generates an incomplete Delphi class declaration for a protobuf message type, ignoring fields and without the message class skeleton.
         /// </summary>
         /// <param name="messageType">The message type</param>
-        /// <returns>The Delphi class declaration</returns>
+        /// <returns> The basic Delphi class declaration</returns>
         private ClassDeclaration GenerateClass(DescriptorProto messageType) => new ClassDeclaration()
         {
             // TODO handling of absent name?
             Name = $"T{messageType.Name.ToPascalCase()}",
             Ancestor = messageRootClass
         };
+
+        /// <summary>
+        /// Injects the internal base structure of a Delphi class for a protobuf message type ("message class skeleton") into
+        /// a Delphi class and a Delphi implementation section.
+        /// </summary>
+        /// <param name="skeleton">The message class skeleton to inject</param>
+        /// <param name="delphiClass">The Delphi class</param>
+        /// <param name="delphiImplementation">The Delphi implementation section</param>
+        private void InjectMessageClassSkeleton(MessageClassSkeleton skeleton, ClassDeclaration delphiClass, Implementation delphiImplementation)
+        {
+            foreach (MethodDeclaration method in skeleton.Methods)
+            {
+                delphiClass.MemberList.Add(new ClassMemberDeclaration()
+                {
+                    Visibility = Visibility.Public,
+                    MethodDeclaration = new MethodInterfaceDeclaration()
+                    {
+                        Binding = MethodInterfaceDeclaration.Types.Binding.Override,
+                        Prototype = method.Prototype.Clone()
+                    }
+                });
+                delphiImplementation.Declarations.Add(new ImplementationDeclaration()
+                {
+                    MethodDeclaration = method.Clone()
+                });
+            }
+        }
+
+        /// <summary>
+        /// Internal base structure of a Delphi class for a protobuf message type.
+        /// Can be used to inject code into so-called "skeleton procedures" that are present in each such class.
+        /// </summary>
+        private class MessageClassSkeleton
+        {
+            /// <summary>
+            /// Constructs a message class skeleton for injection into a Delphi class representing a protobuf message.
+            /// </summary>
+            /// <param name="delphiClassName">Name of the Delphi class</param>
+            public MessageClassSkeleton(string delphiClassName)
+            {
+                Create = new MethodDeclaration()
+                {
+                    Class = delphiClassName,
+                    Prototype = new Prototype()
+                    {
+                        Name = "Create",
+                        Type = Prototype.Types.Type.Constructor
+                    }
+                };
+                Destroy = new MethodDeclaration()
+                {
+                    Class = delphiClassName,
+                    Prototype = new Prototype()
+                    {
+                        Name = "Destroy",
+                        Type = Prototype.Types.Type.Destructor
+                    }
+                };
+                Clear = new MethodDeclaration()
+                {
+                    Class = delphiClassName,
+                    Prototype = new Prototype()
+                    {
+                        Name = "Clear",
+                        Type = Prototype.Types.Type.Procedure
+                    }
+                };
+                Encode = new MethodDeclaration()
+                {
+                    Class = delphiClassName,
+                    Prototype = new Prototype()
+                    {
+                        Name = "Encode",
+                        Type = Prototype.Types.Type.Procedure,
+                        ParameterList =
+                        {
+                            new Parameter()
+                            {
+                                Name = "aDest",
+                                Type = "TStream"
+                            }
+                        }
+                    }
+                };
+                Decode = new MethodDeclaration()
+                {
+                    Class = delphiClassName,
+                    Prototype = new Prototype()
+                    {
+                        Name = "Decode",
+                        Type = Prototype.Types.Type.Procedure,
+                        ParameterList =
+                        {
+                            new Parameter()
+                            {
+                                Name = "aSource",
+                                Type = "TStream"
+                            }
+                        }
+                    }
+                };
+            }
+
+            /// <summary>
+            /// Constructor that constructs an empty message with all protobuf fields absent
+            /// </summary>
+            public MethodDeclaration Create { get; }
+
+            /// <summary>
+            /// Destructor that destroys the message and all objects and resources held by it
+            /// </summary>
+            public MethodDeclaration Destroy { get; }
+
+            /// <summary>
+            /// Procedure that renders all protobuf fields absent by setting them to their default values
+            /// </summary>
+            public MethodDeclaration Clear { get; }
+
+            /// <summary>
+            /// Procedure that encodes the message using the protobuf binary wire format and writes it to a stream
+            /// </summary>
+            public MethodDeclaration Encode { get; }
+
+            /// <summary>
+            /// Procedure that fills the message's protobuf fields by decoding the message using the protobuf binary wire format from data that is read from a stream
+            /// </summary>
+            public MethodDeclaration Decode { get; }
+
+            /// <summary>
+            /// Message "skeleton procedures" in intended declaration order
+            /// </summary>
+            public IEnumerable<MethodDeclaration> Methods => new MethodDeclaration[] { Create, Destroy, Clear, Encode, Decode };
+        }
     }
 }
