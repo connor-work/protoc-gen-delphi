@@ -47,7 +47,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
                 }
             };
 
-            public UnitReference GetMessageDependency() => GetUnitReference("uMessage");
+            public UnitReference GetMessageDependency() => GetUnitReference("uProtobufMessage");
         }
     }
 }
