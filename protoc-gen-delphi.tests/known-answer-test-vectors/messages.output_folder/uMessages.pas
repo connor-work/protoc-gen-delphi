@@ -53,4 +53,24 @@ procedure TMessageX.Decode(aSource: TStream);
 begin
 end;
 
+constructor TMessageY.Create;
+begin
+end;
+
+destructor TMessageY.Destroy;
+begin
+end;
+
+procedure TMessageY.Clear;
+begin
+end;
+
+procedure TMessageY.Encode(aDest: TStream);
+begin
+end;
+
+procedure TMessageY.Decode(aSource: TStream);
+begin
+end;
+
 end.
