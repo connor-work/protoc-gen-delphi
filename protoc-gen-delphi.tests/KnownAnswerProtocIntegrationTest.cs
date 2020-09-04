@@ -27,20 +27,6 @@ using Xunit;
 namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Tests
 {
     /// <summary>
-    /// Extensions to <see cref="string"/> for writing test code.
-    /// </summary>
-    public static partial class StringExtensions
-    {/*
-        /// <summary>
-        /// Escapes a string for passing it as an argument to a <see cref="Process"/>.
-        /// Note that the argument must be passed via <see cref="ProcessStartInfo.ArgumentList"/>, <see cref="ProcessStartInfo.Arguments"/> requires a different escaping.
-        /// </summary>
-        /// <param name="arg">The string argument</param>
-        /// <returns>The escaped form</returns>
-        public static string EscapeAsArgument(this string arg) => $"\"{arg}\"";*/
-    }
-
-    /// <summary>
     /// Tests <see cref="ProtocGenDelphi"/> as a plug-in to <c>protoc</c> with known inputs and outputs.
     /// </summary>
     public class KnownAnswerProtocIntegrationTest
