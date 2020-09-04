@@ -7,7 +7,10 @@ unit Work.Connor.Protobuf.Delphi.StubRuntime.uProtobufMessage;
 interface
 
 uses
-  SysUtils;
+  SysUtils,
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.uProtobufTypes,
+  Work.Connor.Protobuf.Delphi.StubRuntime.uProtobufWireCodec,
+  Work.Connor.Protobuf.Delphi.StubRuntime.uProtobufRepeatedField;
 
 type
   /// <summary>
@@ -65,6 +68,27 @@ type
     /// Developers must ensure that no shared ownership of current field values or further nested embedded objects is held.
     /// </remarks>
     procedure Decode(aSource: TStream); virtual;
+
+  protected
+    /// <summary>
+    /// TODO doc
+    /// </summary>
+    procedure EncodeField<T>(aValue: T; aField: TProtobufFieldNumber; aCodec: TProtobufWireCodec<T>; aDest: TStream);
+
+    /// <summary>
+    /// TODO doc
+    /// </summary>
+    procedure EncodeRepeatedField<T>(aSource: TProtobufRepeatedField<T>; aField: TProtobufFieldNumber; aCodec: TProtobufWireCodec<T>; aDest: TStream);
+
+    /// <summary>
+    /// TODO doc
+    /// </summary>
+    function DecodeUnknownField<T>(aField: TProtobufFieldNumber; aCodec: TProtobufWireCodec<T>): T;
+    
+    /// <summary>
+    /// TODO doc
+    /// </summary>
+    procedure DecodeUnknownRepeatedField<T>(aField: TProtobufFieldNumber; aCodec: TProtobufWireCodec<T>, aDest: TProtobufRepeatedField<T>);
   end;
 
 implementation
