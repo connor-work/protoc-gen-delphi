@@ -51,7 +51,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         private static readonly IRuntimeSupport runtime = new IRuntimeSupport.Default();
 
         /// <summary>
-        /// Name of the root base class of all generated Delphi classes for message
+        /// Name of the root base class of all generated Delphi classes for protobuf messages
         /// </summary>
         private static readonly string messageRootClass = "TProtobufMessage";
 
