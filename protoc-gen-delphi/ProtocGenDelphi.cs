@@ -269,7 +269,9 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
             public MessageClassSkeleton(string delphiClassName)
             {
                 // Constructs pair of class member declaration and defining declaration for a skeleton method
+#pragma warning disable S1172 // Unused method parameters should be removed -> False-positive, the parameters are used
                 (ClassMemberDeclaration, MethodDeclaration) declareMethod(Visibility visibility, MethodInterfaceDeclaration.Types.Binding binding, MethodDeclaration definingDeclaration) => (
+#pragma warning restore S1172 // Unused method parameters should be removed
                     new ClassMemberDeclaration()
                     {
                         Visibility = visibility,
