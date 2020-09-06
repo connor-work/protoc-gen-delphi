@@ -8,7 +8,6 @@ uses
 
 type
   TMessageX = class(TProtobufMessage)
-
   const PROTOBUF_FIELD_NUMBER_FIELD_X = 1;
 
   const PROTOBUF_FIELD_NUMBER_FIELD_Y = 3;
