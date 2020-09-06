@@ -31,6 +31,12 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
     public class ProtocGenDelphi
     {
         /// <summary>
+        /// Optional plug-in option whose value is the Delphi namespace identifier of a custom runtime library to use.
+        /// The custom runtime library needs to follow the structure of the reference stub runtime library.
+        /// </summary>
+        public const string customRuntimeOption = "runtime";
+
+        /// <summary>
         /// File name extension (without leading dot) for protobuf schema definitions
         /// </summary>
         public static readonly string protoFileExtension = "proto";
@@ -46,17 +52,18 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         public static readonly string protoFileNamePathSeparator = "/";
 
         /// <summary>
-        /// Support definition for the targetted protobuf runtime
-        /// </summary>
-        private static readonly IRuntimeSupport runtime = new IRuntimeSupport.Default();
-
-        /// <summary>
         /// Name of the root base class of all generated Delphi classes for protobuf messages
         /// </summary>
         private static readonly string messageRootClass = "TProtobufMessage";
 
+        /// <summary>
+        /// Support definition for the targetted protobuf runtime
+        /// </summary>
+        private IRuntimeSupport runtime = IRuntimeSupport.Default;
+
         static void Main(string[] args)
         {
+            if (args.Length != 0) throw new ArgumentException("protoc-gen-delphi does not expect program arguments");
             // protoc communicates with the plug-in through stdin and stdout
             using Stream input = Console.OpenStandardInput();
             using Stream output = Console.OpenStandardOutput();
@@ -74,11 +81,42 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// <returns>The response to <c>protoc</c></returns>
         public CodeGeneratorResponse HandleRequest(CodeGeneratorRequest request)
         {
+            if (request.Parameter.Length != 0) ApplyOptions(request.Parameter.Split(","));
             CodeGeneratorResponse response = new CodeGeneratorResponse();
             FileDescriptorProto lookupProtoFile(string name) => request.ProtoFile.First(file => file.Name == name);
             // Generate one source code file for each .proto file
             foreach (string protoFileName in request.FileToGenerate) response.File.Add(GenerateSourceFile(lookupProtoFile(protoFileName), lookupProtoFile));
             return response;
+        }
+
+        /// <summary>
+        /// Applies custom plug-in options passed through <c>protoc</c>.
+        /// </summary>
+        /// <param name="options">Sequence of option strings</param>
+        private void ApplyOptions(IEnumerable<string> options)
+        {
+            foreach (string option in options)
+            {
+                string[] optionSegments = option.Split("=", 2);
+                ApplyOption(optionSegments[0], optionSegments.Length > 0 ? optionSegments[1] : null);
+            }
+        }
+
+        /// <summary>
+        /// Applies a custom plug-in option passed through <c>protoc</c>.
+        /// </summary>
+        /// <param name="optionKey">Key of the option</param>
+        /// <param name="optionValue">Optional value of the option</param>
+        private void ApplyOption(string optionKey, string? optionValue)
+        {
+            switch (optionKey)
+            {
+                case customRuntimeOption:
+                    if (string.IsNullOrWhiteSpace(optionValue)) throw new ArgumentException("Missing plug-in option value", optionKey);
+                    runtime = new IRuntimeSupport.ReferenceRuntimeSupport(optionValue);
+                    break;
+                default: throw new NotImplementedException();
+            }
         }
 
         /// <summary>

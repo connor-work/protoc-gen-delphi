@@ -3,7 +3,7 @@ unit uMessages;
 interface
 
 uses
-  Com.GitHub.Pikaju.Protobuf.Delphi.uProtobufMessage;
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufMessage;
 
 type
   TMessageX = class(TProtobufMessage)

@@ -47,6 +47,11 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Tests
         public static readonly string inputFilePrefix = "input_file_";
 
         /// <summary>
+        /// Marker string in the name of of test vectors that indicates that the default runtime shall be used
+        /// </summary>
+        public static readonly string defaultRuntimeMarker = "with_default_runtime";
+
+        /// <summary>
         /// Utility function to create a temporary scratch folder for testing.
         /// </summary>
         /// <returns>Path of the new folder</returns>
@@ -89,9 +94,10 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Tests
         /// </summary>
         /// <param name="protocArgs">Arguments passed to <c>protoc</c>, without the plug-in reference and output specifier</param>
         /// <param name="expectedFiles">Mapping of relative file paths in the plug-in output directory to expected file content</param>
+        /// <param name="useDefaultRuntime"><see langword="true"/> if the default runtime shall be used (instead of the stub)</param>
         [Theory]
         [MemberData(nameof(KnownGeneratedFileSets))]
-        public void GeneratesExpectedFilesWithProtoc(IEnumerable<string> protocArgs, IDictionary<string, string> expectedFiles)
+        public void GeneratesExpectedFilesWithProtoc(IEnumerable<string> protocArgs, IDictionary<string, string> expectedFiles, bool useDefaultRuntime)
         {
             // Create a scratch folder as output folder for the plug-in
             string outputFolder = CreateScratchFolder();
@@ -101,6 +107,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Tests
             // A leading dot seems to be required in the plugin folder name for protoc
             protoc.StartInfo.ArgumentList.Add($"--plugin={Path.Join(".", GetExecutableName("protoc-gen-delphi"))}");
             protoc.StartInfo.ArgumentList.Add($"--delphi_out={outputFolder}");
+            if (!useDefaultRuntime) protoc.StartInfo.ArgumentList.Add($"--delphi_opt={ProtocGenDelphi.customRuntimeOption}={IRuntimeSupport.Stub.DelphiNamespace}");
             foreach (string arg in protocArgs) protoc.StartInfo.ArgumentList.Add(arg);
             protoc.StartInfo.CreateNoWindow = true;
             protoc.StartInfo.UseShellExecute = false;
@@ -123,7 +130,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Tests
         {
             Assembly assembly = Assembly.GetExecutingAssembly();
             // Sets up scratch folders and constructs protoc args
-            object[] buildArgs(string outputFolderName, IEnumerable<string> protoFileNames, IEnumerable<string> inputFileNames)
+            object[] buildArgs(string outputFolderName, IEnumerable<string> protoFileNames, IEnumerable<string> inputFileNames, bool useDefaultRuntime)
             {
                 // The names of manifest resources of the expected output files are prefixed with the folder resource name and a dot
                 string outputFilePrefix = outputFolderName + ".";
@@ -152,7 +159,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Tests
                     File.WriteAllText(protoFilePath, protoFileReader.ReadToEnd());
                 }
                 string[] protocArgs = inputFilePaths.Prepend($"-I{inputFolder}").ToArray();
-                return new object[] { protocArgs, expectedFiles };
+                return new object[] { protocArgs, expectedFiles, useDefaultRuntime };
             }
 
             // Resources contain pairs of protobuf schema definitions and output folders containing expected Delphi unit source code files
@@ -160,7 +167,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Tests
                                                                                             && !name.Contains(inputFolderSuffix)))
             {
                 string outputFolderName = inputFileName.Substring(0, inputFileName.Length - ProtocGenDelphi.protoFileExtension.Length - 1) + outputFolderSuffix;
-                yield return buildArgs(outputFolderName, new[] { inputFileName }, new[] { inputFileName });
+                yield return buildArgs(outputFolderName, new[] { inputFileName }, new[] { inputFileName }, inputFileName.Contains(defaultRuntimeMarker));
             }
 
             // Resources contain pairs of input folders containing protobuf schema definitions and output folders containing expected Delphi unit source code files
@@ -176,7 +183,8 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Tests
             foreach (string inputFolderName in inputFolderNames)
             {
                 string outputFolderName = inputFolderName.Substring(0, inputFolderName.Length - inputFolderSuffix.Length) + outputFolderSuffix;
-                yield return buildArgs(outputFolderName, assembly.GetManifestResourceNames().Where(name => name.StartsWith(inputFolderName)), Enumerable.Empty<string>());
+                yield return buildArgs(outputFolderName, assembly.GetManifestResourceNames().Where(name => name.StartsWith(inputFolderName)),
+                    Enumerable.Empty<string>(), inputFolderName.Contains(defaultRuntimeMarker));
             }
         }
     }
