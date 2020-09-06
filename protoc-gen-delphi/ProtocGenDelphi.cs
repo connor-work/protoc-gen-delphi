@@ -208,27 +208,19 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// <param name="delphiImplementation">The Delphi implementation section</param>
         private void InjectMessageClassSkeleton(MessageClassSkeleton skeleton, ClassDeclaration delphiClass, Implementation delphiImplementation)
         {
-            foreach (MethodDeclaration method in skeleton.Methods)
+            foreach ((ClassMemberDeclaration methodInterface, MethodDeclaration methodImplementation) in skeleton.Methods)
             {
-                delphiClass.MemberList.Add(new ClassMemberDeclaration()
-                {
-                    Visibility = Visibility.Public,
-                    MethodDeclaration = new MethodInterfaceDeclaration()
-                    {
-                        Binding = MethodInterfaceDeclaration.Types.Binding.Override,
-                        Prototype = method.Prototype.Clone()
-                    }
-                });
+                delphiClass.MemberList.Add(methodInterface.Clone());
                 delphiImplementation.Declarations.Add(new ImplementationDeclaration()
                 {
-                    MethodDeclaration = method.Clone()
+                    MethodDeclaration = methodImplementation.Clone()
                 });
             }
         }
 
         /// <summary>
         /// Internal base structure of a Delphi class for a protobuf message type.
-        /// Can be used to inject code into so-called "skeleton procedures" that are present in each such class.
+        /// Can be used to inject code into so-called "skeleton methods" that are present in each such class.
         /// </summary>
         private class MessageClassSkeleton
         {
@@ -238,34 +230,57 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
             /// <param name="delphiClassName">Name of the Delphi class</param>
             public MessageClassSkeleton(string delphiClassName)
             {
-                Create = new MethodDeclaration()
+                // Constructs pair of class member declaration and defining declaration for a skeleton method
+                (ClassMemberDeclaration, MethodDeclaration) declareMethod(Visibility visibility, MethodInterfaceDeclaration.Types.Binding binding, MethodDeclaration definingDeclaration) => (
+                    new ClassMemberDeclaration()
+                    {
+                        Visibility = visibility,
+                        MethodDeclaration = new MethodInterfaceDeclaration
+                        {
+                            Binding = binding,
+                            Prototype = definingDeclaration.Prototype.Clone()
+                        }
+                    }, definingDeclaration);
+                Create = declareMethod(Visibility.Public, MethodInterfaceDeclaration.Types.Binding.Override, new MethodDeclaration()
                 {
                     Class = delphiClassName,
                     Prototype = new Prototype()
                     {
                         Name = "Create",
                         Type = Prototype.Types.Type.Constructor
+                    },
+                    Statements =
+                    {
+                        "inherited;", "ClearOwnFields;"
                     }
-                };
-                Destroy = new MethodDeclaration()
+                });
+                Destroy = declareMethod(Visibility.Public, MethodInterfaceDeclaration.Types.Binding.Override, new MethodDeclaration()
                 {
                     Class = delphiClassName,
                     Prototype = new Prototype()
                     {
                         Name = "Destroy",
                         Type = Prototype.Types.Type.Destructor
+                    },
+                    Statements =
+                    {
+                        "inherited;"
                     }
-                };
-                Clear = new MethodDeclaration()
+                });
+                Clear = declareMethod(Visibility.Public, MethodInterfaceDeclaration.Types.Binding.Override, new MethodDeclaration()
                 {
                     Class = delphiClassName,
                     Prototype = new Prototype()
                     {
                         Name = "Clear",
                         Type = Prototype.Types.Type.Procedure
+                    },
+                    Statements =
+                    {
+                        "inherited;", "ClearOwnFields;"
                     }
-                };
-                Encode = new MethodDeclaration()
+                });
+                Encode = declareMethod(Visibility.Public, MethodInterfaceDeclaration.Types.Binding.Override, new MethodDeclaration()
                 {
                     Class = delphiClassName,
                     Prototype = new Prototype()
@@ -280,9 +295,13 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
                                 Type = "TStream"
                             }
                         }
+                    },
+                    Statements =
+                    {
+                        "inherited;"
                     }
-                };
-                Decode = new MethodDeclaration()
+                });
+                Decode = declareMethod(Visibility.Public, MethodInterfaceDeclaration.Types.Binding.Override, new MethodDeclaration()
                 {
                     Class = delphiClassName,
                     Prototype = new Prototype()
@@ -297,39 +316,57 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
                                 Type = "TStream"
                             }
                         }
+                    },
+                    Statements =
+                    {
+                        "inherited;"
                     }
-                };
+                });
+                ClearOwnFields = declareMethod(Visibility.Private, MethodInterfaceDeclaration.Types.Binding.Static, new MethodDeclaration()
+                {
+                    Class = delphiClassName,
+                    Prototype = new Prototype()
+                    {
+                        Name = "ClearOwnFields",
+                        Type = Prototype.Types.Type.Procedure
+                    }
+                });
             }
 
             /// <summary>
             /// Constructor that constructs an empty message with all protobuf fields absent
             /// </summary>
-            public MethodDeclaration Create { get; }
+            public (ClassMemberDeclaration, MethodDeclaration) Create { get; }
 
             /// <summary>
             /// Destructor that destroys the message and all objects and resources held by it
             /// </summary>
-            public MethodDeclaration Destroy { get; }
+            public (ClassMemberDeclaration, MethodDeclaration) Destroy { get; }
 
             /// <summary>
             /// Procedure that renders all protobuf fields absent by setting them to their default values
             /// </summary>
-            public MethodDeclaration Clear { get; }
+            public (ClassMemberDeclaration, MethodDeclaration) Clear { get; }
 
             /// <summary>
             /// Procedure that encodes the message using the protobuf binary wire format and writes it to a stream
             /// </summary>
-            public MethodDeclaration Encode { get; }
+            public (ClassMemberDeclaration, MethodDeclaration) Encode { get; }
 
             /// <summary>
             /// Procedure that fills the message's protobuf fields by decoding the message using the protobuf binary wire format from data that is read from a stream
             /// </summary>
-            public MethodDeclaration Decode { get; }
+            public (ClassMemberDeclaration, MethodDeclaration) Decode { get; }
 
             /// <summary>
-            /// Message "skeleton procedures" in intended declaration order
+            /// Procedure that renders those protobuf fields absent that belong to this specific message class sub-type, by setting them to their default values
             /// </summary>
-            public IEnumerable<MethodDeclaration> Methods => new MethodDeclaration[] { Create, Destroy, Clear, Encode, Decode };
+            public (ClassMemberDeclaration, MethodDeclaration) ClearOwnFields { get; }
+
+            /// <summary>
+            /// Message "skeleton methods" in intended declaration order
+            /// </summary>
+            public IEnumerable<(ClassMemberDeclaration, MethodDeclaration)> Methods => new (ClassMemberDeclaration, MethodDeclaration)[] { Create, Destroy, Clear, Encode, Decode, ClearOwnFields };
         }
     }
 }
