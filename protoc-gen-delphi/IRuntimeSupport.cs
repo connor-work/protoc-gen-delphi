@@ -13,6 +13,8 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
+using Google.Protobuf.Reflection;
+using System;
 using Work.Connor.Delphi;
 
 namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
@@ -38,7 +40,14 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// Provides the required unit reference for using compiled protobuf messages.
         /// </summary>
         /// <returns>The Delphi unit reference</returns>
-        public UnitReference GetMessageDependency();
+        public UnitReference GetDependencyForMessages();
+
+        /// <summary>
+        /// Provides the required unit reference for handling protobuf fields of a specific field type. 
+        /// </summary>
+        /// <param name="type">The protobuf field type</param>
+        /// <returns>The Delphi unit reference</returns>
+        public UnitReference GetDependencyForFieldType(FieldDescriptorProto.Types.Type type);
 
         /// <summary>
         /// Provides support definitions for a runtime library implementation that follows the structure of the reference stub runtime.
@@ -74,7 +83,16 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
                 };
             }
 
-            public UnitReference GetMessageDependency() => GetUnitReference("uProtobufMessage");
+            public UnitReference GetDependencyForMessages() => GetUnitReference("uProtobufMessage");
+
+            public UnitReference GetDependencyForFieldType(FieldDescriptorProto.Types.Type type)
+            {
+                return GetUnitReference(type switch
+                {
+                    FieldDescriptorProto.Types.Type.Uint32 => "uProtobufUint32",
+                    _ => throw new NotImplementedException()
+                });
+            }
         }
     }
 }

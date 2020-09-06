@@ -26,6 +26,46 @@ using Work.Connor.Delphi.CodeWriter;
 namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
 {
     /// <summary>
+    /// Extensions to protobuf types for Delphi source code production.
+    /// </summary>
+    public static partial class ProtobufExtensions
+    {
+        /// <summary>
+        /// Determines the Delphi type identifier of the Delphi type that is used to represent protobuf field values of a specific protobuf field type.
+        /// </summary>
+        /// <param name="fieldType">The protobuf field type</param>
+        /// <returns>Corresponding Delphi type identifier</returns>
+        internal static string GetDelphiType(this FieldDescriptorProto.Types.Type fieldType) => fieldType switch
+        {
+            FieldDescriptorProto.Types.Type.Uint32 => "UInt32",
+            _ => throw new NotImplementedException()
+        };
+
+        /// <summary>
+        /// Determines the Delphi identifier of the runtime instance of <c>TProtobufWireCodec<!<![CDATA[<T>]]></c> that is used for encoding
+        /// and decoding values of a specific protobuf field type in the protobuf binary wire format.
+        /// </summary>
+        /// <param name="fieldType">The protobuf field type</param>
+        /// <returns>Delphi identifier of the codec instance</returns>
+        internal static string GetDelphiWireCodec(this FieldDescriptorProto.Types.Type fieldType) => fieldType switch
+        {
+            FieldDescriptorProto.Types.Type.Uint32 => "gProtobufWireCodecUInt32",
+            _ => throw new NotImplementedException()
+        };
+
+        /// <summary>
+        /// Determines the Delphi identifier of the true constant whose value is the default value for a specific protobuf field type.
+        /// </summary>
+        /// <param name="fieldType">The protobuf field type</param>
+        /// <returns>Delphi identifier default value constant</returns>
+        internal static string GetDelphiDefaultValueConstant(this FieldDescriptorProto.Types.Type fieldType) => fieldType switch
+        {
+            FieldDescriptorProto.Types.Type.Uint32 => "PROTOBUF_UINT32_DEFAULT_VALUE",
+            _ => throw new NotImplementedException()
+        };
+    }
+
+    /// <summary>
     /// Plug-in for the protobuf compiler <c>protoc</c> that generates Delphi unit source code files for protobuf schema definitions.
     /// </summary>
     public class ProtocGenDelphi
@@ -214,15 +254,17 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// <param name="dependencyHandler"> Action to perform when a new Delphi interface dependency has been detected</param>
         private void CompileMessage(DescriptorProto messageType, Interface delphiInterface, Implementation delphiImplementation, Action<UnitReference> dependencyHandler)
         {
-            dependencyHandler.Invoke(runtime.GetMessageDependency());
+            // Add the required runtime dependency for handling compiled messages
+            dependencyHandler.Invoke(runtime.GetDependencyForMessages());
+            // Generate a corresponding message class
             ClassDeclaration delphiClass = GenerateClass(messageType);
             delphiInterface.Declarations.Add(new InterfaceDeclaration()
             {
                 ClassDeclaration = delphiClass
             });
             MessageClassSkeleton skeleton = new MessageClassSkeleton(delphiClass.Name);
+            foreach (FieldDescriptorProto field in messageType.Field) CompileField(field, delphiClass, skeleton, dependencyHandler);
             InjectMessageClassSkeleton(skeleton, delphiClass, delphiImplementation);
-            // TODO fields
         }
 
         /// <summary>
@@ -236,6 +278,63 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
             Name = $"T{messageType.Name.ToPascalCase()}",
             Ancestor = messageRootClass
         };
+
+        /// <summary>
+        /// Compiles a protobuf field by injecting code into a Delphi class declaration for the message class representing the containing message type,
+        /// and into its message class skeleton (containing the "message skeleton methods").
+        /// </summary>
+        /// <param name="field">The protobuf field</param>
+        /// <param name="delphiClass">The Delphi class representing the message type</param>
+        /// <param name="skeleton">The message class skeleton for the Delphi class</param>
+        /// <param name="dependencyHandler"> Action to perform when a new Delphi interface dependency has been detected</param>
+        private void CompileField(FieldDescriptorProto field, ClassDeclaration delphiClass, MessageClassSkeleton skeleton, Action<UnitReference> dependencyHandler)
+        {
+            // Add the required runtime dependency for handling protobuf fields of this specific type
+            dependencyHandler.Invoke(runtime.GetDependencyForFieldType(field.Type));
+            string delphiType = field.Type.GetDelphiType(); // TODO handling of enum/message/group?
+            // Create a Delphi constant for the protobuf field number
+            TrueConstDeclaration delphiFieldNumberConst = new TrueConstDeclaration()
+            {
+                Identifier = $"PROTOBUF_FIELD_NUMBER_{field.Name.ToScreamingSnakeCase()}",
+                Value = field.Number.ToString()
+            };
+            delphiClass.NestedConstDeclarations.Add(new ConstDeclaration()
+            {
+                TrueConstDeclaration = delphiFieldNumberConst
+            });
+            // Create a Delphi field to hold the decoded value
+            FieldDeclaration delphiField = new FieldDeclaration()
+            {
+                Name = $"F{field.Name.ToPascalCase()}",
+                Type = delphiType
+            };
+            delphiClass.MemberList.Add(new ClassMemberDeclaration()
+            {
+                Visibility = Visibility.Private,
+                FieldDeclaration = delphiField
+            });
+            // Create a Delphi property for access by the client
+            PropertyDeclaration delphiProperty = new PropertyDeclaration()
+            {
+                Name = field.Name.ToPascalCase(),
+                Type = delphiType,
+                ReadSpecifier = delphiField.Name,
+                WriteSpecifier = delphiField.Name
+            };
+            delphiClass.MemberList.Add(new ClassMemberDeclaration()
+            {
+                Visibility = Visibility.Public,
+                PropertyDeclaration = delphiProperty
+            });
+            // Fill the message skeleton with the runtime field logic
+            string wireCodec = field.Type.GetDelphiWireCodec();
+            (_, MethodDeclaration encodeDeclaration) = skeleton.Encode;
+            (_, MethodDeclaration decodeDeclaration) = skeleton.Decode;
+            (_, MethodDeclaration clearOwnFieldsDeclaration) = skeleton.ClearOwnFields;
+            encodeDeclaration.Statements.Add($"EncodeField<{delphiType}>({delphiField.Name}, {delphiFieldNumberConst.Identifier}, {wireCodec}, aDest);");
+            decodeDeclaration.Statements.Add($"{delphiField.Name} := DecodeUnknownField<{delphiType}>({delphiFieldNumberConst.Identifier}, {wireCodec});");
+            clearOwnFieldsDeclaration.Statements.Add($"{delphiField.Name} := {field.Type.GetDelphiDefaultValueConstant()};");
+        }
 
         /// <summary>
         /// Injects the internal base structure of a Delphi class for a protobuf message type ("message class skeleton") into
@@ -270,7 +369,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
             {
                 // Constructs pair of class member declaration and defining declaration for a skeleton method
 #pragma warning disable S1172 // Unused method parameters should be removed -> False-positive, the parameters are used
-                (ClassMemberDeclaration, MethodDeclaration) declareMethod(Visibility visibility, MethodInterfaceDeclaration.Types.Binding binding, MethodDeclaration definingDeclaration) => (
+                static (ClassMemberDeclaration, MethodDeclaration) declareMethod(Visibility visibility, MethodInterfaceDeclaration.Types.Binding binding, MethodDeclaration definingDeclaration) => (
 #pragma warning restore S1172 // Unused method parameters should be removed
                     new ClassMemberDeclaration()
                     {
