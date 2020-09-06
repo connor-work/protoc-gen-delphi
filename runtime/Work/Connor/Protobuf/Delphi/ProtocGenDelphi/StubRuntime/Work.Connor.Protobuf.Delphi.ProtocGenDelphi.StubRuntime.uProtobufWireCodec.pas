@@ -13,7 +13,7 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
-unit Work.Connor.Protobuf.Delphi.StubRuntime.uProtobufFieldCodec;
+unit Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufRepeatedField;
 
 {$IFDEF FPC}
   {$MODE DELPHI}
@@ -22,7 +22,8 @@ unit Work.Connor.Protobuf.Delphi.StubRuntime.uProtobufFieldCodec;
 interface
 
 type
-  
+  TProtobufRepeatedField<T> = class
+  end;
 
 implementation
 

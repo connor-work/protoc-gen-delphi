@@ -13,7 +13,7 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
-unit Work.Connor.Protobuf.Delphi.StubRuntime.uProtobufMessage;
+unit Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufMessage;
 
 {$IFDEF FPC}
   {$MODE DELPHI}
@@ -24,8 +24,8 @@ interface
 uses
   SysUtils,
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.uProtobufTypes,
-  Work.Connor.Protobuf.Delphi.StubRuntime.uProtobufWireCodec,
-  Work.Connor.Protobuf.Delphi.StubRuntime.uProtobufRepeatedField;
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufWireCodec,
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufRepeatedField;
 
 type
   /// <summary>
