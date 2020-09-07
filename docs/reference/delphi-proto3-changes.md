@@ -30,23 +30,23 @@ Addition to list:
 ## Scalar Value Types
 Column addition to table:
 
-| .proto Type | Delphi Type |
-|-------------|-------------|
-| double      | TODO        |
-| float       | TODO        |
-| int32       | TODO        |
-| int64       | TODO        |
-| uint32      | TODO        |
-| uint64      | TODO        |
-| sint32      | TODO        |
-| sint64      | TODO        |
-| fixed32     | TODO        |
-| fixed64     | TODO        |
-| sfixed32    | TODO        |
-| sfixed64    | TODO        |
-| bool        | TODO        |
-| string      | TODO        |
-| bytes       | TODO        |
+| .proto Type | Delphi Type          |
+|-------------|----------------------|
+| double      | TODO                 |
+| float       | TODO                 |
+| int32       | TODO                 |
+| int64       | TODO                 |
+| uint32      | System.UInt32        |
+| uint64      | TODO                 |
+| sint32      | TODO                 |
+| sint64      | TODO                 |
+| fixed32     | TODO                 |
+| fixed64     | TODO                 |
+| sfixed32    | TODO                 |
+| sfixed64    | TODO                 |
+| bool        | TODO                 |
+| string      | System.UnicodeString |
+| bytes       | TODO                 |
 
 ## Default Values
 No changes.
