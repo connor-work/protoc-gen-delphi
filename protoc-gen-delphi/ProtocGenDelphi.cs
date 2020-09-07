@@ -276,7 +276,17 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         {
             // TODO handling of absent name?
             Name = $"T{messageType.Name.ToPascalCase()}",
-            Ancestor = messageRootClass
+            Ancestor = messageRootClass,
+            Comment = new AnnotationComment()
+            {
+                CommentLines =
+                {
+                    // TODO transfer protobuf comment
+                    $"<remarks>",
+                    $"This class corresponds to the protobuf message type <c>{messageType.Name}</c>.",
+                    $"</remarks>"
+                }
+            }
         };
 
         /// <summary>
