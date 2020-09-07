@@ -205,6 +205,8 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
             void dependencyHandler(UnitReference dependency) => InjectInterfaceDependency(dependency, delphiUnit.Interface);
             // Compile protobuf dependencies (imports)
             foreach (FileDescriptorProto dependency in dependencies) CompileDependency(dependency, dependencyHandler);
+            // Compile enums
+            foreach (EnumDescriptorProto @enum in protoFile.EnumType) CompileEnum(@enum, delphiUnit.Interface, dependencyHandler);
             // Compile message types
             foreach (DescriptorProto messageType in protoFile.MessageType) CompileMessage(messageType, delphiUnit.Interface, delphiUnit.Implementation, dependencyHandler);
             return delphiUnit;
@@ -254,6 +256,71 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         {
             Unit = GenerateUnitIdentifier(dependency)
         });
+
+        /// <summary>
+        /// Compiles a protobuf enum by injecting code into a Delphi interface section.
+        /// </summary>
+        /// <param name="enum">The enum</param>
+        /// <param name="delphiInterface">The Delphi interface section</param>
+        /// <param name="dependencyHandler"> Action to perform when a new Delphi interface dependency has been detected</param>
+        private void CompileEnum(EnumDescriptorProto @enum, Interface delphiInterface, Action<UnitReference> dependencyHandler)
+        {
+            // Add the required runtime dependency for handling compiled enums
+            dependencyHandler.Invoke(runtime.GetDependencyForEnums());
+            // Generate a corresponding enumerated type
+            EnumDeclaration delphiEnum = GenerateEnum(@enum);
+            delphiInterface.Declarations.Add(new InterfaceDeclaration()
+            {
+                EnumDeclaration = delphiEnum
+            });
+            foreach (EnumValueDescriptorProto value in @enum.Value) CompileEnumValue(value, @enum.Name.ToPascalCase(), delphiEnum);
+        }
+
+        /// <summary>
+        /// Generates an incomplete Delphi enumerated type declaration for a protobuf enum, ignoring enum constants.
+        /// </summary>
+        /// <param name="enum">The enum</param>
+        /// <returns> The basic Delphi enumerated type declaration</returns>
+        private EnumDeclaration GenerateEnum(EnumDescriptorProto @enum) => new EnumDeclaration()
+        {
+            // TODO handling of absent name?
+            Name = $"T{@enum.Name.ToPascalCase()}",
+            Comment = new AnnotationComment()
+            {
+                CommentLines =
+                {
+                    // TODO transfer protobuf comment
+                    $"<remarks>",
+                    $"This enumerated type corresponds to the protobuf enum <c>{@enum.Name}</c>.",
+                    $"</remarks>"
+                }
+            }
+        };
+
+        /// <summary>
+        /// Compiles a protobuf enum constant by injecting code into a Delphi enumerated type declaration for the enumerated type representing the containing enum.
+        /// </summary>
+        /// <param name="value">The protobuf enum constant</param>
+        /// <param name="prefix">Optional string that is prepended to the name of the generated Delphi enumerated value</param>
+        /// <param name="delphiEnum">The Delphi enumerated type representing the enum</param>
+        private void CompileEnumValue(EnumValueDescriptorProto value, string? prefix, EnumDeclaration delphiEnum)
+        {
+            delphiEnum.Values.Add(new EnumValueDeclaration()
+            {
+                Name = $"{prefix ?? ""}{value.Name.ToPascalCase()}",
+                Ordinality = value.Number,
+                Comment = new AnnotationComment()
+                {
+                    CommentLines =
+                    {
+                        // TODO transfer protobuf comment
+                        $"<remarks>",
+                        $"This enumerated value corresponds to the protobuf enum constant <c>{value.Name}</c>.",
+                        $"</remarks>"
+                    }
+                }
+            });
+        }
 
         /// <summary>
         /// Compiles a protobuf message type by injecting code into a Delphi interface section and a Delphi implementation section.
