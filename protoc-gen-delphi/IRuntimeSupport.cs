@@ -37,6 +37,12 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         public static readonly ReferenceRuntimeSupport Default = new ReferenceRuntimeSupport("Com.GitHub.Pikaju.Protobuf.Delphi");
 
         /// <summary>
+        /// Provides the required unit reference for using compiled protobuf enums.
+        /// </summary>
+        /// <returns>The Delphi unit reference</returns>
+        public UnitReference GetDependencyForEnums();
+
+        /// <summary>
         /// Provides the required unit reference for using compiled protobuf messages.
         /// </summary>
         /// <returns>The Delphi unit reference</returns>
@@ -83,12 +89,15 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
                 };
             }
 
+            public UnitReference GetDependencyForEnums() => GetUnitReference("uProtobufEnum");
+
             public UnitReference GetDependencyForMessages() => GetUnitReference("uProtobufMessage");
 
             public UnitReference GetDependencyForFieldType(FieldDescriptorProto.Types.Type type)
             {
                 return GetUnitReference(type switch
                 {
+                    FieldDescriptorProto.Types.Type.String => "uProtobufString",
                     FieldDescriptorProto.Types.Type.Uint32 => "uProtobufUint32",
                     _ => throw new NotImplementedException()
                 });
