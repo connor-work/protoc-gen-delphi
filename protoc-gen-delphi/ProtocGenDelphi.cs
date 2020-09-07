@@ -361,6 +361,28 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// </summary>
         private class MessageClassSkeleton
         {
+            // SYNC message skeleton structure with example code in "Messages" section of the "Delphi Generated Code" guide
+
+            /// <summary>
+            /// Parameter declaration for <see cref="Encode"/>.
+            /// </summary>
+            private static readonly Parameter encodeDestinationParameter = new Parameter()
+            {
+                // SYNC with parameter declaration in stub runtime TProtobufMessage.Encode
+                Name = "aDest",
+                Type = "TStream"
+            };
+
+            /// <summary>
+            /// Parameter declaration for <see cref="Decode"/>.
+            /// </summary>
+            private static readonly Parameter decodeSourceParameter = new Parameter()
+            {
+                // SYNC with parameter declaration in stub runtime TProtobufMessage.Decode
+                Name = "aSource",
+                Type = "TStream"
+            };
+
             /// <summary>
             /// Constructs a message class skeleton for injection into a Delphi class representing a protobuf message.
             /// </summary>
@@ -369,7 +391,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
             {
                 // Constructs pair of class member declaration and defining declaration for a skeleton method
 #pragma warning disable S1172 // Unused method parameters should be removed -> False-positive, the parameters are used
-                static (ClassMemberDeclaration, MethodDeclaration) declareMethod(Visibility visibility, MethodInterfaceDeclaration.Types.Binding binding, MethodDeclaration definingDeclaration) => (
+                static (ClassMemberDeclaration, MethodDeclaration) declareMethod(Visibility visibility, MethodInterfaceDeclaration.Types.Binding binding, MethodDeclaration definingDeclaration, AnnotationComment comment) => (
 #pragma warning restore S1172 // Unused method parameters should be removed
                     new ClassMemberDeclaration()
                     {
@@ -377,7 +399,8 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
                         MethodDeclaration = new MethodInterfaceDeclaration
                         {
                             Binding = binding,
-                            Prototype = definingDeclaration.Prototype.Clone()
+                            Prototype = definingDeclaration.Prototype.Clone(),
+                            Comment = comment.Clone()
                         }
                     }, definingDeclaration);
                 Create = declareMethod(Visibility.Public, MethodInterfaceDeclaration.Types.Binding.Override, new MethodDeclaration()
@@ -392,6 +415,21 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
                     {
                         "inherited;", "ClearOwnFields;"
                     }
+                }, new AnnotationComment()
+                {
+                    CommentLines =
+                    {
+                        // SYNC partially with stub runtime annotation comment for TProtobufMessage.Create
+                        // SYNC partially with "Create" comment in "Messages" section of the "Delphi Generated Code" guide
+                        $"<summary>",
+                        $"Creates an empty <see cref=\"{delphiClassName}\"/> that can be used as a protobuf message.",
+                        $"Initially, all protobuf fields are absent, meaning that they are set to their default values.",
+                        $"</summary>",
+                        $"<remarks>",
+                        $"Protobuf's interpretation of the absence of a field may be counterintuitive for Delphi developers.",
+                        $"For a detailed explanation, see https://developers.google.com/protocol-buffers/docs/proto3#default.",
+                        $"</remarks>"
+                    }
                 });
                 Destroy = declareMethod(Visibility.Public, MethodInterfaceDeclaration.Types.Binding.Override, new MethodDeclaration()
                 {
@@ -404,6 +442,19 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
                     Statements =
                     {
                         "inherited;"
+                    }
+                }, new AnnotationComment()
+                {
+                    CommentLines =
+                    {
+                        // SYNC partially with stub runtime annotation comment for TProtobufMessage.Destroy
+                        // SYNC partially with "Destroy" comment in "Messages" section of the "Delphi Generated Code" guide
+                        $"<summary>",
+                        $"Destroys the instances and all objects and resources held by it, including the protobuf field values.",
+                        $"</summary>",
+                        $"<remarks>",
+                        $"Developers must ensure that no shared ownership of current field values or further nested embedded objects is held.",
+                        $"</remarks>"
                     }
                 });
                 Clear = declareMethod(Visibility.Public, MethodInterfaceDeclaration.Types.Binding.Override, new MethodDeclaration()
@@ -418,6 +469,22 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
                     {
                         "inherited;", "ClearOwnFields;"
                     }
+                }, new AnnotationComment()
+                {
+                    CommentLines =
+                    {
+                        // SYNC partially with stub runtime annotation comment for TProtobufMessage.Clear
+                        // SYNC partially with "Clear" comment in "Messages" section of the "Delphi Generated Code" guide
+                        $"<summary>",
+                        $"Renders all protobuf fields absent by setting them to their default values.",
+                        $"</summary>",
+                        $"<remarks>",
+                        $"The resulting instance state is equivalent to a newly constructed <see cref=\"{delphiClassName}\"/>.",
+                        $"For more details, see the documentation of <see cref=\"{Create.Item2.Prototype.Name}\"/>.",
+                        $"This procedure may cause the destruction of transitively owned objects.",
+                        $"Developers must ensure that no shared ownership of current field values or further nested embedded objects is held.",
+                        $"</remarks>"
+                    }
                 });
                 Encode = declareMethod(Visibility.Public, MethodInterfaceDeclaration.Types.Binding.Override, new MethodDeclaration()
                 {
@@ -426,18 +493,22 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
                     {
                         Name = "Encode",
                         Type = Prototype.Types.Type.Procedure,
-                        ParameterList =
-                        {
-                            new Parameter()
-                            {
-                                Name = "aDest",
-                                Type = "TStream"
-                            }
-                        }
+                        ParameterList = { encodeDestinationParameter.Clone() }
                     },
                     Statements =
                     {
                         "inherited;"
+                    }
+                }, new AnnotationComment()
+                {
+                    CommentLines =
+                    {
+                        // SYNC partially with stub runtime annotation comment for TProtobufMessage.Encode
+                        // SYNC partially with "Encode" comment in "Messages" section of the "Delphi Generated Code" guide
+                        $"<summary>",
+                        $"Encodes the message using the protobuf binary wire format and writes it to a stream.",
+                        $"</summary>",
+                        $"<param name=\"{encodeDestinationParameter.Name}\">The stream that the encoded message is written to</param>"
                     }
                 });
                 Decode = declareMethod(Visibility.Public, MethodInterfaceDeclaration.Types.Binding.Override, new MethodDeclaration()
@@ -447,18 +518,27 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
                     {
                         Name = "Decode",
                         Type = Prototype.Types.Type.Procedure,
-                        ParameterList =
-                        {
-                            new Parameter()
-                            {
-                                Name = "aSource",
-                                Type = "TStream"
-                            }
-                        }
+                        ParameterList = { decodeSourceParameter.Clone() }
                     },
                     Statements =
                     {
                         "inherited;"
+                    }
+                }, new AnnotationComment()
+                {
+                    CommentLines =
+                    {
+                        // SYNC partially with stub runtime annotation comment for TProtobufMessage.Decode
+                        // SYNC partially with "Decode" comment in "Messages" section of the "Delphi Generated Code" guide
+                        $"<summary>",
+                        $"Fills the message's protobuf fields by decoding the message using the protobuf binary wire format from data that is read from a stream.",
+                        $"</summary>",
+                        $"<param name=\"{decodeSourceParameter.Name}\">The stream that the data is read from</param>",
+                        $"<remarks>",
+                        $"Protobuf fields that are not present in the read data are rendered absent by setting them to their default values.",
+                        $"This may cause the destruction of transitively owned objects (this is also the case when a present fields overwrites a previous value)",
+                        $"Developers must ensure that no shared ownership of current field values or further nested embedded objects is held.",
+                        $"</remarks>"
                     }
                 });
                 ClearOwnFields = declareMethod(Visibility.Private, MethodInterfaceDeclaration.Types.Binding.Static, new MethodDeclaration()
@@ -468,6 +548,14 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
                     {
                         Name = "ClearOwnFields",
                         Type = Prototype.Types.Type.Procedure
+                    }
+                }, new AnnotationComment()
+                {
+                    CommentLines =
+                    {
+                        $"<summary>",
+                        $"Renders those protobuf fields absent that belong to <see cref=\"{delphiClassName}\"/> (i.e., are not managed by an ancestor class), by setting them to their default values.",
+                        $"</summary>"
                     }
                 });
             }
