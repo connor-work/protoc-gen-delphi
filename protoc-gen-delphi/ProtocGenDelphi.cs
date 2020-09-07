@@ -190,7 +190,17 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
             {
                 Heading = GenerateUnitIdentifier(protoFile),
                 Interface = GenerateInterface(),
-                Implementation = GenerateImplementation()
+                Implementation = GenerateImplementation(),
+                Comment = new AnnotationComment()
+                {
+                    CommentLines =
+                    {
+                        // TODO transfer protobuf comment
+                        $"<remarks>",
+                        $"This unit corresponds to the protobuf schema definition (.proto file) <c>{protoFile.Name}</c>.",
+                        $"</remarks>"
+                    }
+                }
             };
             void dependencyHandler(UnitReference dependency) => InjectInterfaceDependency(dependency, delphiUnit.Interface);
             // Compile protobuf dependencies (imports)
