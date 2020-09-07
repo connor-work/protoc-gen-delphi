@@ -6,6 +6,9 @@ uses
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufMessage;
 
 type
+  /// <remarks>
+  /// This class corresponds to the protobuf message type <c>MessageX</c>.
+  /// </remarks>
   TMessageX = class(TProtobufMessage)
   /// <summary>
   /// Creates an empty <see cref="TMessageX"/> that can be used as a protobuf message.
@@ -60,6 +63,9 @@ type
   end;
 
 type
+  /// <remarks>
+  /// This class corresponds to the protobuf message type <c>MessageY</c>.
+  /// </remarks>
   TMessageY = class(TProtobufMessage)
   /// <summary>
   /// Creates an empty <see cref="TMessageY"/> that can be used as a protobuf message.
