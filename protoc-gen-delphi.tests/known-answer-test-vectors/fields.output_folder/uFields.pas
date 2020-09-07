@@ -7,6 +7,9 @@ uses
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufUint32;
 
 type
+  /// <remarks>
+  /// This class corresponds to the protobuf message type <c>MessageX</c>.
+  /// </remarks>
   TMessageX = class(TProtobufMessage)
   /// <summary>
   /// Protobuf field number of the protobuf field <c>fieldX</c>.

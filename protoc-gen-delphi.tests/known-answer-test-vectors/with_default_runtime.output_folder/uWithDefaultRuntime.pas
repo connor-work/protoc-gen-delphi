@@ -6,6 +6,9 @@ uses
   Com.GitHub.Pikaju.Protobuf.Delphi.uProtobufMessage;
 
 type
+  /// <remarks>
+  /// This class corresponds to the protobuf message type <c>MessageX</c>.
+  /// </remarks>
   TMessageX = class(TProtobufMessage)
   /// <summary>
   /// Creates an empty <see cref="TMessageX"/> that can be used as a protobuf message.
