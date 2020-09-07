@@ -296,7 +296,16 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
             TrueConstDeclaration delphiFieldNumberConst = new TrueConstDeclaration()
             {
                 Identifier = $"PROTOBUF_FIELD_NUMBER_{field.Name.ToScreamingSnakeCase()}",
-                Value = field.Number.ToString()
+                Value = field.Number.ToString(),
+                Comment = new AnnotationComment()
+                {
+                    CommentLines =
+                    {
+                        $"<summary>",
+                        $"Protobuf field number of the protobuf field <c>{field.Name}</c>.",
+                        $"</summary>"
+                    }
+                }
             };
             delphiClass.NestedConstDeclarations.Add(new ConstDeclaration()
             {
@@ -306,7 +315,16 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
             FieldDeclaration delphiField = new FieldDeclaration()
             {
                 Name = $"F{field.Name.ToPascalCase()}",
-                Type = delphiType
+                Type = delphiType,
+                Comment = new AnnotationComment()
+                {
+                    CommentLines =
+                    {
+                        $"<summary>",
+                        $"Holds the decoded value of the protobuf field <c>{field.Name}</c>.",
+                        $"</summary>"
+                    }
+                }
             };
             delphiClass.MemberList.Add(new ClassMemberDeclaration()
             {
@@ -319,7 +337,17 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
                 Name = field.Name.ToPascalCase(),
                 Type = delphiType,
                 ReadSpecifier = delphiField.Name,
-                WriteSpecifier = delphiField.Name
+                WriteSpecifier = delphiField.Name,
+                Comment = new AnnotationComment()
+                {
+                    CommentLines =
+                    {
+                        // TODO transfer protobuf comment
+                        $"<remarks>",
+                        $"This property corresponds to the protobuf field <c>{field.Name}</c>.",
+                        $"</remarks>"
+                    }
+                }
             };
             delphiClass.MemberList.Add(new ClassMemberDeclaration()
             {
