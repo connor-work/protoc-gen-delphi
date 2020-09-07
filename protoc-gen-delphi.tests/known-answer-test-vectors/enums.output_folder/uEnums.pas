@@ -26,9 +26,9 @@ type
   /// </remarks>
   TEnumY = (
     /// <remarks>
-    /// This enumerated value corresponds to the protobuf enum constant <c>None</c>.
+    /// This enumerated value corresponds to the protobuf enum constant <c>NONE</c>.
     /// </remarks>
-    EnumYValueNone = 0,
+    EnumYNone = 0,
 
     /// <remarks>
     /// This enumerated value corresponds to the protobuf enum constant <c>VALUE_Y</c>.
