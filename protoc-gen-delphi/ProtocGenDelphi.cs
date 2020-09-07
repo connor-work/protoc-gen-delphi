@@ -37,6 +37,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// <returns>Corresponding Delphi type identifier</returns>
         internal static string GetDelphiType(this FieldDescriptorProto.Types.Type fieldType) => fieldType switch
         {
+            FieldDescriptorProto.Types.Type.String => "UnicodeString",
             FieldDescriptorProto.Types.Type.Uint32 => "UInt32",
             _ => throw new NotImplementedException()
         };
@@ -49,7 +50,8 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// <returns>Delphi identifier of the codec instance</returns>
         internal static string GetDelphiWireCodec(this FieldDescriptorProto.Types.Type fieldType) => fieldType switch
         {
-            FieldDescriptorProto.Types.Type.Uint32 => "gProtobufWireCodecUInt32",
+            FieldDescriptorProto.Types.Type.String => "gProtobufWireCodecString",
+            FieldDescriptorProto.Types.Type.Uint32 => "gProtobufWireCodecUint32",
             _ => throw new NotImplementedException()
         };
 
@@ -60,6 +62,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// <returns>Delphi identifier default value constant</returns>
         internal static string GetDelphiDefaultValueConstant(this FieldDescriptorProto.Types.Type fieldType) => fieldType switch
         {
+            FieldDescriptorProto.Types.Type.String => "PROTOBUF_STRING_DEFAULT_VALUE",
             FieldDescriptorProto.Types.Type.Uint32 => "PROTOBUF_UINT32_DEFAULT_VALUE",
             _ => throw new NotImplementedException()
         };
