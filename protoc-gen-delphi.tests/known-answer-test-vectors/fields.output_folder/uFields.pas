@@ -8,16 +8,34 @@ uses
 
 type
   TMessageX = class(TProtobufMessage)
+  /// <summary>
+  /// Protobuf field number of the protobuf field <c>fieldX</c>.
+  /// </summary>
   const PROTOBUF_FIELD_NUMBER_FIELD_X = 1;
 
+  /// <summary>
+  /// Protobuf field number of the protobuf field <c>fieldY</c>.
+  /// </summary>
   const PROTOBUF_FIELD_NUMBER_FIELD_Y = 3;
 
+  /// <summary>
+  /// Holds the decoded value of the protobuf field <c>fieldX</c>.
+  /// </summary>
   private var FFieldX: UInt32;
 
+  /// <remarks>
+  /// This property corresponds to the protobuf field <c>fieldX</c>.
+  /// </remarks>
   public property FieldX: UInt32 read FFieldX write FFieldX;
 
+  /// <summary>
+  /// Holds the decoded value of the protobuf field <c>fieldY</c>.
+  /// </summary>
   private var FFieldY: UInt32;
 
+  /// <remarks>
+  /// This property corresponds to the protobuf field <c>fieldY</c>.
+  /// </remarks>
   public property FieldY: UInt32 read FFieldY write FFieldY;
 
   /// <summary>
