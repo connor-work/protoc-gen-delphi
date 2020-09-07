@@ -1,13 +1,13 @@
 /// <remarks>
-/// This unit corresponds to the protobuf schema definition (.proto file) <c>fields.proto</c>.
+/// This unit corresponds to the protobuf schema definition (.proto file) <c>string.proto</c>.
 /// </remarks>
-unit uFields;
+unit uString;
 
 interface
 
 uses
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufMessage,
-  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufUint32;
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufString;
 
 type
   /// <remarks>
@@ -20,29 +20,14 @@ type
   const PROTOBUF_FIELD_NUMBER_FIELD_X = 1;
 
   /// <summary>
-  /// Protobuf field number of the protobuf field <c>fieldY</c>.
-  /// </summary>
-  const PROTOBUF_FIELD_NUMBER_FIELD_Y = 3;
-
-  /// <summary>
   /// Holds the decoded value of the protobuf field <c>fieldX</c>.
   /// </summary>
-  private var FFieldX: UInt32;
+  private var FFieldX: UnicodeString;
 
   /// <remarks>
   /// This property corresponds to the protobuf field <c>fieldX</c>.
   /// </remarks>
-  public property FieldX: UInt32 read FFieldX write FFieldX;
-
-  /// <summary>
-  /// Holds the decoded value of the protobuf field <c>fieldY</c>.
-  /// </summary>
-  private var FFieldY: UnicodeString;
-
-  /// <remarks>
-  /// This property corresponds to the protobuf field <c>fieldY</c>.
-  /// </remarks>
-  public property FieldY: UnicodeString read FFieldY write FFieldY;
+  public property FieldX: UnicodeString read FFieldX write FFieldX;
 
   /// <summary>
   /// Creates an empty <see cref="TMessageX"/> that can be used as a protobuf message.
@@ -118,21 +103,18 @@ end;
 procedure TMessageX.Encode(aDest: TStream);
 begin
   inherited;
-  EncodeField<UInt32>(FFieldX, PROTOBUF_FIELD_NUMBER_FIELD_X, gProtobufWireCodecUint32, aDest);
-  EncodeField<UnicodeString>(FFieldY, PROTOBUF_FIELD_NUMBER_FIELD_Y, gProtobufWireCodecString, aDest);
+  EncodeField<UnicodeString>(FFieldX, PROTOBUF_FIELD_NUMBER_FIELD_X, gProtobufWireCodecString, aDest);
 end;
 
 procedure TMessageX.Decode(aSource: TStream);
 begin
   inherited;
-  FFieldX := DecodeUnknownField<UInt32>(PROTOBUF_FIELD_NUMBER_FIELD_X, gProtobufWireCodecUint32);
-  FFieldY := DecodeUnknownField<UnicodeString>(PROTOBUF_FIELD_NUMBER_FIELD_Y, gProtobufWireCodecString);
+  FFieldX := DecodeUnknownField<UnicodeString>(PROTOBUF_FIELD_NUMBER_FIELD_X, gProtobufWireCodecString);
 end;
 
 procedure TMessageX.ClearOwnFields;
 begin
-  FFieldX := PROTOBUF_UINT32_DEFAULT_VALUE;
-  FFieldY := PROTOBUF_STRING_DEFAULT_VALUE;
+  FFieldX := PROTOBUF_STRING_DEFAULT_VALUE;
 end;
 
 end.

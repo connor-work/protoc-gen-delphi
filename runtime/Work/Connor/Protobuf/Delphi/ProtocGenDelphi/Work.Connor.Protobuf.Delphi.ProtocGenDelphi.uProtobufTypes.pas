@@ -49,6 +49,11 @@ const
   /// </summary>
   PROTOBUF_UINT32_DEFAULT_VALUE: UInt32 = 0;
 
+  /// <summary>
+  /// Default value for a protobuf field of <c>string</c> protobuf type
+  /// </summary>
+  PROTOBUF_STRING_DEFAULT_VALUE: UnicodeString = '';
+
 implementation
 
 end.

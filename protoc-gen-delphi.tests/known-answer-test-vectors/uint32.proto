@@ -2,5 +2,4 @@ syntax = "proto3";
 
 message MessageX {
     uint32 fieldX = 1;
-    string fieldY = 3;
 }
