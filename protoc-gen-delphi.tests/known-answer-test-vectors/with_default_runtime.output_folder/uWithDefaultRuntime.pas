@@ -1,3 +1,6 @@
+/// <remarks>
+/// This unit corresponds to the protobuf schema definition (.proto file) <c>with_default_runtime.proto</c>.
+/// </remarks>
 unit uWithDefaultRuntime;
 
 interface
