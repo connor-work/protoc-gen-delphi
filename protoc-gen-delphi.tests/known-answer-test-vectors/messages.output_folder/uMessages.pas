@@ -1,3 +1,6 @@
+/// <remarks>
+/// This unit corresponds to the protobuf schema definition (.proto file) <c>messages.proto</c>.
+/// </remarks>
 unit uMessages;
 
 interface
