@@ -40,7 +40,7 @@ type
 
   public
     /// <summary>
-    /// Constructs an empty message with all protobuf fields absent (i.e., set to their default values).
+    /// Constructs an empty message with all protobuf fields absent, meaning that they are set to their default values.
     /// </summary>
     /// <remarks>
     /// Protobuf's interpretation of the absence of a field may be counterintuitive for Delphi developers.
@@ -49,7 +49,7 @@ type
     constructor Create; virtual;
 
     /// <summary>
-    /// Destroys the message and all objects and resources held by it (e.g., protobuf field values).
+    /// Destroys the message and all objects and resources held by it, including the protobuf field values.
     /// </summary>
     /// <remarks>
     /// Developers must ensure that no shared ownership of current field values or further nested embedded objects is held.
