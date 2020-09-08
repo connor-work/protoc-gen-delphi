@@ -211,10 +211,23 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         {
             if (!typeName.StartsWith(".")) return $"T{typeName.ToPascalCase()}";
             string[] delphiTypeNameSegments = typeName.Split(".", StringSplitOptions.RemoveEmptyEntries).Select(segment => segment.ToPascalCase()).ToArray();
-            delphiTypeNameSegments[^1] = ConstructDelphiTypeName(delphiTypeNameSegments[^1]);
-            if (delphiTypeNameSegments.Length >= 2) delphiTypeNameSegments[^2] = $"u{delphiTypeNameSegments[^2]}";
-            return string.Join(".", delphiTypeNameSegments);
+            string unqualifiedName = ConstructDelphiTypeName(delphiTypeNameSegments[^1]);
+            if (delphiTypeNameSegments.Length < 2) return unqualifiedName;
+            return $"{ConstructUnitIdentifier(delphiTypeNameSegments[0..^2], delphiTypeNameSegments[^2]).ToSourceCode()}.{unqualifiedName}";
         }
+
+        /// <summary>
+        /// Constructs a Delphi unit identifier that corresponds to a protobuf qualified schema name.
+        /// </summary>
+        /// <param name="nameSpaceSegments">Segments in the protobuf namespace string</param>
+        /// <param name="fileName">Unqualified schema name (should be .proto file name without extension)</param>
+        /// <returns>The unit identifier</returns>
+        private UnitIdentifier ConstructUnitIdentifier(string[] nameSpaceSegments, string fileName) => new UnitIdentifier()
+        {
+            // Use .proto file filename without extensions as identifier
+            Unit = $"u{fileName.Split(".")[0].ToPascalCase()}",
+            Namespace = { nameSpaceSegments.Select(segment => segment.ToPascalCase()) }
+        };
 
         /// <summary>
         /// Generates a Delphi unit for a protobuf schema definition.
@@ -254,12 +267,15 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// </summary>
         /// <param name="protoFile">The .proto file defining the schema</param>
         /// <returns>The unit identifier</returns>
-        private UnitIdentifier GenerateUnitIdentifier(FileDescriptorProto protoFile) => new UnitIdentifier()
+        private UnitIdentifier GenerateUnitIdentifier(FileDescriptorProto protoFile)
         {
-            // Use .proto file filename without extensions as identifier
-            // TODO namespaces
-            Unit = $"u{protoFile.Name.Split(protoFileNamePathSeparator)[^1].Split(".")[0].ToPascalCase()}"
-        };
+            string[] fileNameSegments = protoFile.Name.Split(protoFileNamePathSeparator);
+            // Use namespace that matches the package, if no package is set, match the path
+            string[] nameSpaceSegments = protoFile.HasPackage ? protoFile.Package.Split(".")
+                                                              : fileNameSegments[0..^1];
+            // Split off extension from file name
+            return ConstructUnitIdentifier(nameSpaceSegments, fileNameSegments[^1].Split(".")[0].ToPascalCase());
+        }
 
         /// <summary>
         /// Generates an incomplete Delphi interface section for a protobuf schema definition, ignoring schema types.
