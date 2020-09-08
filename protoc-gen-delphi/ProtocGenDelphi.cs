@@ -31,14 +31,32 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
     public static partial class ProtobufExtensions
     {
         /// <summary>
-        /// Determines the Delphi type identifier of the Delphi type that is used to represent protobuf field values of a specific protobuf field type.
+        /// Determines the Delphi type identifier of the Delphi type that is used to represent protobuf field values of a specific protobuf field,
+        /// when communicating with client code.
         /// </summary>
-        /// <param name="fieldType">The protobuf field type</param>
+        /// <param name="field">The protobuf field</param>
+        /// <param name="generator">Function that generates a Delphi type name for a protobuf message type or enumerated type name</param>
         /// <returns>Corresponding Delphi type identifier</returns>
-        internal static string GetDelphiType(this FieldDescriptorProto.Types.Type fieldType) => fieldType switch
+        internal static string GetPublicDelphiType(this FieldDescriptorProto field, Func<string, string> generator) => field.Type switch
         {
             FieldDescriptorProto.Types.Type.String => "UnicodeString",
             FieldDescriptorProto.Types.Type.Uint32 => "UInt32",
+            FieldDescriptorProto.Types.Type.Enum => generator.Invoke(field.TypeName),
+            _ => throw new NotImplementedException()
+        };
+
+        /// <summary>
+        /// Determines the Delphi type identifier of the Delphi type that is used to represent protobuf field values of a specific protobuf field,
+        /// when communicating with internal (runtime) code.
+        /// </summary>
+        /// <param name="field">The protobuf field</param>
+        /// <param name="generator">Function that generates a Delphi type name for a protobuf message type or enumerated type name</param>
+        /// <returns>Corresponding Delphi type identifier</returns>
+        internal static string GetPrivateDelphiType(this FieldDescriptorProto field, Func<string, string> generator) => field.Type switch
+        {
+            FieldDescriptorProto.Types.Type.String => "UnicodeString",
+            FieldDescriptorProto.Types.Type.Uint32 => "UInt32",
+            FieldDescriptorProto.Types.Type.Enum => "TProtobufEnumFieldValue",
             _ => throw new NotImplementedException()
         };
 
@@ -52,6 +70,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         {
             FieldDescriptorProto.Types.Type.String => "gProtobufWireCodecString",
             FieldDescriptorProto.Types.Type.Uint32 => "gProtobufWireCodecUint32",
+            FieldDescriptorProto.Types.Type.Enum => "gProtobufWireCodecEnum",
             _ => throw new NotImplementedException()
         };
 
@@ -64,6 +83,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         {
             FieldDescriptorProto.Types.Type.String => "PROTOBUF_STRING_DEFAULT_VALUE",
             FieldDescriptorProto.Types.Type.Uint32 => "PROTOBUF_UINT32_DEFAULT_VALUE",
+            FieldDescriptorProto.Types.Type.Enum => "PROTOBUF_ENUM_DEFAULT_VALUE",
             _ => throw new NotImplementedException()
         };
     }
@@ -183,6 +203,20 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         }
 
         /// <summary>
+        /// Constructs a Delphi type name for a type that represents a protobuf message type or enumerated type.
+        /// </summary>
+        /// <param name="typeName">The protobuf type's name</param>
+        /// <returns>The Delphi type name</returns>
+        private string ConstructDelphiTypeName(string typeName)
+        {
+            if (!typeName.StartsWith(".")) return $"T{typeName.ToPascalCase()}";
+            string[] delphiTypeNameSegments = typeName.Split(".", StringSplitOptions.RemoveEmptyEntries).Select(segment => segment.ToPascalCase()).ToArray();
+            delphiTypeNameSegments[^1] = ConstructDelphiTypeName(delphiTypeNameSegments[^1]);
+            if (delphiTypeNameSegments.Length >= 2) delphiTypeNameSegments[^2] = $"u{delphiTypeNameSegments[^2]}";
+            return string.Join(".", delphiTypeNameSegments);
+        }
+
+        /// <summary>
         /// Generates a Delphi unit for a protobuf schema definition.
         /// </summary>
         /// <param name="protoFile">The .proto file defining the schema</param>
@@ -287,7 +321,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         private EnumDeclaration GenerateEnum(EnumDescriptorProto @enum) => new EnumDeclaration()
         {
             // TODO handling of absent name?
-            Name = $"T{@enum.Name.ToPascalCase()}",
+            Name = ConstructDelphiTypeName(@enum.Name),
             Comment = new AnnotationComment()
             {
                 CommentLines =
@@ -355,7 +389,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         private ClassDeclaration GenerateClass(DescriptorProto messageType) => new ClassDeclaration()
         {
             // TODO handling of absent name?
-            Name = $"T{messageType.Name.ToPascalCase()}",
+            Name = ConstructDelphiTypeName(messageType.Name),
             Ancestor = messageRootClass,
             Comment = new AnnotationComment()
             {
@@ -382,9 +416,9 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
             // Add the required runtime dependency for handling protobuf fields of this specific type
             dependencyHandler.Invoke(runtime.GetDependencyForFieldType(field.Type));
             // Delphi type exposed to client code
-            string publicDelphiType = field.Type.GetDelphiType(); // TODO handling of enum/message/group?
+            string publicDelphiType = field.GetPublicDelphiType(name => ConstructDelphiTypeName(name));
             // Delphi type used for internal representation
-            string privateDelphiType = publicDelphiType;
+            string privateDelphiType = field.GetPrivateDelphiType(name => ConstructDelphiTypeName(name));
             // Create public constants and members for the client code
             TrueConstDeclaration delphiFieldNumberConst = GenerateAndInjectFieldNumberConst(field, delphiClass);
             string delphiPropertyName = field.Name.ToPascalCase();
@@ -467,12 +501,15 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// <param name="field">The protobuf field</param>
         /// <param name="delphiField">The Delphi field holding the internal representation of the protobuf field value</param>
         /// <param name="delphiPropertyName">Name of the Delphi property providing client access to the field</param>
-        /// <param name="delphiType">Delphi type of the field</param>
+        /// <param name="delphiType">Delphi type of the property</param>
         /// <param name="delphiClass">The Delphi class representing the message type</param>
         /// <param name="skeleton">The message class skeleton for the Delphi class</param>
         /// <returns>The injected field declaration</returns>
         private MethodDeclaration GenerateAndInjectGetter(FieldDescriptorProto field, FieldDeclaration delphiField, string delphiPropertyName, string delphiType, ClassDeclaration delphiClass, MessageClassSkeleton skeleton)
         {
+            // TODO handling of absent type (unknown if message or enum) and message type
+            string valueExpression = field.Type == FieldDescriptorProto.Types.Type.Enum ? $"{ConstructDelphiTypeName(field.TypeName)}({delphiField.Name})"
+                                                                                        : delphiField.Name;
             MethodDeclaration getter = new MethodDeclaration()
             {
                 Class = delphiClass.Name,
@@ -482,7 +519,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
                     Type = Prototype.Types.Type.Function,
                     ReturnType = delphiType
                 },
-                Statements = { $"result := {delphiField.Name};" }
+                Statements = { $"result := {valueExpression};" }
             };
             skeleton.PropertyAccessors.Add(getter);
             delphiClass.MemberList.Add(new ClassMemberDeclaration()
@@ -518,7 +555,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// <param name="field">The protobuf field</param>
         /// <param name="delphiField">The Delphi field holding the internal representation of the protobuf field value</param>
         /// <param name="delphiPropertyName">Name of the Delphi property providing client access to the field</param>
-        /// <param name="delphiType">Delphi type of the field</param>
+        /// <param name="delphiType">Delphi type of the property</param>
         /// <param name="delphiClass">The Delphi class representing the message type</param>
         /// <param name="skeleton">The message class skeleton for the Delphi class</param>
         /// <returns>The injected field declaration</returns>
@@ -529,6 +566,9 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
                 Name = "aValue",
                 Type = delphiType
             };
+            // TODO handling of absent type (unknown if message or enum) and message type
+            string valueExpression = field.Type == FieldDescriptorProto.Types.Type.Enum ? $"Ord({setterParameter.Name})"
+                                                                                        : setterParameter.Name;
             MethodDeclaration setter = new MethodDeclaration()
             {
                 Class = delphiClass.Name,
@@ -538,7 +578,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
                     Type = Prototype.Types.Type.Procedure,
                     ParameterList = { setterParameter }
                 },
-                Statements = { $"{delphiField.Name} := {setterParameter.Name};" }
+                Statements = { $"{delphiField.Name} := {valueExpression};" }
             };
             skeleton.PropertyAccessors.Add(setter);
             delphiClass.MemberList.Add(new ClassMemberDeclaration()
@@ -574,7 +614,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// <param name="field">The protobuf field</param>
         /// <param name="delphiField">The Delphi field holding the internal representation of the protobuf field value</param>
         /// <param name="delphiPropertyName">Name of the Delphi property</param>
-        /// <param name="delphiType">Delphi type of the field</param>
+        /// <param name="delphiType">Delphi type of the property</param>
         /// <param name="delphiClass">The Delphi class representing the message type</param>
         /// <param name="skeleton">The message class skeleton for the Delphi class</param>
         private void GenerateAndInjectProperty(FieldDescriptorProto field, FieldDeclaration delphiField, string delphiPropertyName, string delphiType, ClassDeclaration delphiClass, MessageClassSkeleton skeleton)
