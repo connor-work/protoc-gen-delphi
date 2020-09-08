@@ -385,7 +385,29 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
             string publicDelphiType = field.Type.GetDelphiType(); // TODO handling of enum/message/group?
             // Delphi type used for internal representation
             string privateDelphiType = publicDelphiType;
-            // Create a Delphi constant for the protobuf field number
+            // Create public constants and members for the client code
+            TrueConstDeclaration delphiFieldNumberConst = GenerateAndInjectFieldNumberConst(field, delphiClass);
+            string delphiPropertyName = field.Name.ToPascalCase();
+            FieldDeclaration delphiField = GenerateAndInjectField(field, delphiPropertyName, privateDelphiType, delphiClass);
+            GenerateAndInjectProperty(field, delphiField, delphiPropertyName, publicDelphiType, delphiClass, skeleton);
+            // Fill the message skeleton with the runtime field logic
+            string wireCodec = field.Type.GetDelphiWireCodec();
+            (_, MethodDeclaration encodeDeclaration) = skeleton.Encode;
+            (_, MethodDeclaration decodeDeclaration) = skeleton.Decode;
+            (_, MethodDeclaration clearOwnFieldsDeclaration) = skeleton.ClearOwnFields;
+            encodeDeclaration.Statements.Add($"EncodeField<{privateDelphiType}>({delphiField.Name}, {delphiFieldNumberConst.Identifier}, {wireCodec}, aDest);");
+            decodeDeclaration.Statements.Add($"{delphiField.Name} := DecodeUnknownField<{privateDelphiType}>({delphiFieldNumberConst.Identifier}, {wireCodec});");
+            clearOwnFieldsDeclaration.Statements.Add($"{delphiField.Name} := {field.Type.GetDelphiDefaultValueConstant()};");
+        }
+
+        /// <summary>
+        /// Generates a Delphi true constant to hold a protobuf field number, and injects it into the Delphi class declaration for the message class representing the containing message type.
+        /// </summary>
+        /// <param name="field">The protobuf field</param>
+        /// <param name="delphiClass">The Delphi class representing the message type</param>
+        /// <returns>The injected constant declaration</returns>
+        private TrueConstDeclaration GenerateAndInjectFieldNumberConst(FieldDescriptorProto field, ClassDeclaration delphiClass)
+        {
             TrueConstDeclaration delphiFieldNumberConst = new TrueConstDeclaration()
             {
                 Identifier = $"PROTOBUF_FIELD_NUMBER_{field.Name.ToScreamingSnakeCase()}",
@@ -400,17 +422,25 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
                     }
                 }
             };
-            delphiClass.NestedConstDeclarations.Add(new ConstDeclaration()
-            {
-                TrueConstDeclaration = delphiFieldNumberConst
-            });
-            // Create a Delphi property for access by the client, with backing field, getter and setter
-            string delphiPropertyName = field.Name.ToPascalCase();
-            // Create a Delphi field to hold the decoded value
+            delphiClass.NestedConstDeclarations.Add(new ConstDeclaration() { TrueConstDeclaration = delphiFieldNumberConst });
+            return delphiFieldNumberConst;
+        }
+
+        /// <summary>
+        /// Generates a Delphi field to hold the internal representation of a protobuf field value,
+        /// and injects it into the Delphi class declaration for the message class representing the containing message type.
+        /// </summary>
+        /// <param name="field">The protobuf field</param>
+        /// <param name="delphiPropertyName">Name of the Delphi property providing client access to the field</param>
+        /// <param name="delphiType">Delphi type of the field</param>
+        /// <param name="delphiClass">The Delphi class representing the message type</param>
+        /// <returns>The injected field declaration</returns>
+        private FieldDeclaration GenerateAndInjectField(FieldDescriptorProto field, string delphiPropertyName, string delphiType, ClassDeclaration delphiClass)
+        {
             FieldDeclaration delphiField = new FieldDeclaration()
             {
                 Name = $"F{delphiPropertyName}",
-                Type = privateDelphiType,
+                Type = delphiType,
                 Comment = new AnnotationComment()
                 {
                     CommentLines =
@@ -426,7 +456,23 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
                 Visibility = Visibility.Private,
                 FieldDeclaration = delphiField
             });
-            // Create a getter for a Delphi property
+            return delphiField;
+        }
+
+        /// <summary>
+        /// Generates a Delphi getter that backs a property representing a protobuf field,
+        /// and injects it into the Delphi class declaration for the message class representing the containing message type,
+        /// and into its message class skeleton (containing the "message skeleton methods").
+        /// </summary>
+        /// <param name="field">The protobuf field</param>
+        /// <param name="delphiField">The Delphi field holding the internal representation of the protobuf field value</param>
+        /// <param name="delphiPropertyName">Name of the Delphi property providing client access to the field</param>
+        /// <param name="delphiType">Delphi type of the field</param>
+        /// <param name="delphiClass">The Delphi class representing the message type</param>
+        /// <param name="skeleton">The message class skeleton for the Delphi class</param>
+        /// <returns>The injected field declaration</returns>
+        private MethodDeclaration GenerateAndInjectGetter(FieldDescriptorProto field, FieldDeclaration delphiField, string delphiPropertyName, string delphiType, ClassDeclaration delphiClass, MessageClassSkeleton skeleton)
+        {
             MethodDeclaration getter = new MethodDeclaration()
             {
                 Class = delphiClass.Name,
@@ -434,7 +480,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
                 {
                     Name = $"Get{delphiPropertyName}",
                     Type = Prototype.Types.Type.Function,
-                    ReturnType = publicDelphiType
+                    ReturnType = delphiType
                 },
                 Statements = { $"result := {delphiField.Name};" }
             };
@@ -461,11 +507,27 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
                     }
                 }
             });
-            // Create a setter for a Delphi property
+            return getter;
+        }
+
+        /// <summary>
+        /// Generates a Delphi setter that backs a property representing a protobuf field,
+        /// and injects it into the Delphi class declaration for the message class representing the containing message type,
+        /// and into its message class skeleton (containing the "message skeleton methods").
+        /// </summary>
+        /// <param name="field">The protobuf field</param>
+        /// <param name="delphiField">The Delphi field holding the internal representation of the protobuf field value</param>
+        /// <param name="delphiPropertyName">Name of the Delphi property providing client access to the field</param>
+        /// <param name="delphiType">Delphi type of the field</param>
+        /// <param name="delphiClass">The Delphi class representing the message type</param>
+        /// <param name="skeleton">The message class skeleton for the Delphi class</param>
+        /// <returns>The injected field declaration</returns>
+        private MethodDeclaration GenerateAndInjectSetter(FieldDescriptorProto field, FieldDeclaration delphiField, string delphiPropertyName, string delphiType, ClassDeclaration delphiClass, MessageClassSkeleton skeleton)
+        {
             Parameter setterParameter = new Parameter()
             {
                 Name = "aValue",
-                Type = publicDelphiType
+                Type = delphiType
             };
             MethodDeclaration setter = new MethodDeclaration()
             {
@@ -501,11 +563,28 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
                     }
                 }
             });
-            // Create the actual delphi property
+            return setter;
+        }
+
+        /// <summary>
+        /// Generates a Delphi property representing a protobuf field,
+        /// and injects it (including getter and setter code) into the Delphi class declaration for the message class representing the containing message type,
+        /// and into its message class skeleton (containing the "message skeleton methods").
+        /// </summary>
+        /// <param name="field">The protobuf field</param>
+        /// <param name="delphiField">The Delphi field holding the internal representation of the protobuf field value</param>
+        /// <param name="delphiPropertyName">Name of the Delphi property</param>
+        /// <param name="delphiType">Delphi type of the field</param>
+        /// <param name="delphiClass">The Delphi class representing the message type</param>
+        /// <param name="skeleton">The message class skeleton for the Delphi class</param>
+        private void GenerateAndInjectProperty(FieldDescriptorProto field, FieldDeclaration delphiField, string delphiPropertyName, string delphiType, ClassDeclaration delphiClass, MessageClassSkeleton skeleton)
+        {
+            MethodDeclaration getter = GenerateAndInjectGetter(field, delphiField, delphiPropertyName, delphiType, delphiClass, skeleton);
+            MethodDeclaration setter = GenerateAndInjectSetter(field, delphiField, delphiPropertyName, delphiType, delphiClass, skeleton);
             PropertyDeclaration delphiProperty = new PropertyDeclaration()
             {
                 Name = delphiPropertyName,
-                Type = publicDelphiType,
+                Type = delphiType,
                 ReadSpecifier = getter.Prototype.Name,
                 WriteSpecifier = setter.Prototype.Name,
                 Comment = new AnnotationComment()
@@ -524,14 +603,6 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
                 Visibility = Visibility.Public,
                 PropertyDeclaration = delphiProperty
             });
-            // Fill the message skeleton with the runtime field logic
-            string wireCodec = field.Type.GetDelphiWireCodec();
-            (_, MethodDeclaration encodeDeclaration) = skeleton.Encode;
-            (_, MethodDeclaration decodeDeclaration) = skeleton.Decode;
-            (_, MethodDeclaration clearOwnFieldsDeclaration) = skeleton.ClearOwnFields;
-            encodeDeclaration.Statements.Add($"EncodeField<{privateDelphiType}>({delphiField.Name}, {delphiFieldNumberConst.Identifier}, {wireCodec}, aDest);");
-            decodeDeclaration.Statements.Add($"{delphiField.Name} := DecodeUnknownField<{privateDelphiType}>({delphiFieldNumberConst.Identifier}, {wireCodec});");
-            clearOwnFieldsDeclaration.Statements.Add($"{delphiField.Name} := {field.Type.GetDelphiDefaultValueConstant()};");
         }
     }
 }
