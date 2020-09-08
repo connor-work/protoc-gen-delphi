@@ -24,10 +24,28 @@ type
   /// </summary>
   private var FFieldX: UnicodeString;
 
+  /// <summary>
+  /// Getter for <see cref="FieldX"/>.
+  /// </summary>
+  /// <returns>The value of the protobuf field <c>fieldX</c></returns>
+  /// <remarks>
+  /// May be overridden. Overriders shall only add side-effects and must call the ancestor implementation.
+  /// </remarks>
+  protected function GetFieldX: UnicodeString; virtual;
+
+  /// <summary>
+  /// Setter for <see cref="FieldX"/>.
+  /// </summary>
+  /// <param name="aValue">The new value of the protobuf field <c>fieldX</c></param>
+  /// <remarks>
+  /// May be overridden. Overriders shall only add side-effects and must call the ancestor implementation.
+  /// </remarks>
+  protected procedure SetFieldX(aValue: UnicodeString); virtual;
+
   /// <remarks>
   /// This property corresponds to the protobuf field <c>fieldX</c>.
   /// </remarks>
-  public property FieldX: UnicodeString read FFieldX write FFieldX;
+  public property FieldX: UnicodeString read GetFieldX write SetFieldX;
 
   /// <summary>
   /// Creates an empty <see cref="TMessageX"/> that can be used as a protobuf message.
@@ -115,6 +133,16 @@ end;
 procedure TMessageX.ClearOwnFields;
 begin
   FFieldX := PROTOBUF_STRING_DEFAULT_VALUE;
+end;
+
+function TMessageX.GetFieldX: UnicodeString;
+begin
+  result := FFieldX;
+end;
+
+procedure TMessageX.SetFieldX(aValue: UnicodeString);
+begin
+  FFieldX := aValue;
 end;
 
 end.
