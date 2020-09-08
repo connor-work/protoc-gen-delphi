@@ -381,7 +381,10 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         {
             // Add the required runtime dependency for handling protobuf fields of this specific type
             dependencyHandler.Invoke(runtime.GetDependencyForFieldType(field.Type));
-            string delphiType = field.Type.GetDelphiType(); // TODO handling of enum/message/group?
+            // Delphi type exposed to client code
+            string publicDelphiType = field.Type.GetDelphiType(); // TODO handling of enum/message/group?
+            // Delphi type used for internal representation
+            string privateDelphiType = publicDelphiType;
             // Create a Delphi constant for the protobuf field number
             TrueConstDeclaration delphiFieldNumberConst = new TrueConstDeclaration()
             {
@@ -401,11 +404,13 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
             {
                 TrueConstDeclaration = delphiFieldNumberConst
             });
+            // Create a Delphi property for access by the client, with backing field, getter and setter
+            string delphiPropertyName = field.Name.ToPascalCase();
             // Create a Delphi field to hold the decoded value
             FieldDeclaration delphiField = new FieldDeclaration()
             {
-                Name = $"F{field.Name.ToPascalCase()}",
-                Type = delphiType,
+                Name = $"F{delphiPropertyName}",
+                Type = privateDelphiType,
                 Comment = new AnnotationComment()
                 {
                     CommentLines =
@@ -421,13 +426,88 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
                 Visibility = Visibility.Private,
                 FieldDeclaration = delphiField
             });
-            // Create a Delphi property for access by the client
+            // Create a getter for a Delphi property
+            MethodDeclaration getter = new MethodDeclaration()
+            {
+                Class = delphiClass.Name,
+                Prototype = new Prototype()
+                {
+                    Name = $"Get{delphiPropertyName}",
+                    Type = Prototype.Types.Type.Function,
+                    ReturnType = publicDelphiType
+                },
+                Statements = { $"result := {delphiField.Name};" }
+            };
+            skeleton.PropertyAccessors.Add(getter);
+            delphiClass.MemberList.Add(new ClassMemberDeclaration()
+            {
+                Visibility = Visibility.Protected,
+                MethodDeclaration = new MethodInterfaceDeclaration()
+                {
+                    Prototype = getter.Prototype.Clone(),
+                    Binding = MethodInterfaceDeclaration.Types.Binding.Virtual,
+                    Comment = new AnnotationComment()
+                    {
+                        CommentLines =
+                        {
+                            $"<summary>",
+                            $"Getter for <see cref=\"{delphiPropertyName}\"/>.",
+                            $"</summary>",
+                            $"<returns>The value of the protobuf field <c>{field.Name}</c></returns>",
+                            $"<remarks>",
+                            $"May be overridden. Overriders shall only add side-effects and must call the ancestor implementation.",
+                            $"</remarks>"
+                        },
+                    }
+                }
+            });
+            // Create a setter for a Delphi property
+            Parameter setterParameter = new Parameter()
+            {
+                Name = "aValue",
+                Type = publicDelphiType
+            };
+            MethodDeclaration setter = new MethodDeclaration()
+            {
+                Class = delphiClass.Name,
+                Prototype = new Prototype()
+                {
+                    Name = $"Set{delphiPropertyName}",
+                    Type = Prototype.Types.Type.Procedure,
+                    ParameterList = { setterParameter }
+                },
+                Statements = { $"{delphiField.Name} := {setterParameter.Name};" }
+            };
+            skeleton.PropertyAccessors.Add(setter);
+            delphiClass.MemberList.Add(new ClassMemberDeclaration()
+            {
+                Visibility = Visibility.Protected,
+                MethodDeclaration = new MethodInterfaceDeclaration()
+                {
+                    Prototype = setter.Prototype.Clone(),
+                    Binding = MethodInterfaceDeclaration.Types.Binding.Virtual,
+                    Comment = new AnnotationComment()
+                    {
+                        CommentLines =
+                        {
+                            $"<summary>",
+                            $"Setter for <see cref=\"{delphiPropertyName}\"/>.",
+                            $"</summary>",
+                            $"<param name=\"{setterParameter.Name}\">The new value of the protobuf field <c>{field.Name}</c></param>",
+                            $"<remarks>",
+                            $"May be overridden. Overriders shall only add side-effects and must call the ancestor implementation.",
+                            $"</remarks>"
+                        },
+                    }
+                }
+            });
+            // Create the actual delphi property
             PropertyDeclaration delphiProperty = new PropertyDeclaration()
             {
-                Name = field.Name.ToPascalCase(),
-                Type = delphiType,
-                ReadSpecifier = delphiField.Name,
-                WriteSpecifier = delphiField.Name,
+                Name = delphiPropertyName,
+                Type = publicDelphiType,
+                ReadSpecifier = getter.Prototype.Name,
+                WriteSpecifier = setter.Prototype.Name,
                 Comment = new AnnotationComment()
                 {
                     CommentLines =
@@ -449,8 +529,8 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
             (_, MethodDeclaration encodeDeclaration) = skeleton.Encode;
             (_, MethodDeclaration decodeDeclaration) = skeleton.Decode;
             (_, MethodDeclaration clearOwnFieldsDeclaration) = skeleton.ClearOwnFields;
-            encodeDeclaration.Statements.Add($"EncodeField<{delphiType}>({delphiField.Name}, {delphiFieldNumberConst.Identifier}, {wireCodec}, aDest);");
-            decodeDeclaration.Statements.Add($"{delphiField.Name} := DecodeUnknownField<{delphiType}>({delphiFieldNumberConst.Identifier}, {wireCodec});");
+            encodeDeclaration.Statements.Add($"EncodeField<{privateDelphiType}>({delphiField.Name}, {delphiFieldNumberConst.Identifier}, {wireCodec}, aDest);");
+            decodeDeclaration.Statements.Add($"{delphiField.Name} := DecodeUnknownField<{privateDelphiType}>({delphiFieldNumberConst.Identifier}, {wireCodec});");
             clearOwnFieldsDeclaration.Statements.Add($"{delphiField.Name} := {field.Type.GetDelphiDefaultValueConstant()};");
         }
 
@@ -469,6 +549,13 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
                 delphiImplementation.Declarations.Add(new ImplementationDeclaration()
                 {
                     MethodDeclaration = methodImplementation.Clone()
+                });
+            }
+            foreach (MethodDeclaration accessor in skeleton.PropertyAccessors)
+            {
+                delphiImplementation.Declarations.Add(new ImplementationDeclaration()
+                {
+                    MethodDeclaration = accessor.Clone()
                 });
             }
         }
@@ -676,6 +763,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
                         $"</summary>"
                     }
                 });
+                PropertyAccessors = new List<MethodDeclaration>();
             }
 
             /// <summary>
@@ -712,6 +800,11 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
             /// Message "skeleton methods" in intended declaration order
             /// </summary>
             public IEnumerable<(ClassMemberDeclaration, MethodDeclaration)> Methods => new (ClassMemberDeclaration, MethodDeclaration)[] { Create, Destroy, Clear, Encode, Decode, ClearOwnFields };
+
+            /// <summary>
+            /// Mutable list of method declarations that serve as getter or setters of generated properties.
+            /// </summary>
+            public List<MethodDeclaration> PropertyAccessors { get; }
         }
     }
 }
