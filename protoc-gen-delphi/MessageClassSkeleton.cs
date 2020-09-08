@@ -76,7 +76,8 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
                 },
                 Statements =
                     {
-                        "inherited;", "ClearOwnFields;"
+                        "inherited;",
+                        "ClearOwnFields;"
                     }
             }, new AnnotationComment()
             {
@@ -102,10 +103,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
                     Name = "Destroy",
                     Type = Prototype.Types.Type.Destructor
                 },
-                Statements =
-                    {
-                        "inherited;"
-                    }
+                Statements = { "inherited;" }
             }, new AnnotationComment()
             {
                 CommentLines =
@@ -130,7 +128,8 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
                 },
                 Statements =
                     {
-                        "inherited;", "ClearOwnFields;"
+                        "inherited;",
+                        "ClearOwnFields;"
                     }
             }, new AnnotationComment()
             {
@@ -158,10 +157,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
                     Type = Prototype.Types.Type.Procedure,
                     ParameterList = { encodeDestinationParameter.Clone() }
                 },
-                Statements =
-                    {
-                        "inherited;"
-                    }
+                Statements = { "inherited;" }
             }, new AnnotationComment()
             {
                 CommentLines =
@@ -183,10 +179,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
                     Type = Prototype.Types.Type.Procedure,
                     ParameterList = { decodeSourceParameter.Clone() }
                 },
-                Statements =
-                    {
-                        "inherited;"
-                    }
+                Statements = { "inherited;" }
             }, new AnnotationComment()
             {
                 CommentLines =
@@ -275,18 +268,9 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
             foreach ((ClassMemberDeclaration methodInterface, MethodDeclaration methodImplementation) in Methods)
             {
                 delphiClass.MemberList.Add(methodInterface.Clone());
-                delphiImplementation.Declarations.Add(new ImplementationDeclaration()
-                {
-                    MethodDeclaration = methodImplementation.Clone()
-                });
+                delphiImplementation.Declarations.Add(new ImplementationDeclaration() { MethodDeclaration = methodImplementation.Clone() });
             }
-            foreach (MethodDeclaration accessor in PropertyAccessors)
-            {
-                delphiImplementation.Declarations.Add(new ImplementationDeclaration()
-                {
-                    MethodDeclaration = accessor.Clone()
-                });
-            }
+            foreach (MethodDeclaration accessor in PropertyAccessors) delphiImplementation.Declarations.Add(new ImplementationDeclaration() { MethodDeclaration = accessor.Clone() });
         }
     }
 }
