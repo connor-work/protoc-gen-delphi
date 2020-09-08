@@ -344,7 +344,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
             });
             MessageClassSkeleton skeleton = new MessageClassSkeleton(delphiClass.Name);
             foreach (FieldDescriptorProto field in messageType.Field) CompileField(field, delphiClass, skeleton, dependencyHandler);
-            InjectMessageClassSkeleton(skeleton, delphiClass, delphiImplementation);
+            skeleton.Inject(delphiClass, delphiImplementation);
         }
 
         /// <summary>
@@ -532,32 +532,6 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
             encodeDeclaration.Statements.Add($"EncodeField<{privateDelphiType}>({delphiField.Name}, {delphiFieldNumberConst.Identifier}, {wireCodec}, aDest);");
             decodeDeclaration.Statements.Add($"{delphiField.Name} := DecodeUnknownField<{privateDelphiType}>({delphiFieldNumberConst.Identifier}, {wireCodec});");
             clearOwnFieldsDeclaration.Statements.Add($"{delphiField.Name} := {field.Type.GetDelphiDefaultValueConstant()};");
-        }
-
-        /// <summary>
-        /// Injects the internal base structure of a Delphi class for a protobuf message type ("message class skeleton") into
-        /// a Delphi class and a Delphi implementation section.
-        /// </summary>
-        /// <param name="skeleton">The message class skeleton to inject</param>
-        /// <param name="delphiClass">The Delphi class</param>
-        /// <param name="delphiImplementation">The Delphi implementation section</param>
-        private void InjectMessageClassSkeleton(MessageClassSkeleton skeleton, ClassDeclaration delphiClass, Implementation delphiImplementation)
-        {
-            foreach ((ClassMemberDeclaration methodInterface, MethodDeclaration methodImplementation) in skeleton.Methods)
-            {
-                delphiClass.MemberList.Add(methodInterface.Clone());
-                delphiImplementation.Declarations.Add(new ImplementationDeclaration()
-                {
-                    MethodDeclaration = methodImplementation.Clone()
-                });
-            }
-            foreach (MethodDeclaration accessor in skeleton.PropertyAccessors)
-            {
-                delphiImplementation.Declarations.Add(new ImplementationDeclaration()
-                {
-                    MethodDeclaration = accessor.Clone()
-                });
-            }
         }
     }
 }

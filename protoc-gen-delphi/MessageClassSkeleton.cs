@@ -263,5 +263,30 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// Mutable list of method declarations that serve as getter or setters of generated properties.
         /// </summary>
         public List<MethodDeclaration> PropertyAccessors { get; }
+
+        /// <summary>
+        /// Injects this internal base structure of a Delphi class for a protobuf message type ("message class skeleton") into
+        /// a Delphi class and a Delphi implementation section.
+        /// </summary>
+        /// <param name="delphiClass">The Delphi class</param>
+        /// <param name="delphiImplementation">The Delphi implementation section</param>
+        public void Inject(ClassDeclaration delphiClass, Implementation delphiImplementation)
+        {
+            foreach ((ClassMemberDeclaration methodInterface, MethodDeclaration methodImplementation) in Methods)
+            {
+                delphiClass.MemberList.Add(methodInterface.Clone());
+                delphiImplementation.Declarations.Add(new ImplementationDeclaration()
+                {
+                    MethodDeclaration = methodImplementation.Clone()
+                });
+            }
+            foreach (MethodDeclaration accessor in PropertyAccessors)
+            {
+                delphiImplementation.Declarations.Add(new ImplementationDeclaration()
+                {
+                    MethodDeclaration = accessor.Clone()
+                });
+            }
+        }
     }
 }
