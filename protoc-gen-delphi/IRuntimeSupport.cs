@@ -99,6 +99,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
                 {
                     FieldDescriptorProto.Types.Type.String => "uProtobufString",
                     FieldDescriptorProto.Types.Type.Uint32 => "uProtobufUint32",
+                    FieldDescriptorProto.Types.Type.Enum => "uProtobufEnum",
                     _ => throw new NotImplementedException()
                 });
             }
