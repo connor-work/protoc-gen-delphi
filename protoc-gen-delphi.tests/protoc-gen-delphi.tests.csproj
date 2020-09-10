@@ -5,6 +5,7 @@
     <RootNamespace>Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Tests</RootNamespace>
 
     <IsPackable>false</IsPackable>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
@@ -36,10 +37,25 @@
   </Target>
 
   <ItemGroup>
-    <EmbeddedResource Include="known-answer-test-vectors\**\*.request.pb.json" />
-    <EmbeddedResource Include="known-answer-test-vectors\**\*.response.pb.json" />
-    <EmbeddedResource Include="known-answer-test-vectors\**\*.proto" />
-    <EmbeddedResource Include="known-answer-test-vectors\**\*.output_folder\**\*" />
+    <!-- Each known protoc output file tree is stored in a marked sub-directory -->
+    <EmbeddedResource Include="test-vectors/known-protoc-outputs/**/*.protoc-output/**/*"
+                      LogicalName="[known protoc output][expected output folder]%(RecursiveDir)%(Filename)%(Extension)" />
+    <!-- For each known protoc output file tree, there is either an input folder... -->
+    <EmbeddedResource Include="test-vectors/known-protoc-outputs/**/*.protoc-input/**/*"
+                      LogicalName="[known protoc output][input folder]%(RecursiveDir)%(Filename)%(Extension)" />
+    <!-- ... or a single input .proto file with matching name -->
+    <EmbeddedResource Include="test-vectors/known-protoc-outputs/**/*.proto"
+                      Exclude="test-vectors/known-protoc-outputs/**/*.protoc-input/**/*"
+                      LogicalName="[known protoc output][input schema file]%(RecursiveDir)%(Filename)%(Extension)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Each known response to protoc is stored in a JSON-encoded file -->
+    <EmbeddedResource Include="test-vectors/known-responses-to-protoc/**/*.response.pb.json"
+                      LogicalName="[known response to protoc][expected response]%(RecursiveDir)%(Filename)%(Extension)" />
+    <!-- For each known response to protoc, there is a request stored in a JSON-encoded file with matching name -->
+    <EmbeddedResource Include="test-vectors/known-responses-to-protoc/**/*.request.pb.json"
+                      LogicalName="[known response to protoc][request]%(RecursiveDir)%(Filename)%(Extension)" />
   </ItemGroup>
 
 </Project>
