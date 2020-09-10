@@ -1,0 +1,38 @@
+{
+    "fileToGenerate": [
+        "empty_schema.proto"
+    ],
+    "compilerVersion": {
+        "major": 3,
+        "minor": 12,
+        "patch": 3,
+        "suffix": ""
+    },
+    "protoFile": [
+        {
+            "name": "empty_schema.proto",
+            "sourceCodeInfo": {
+                "location": [
+                    {
+                        "span": [
+                            0,
+                            0,
+                            18
+                        ]
+                    },
+                    {
+                        "path": [
+                            12
+                        ],
+                        "span": [
+                            0,
+                            0,
+                            18
+                        ]
+                    }
+                ]
+            },
+            "syntax": "proto3"
+        }
+    ]
+}

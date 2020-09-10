@@ -1,0 +1,4 @@
+syntax = "proto3";
+
+import "imported_a.proto";
+import "imported_b.proto";

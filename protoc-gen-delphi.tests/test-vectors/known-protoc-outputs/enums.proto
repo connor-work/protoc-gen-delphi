@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+enum EnumX {
+    VALUE_X = 0;
+}
+
+enum EnumY {
+    NONE = 0;
+    VALUE_Y = 3;
+}

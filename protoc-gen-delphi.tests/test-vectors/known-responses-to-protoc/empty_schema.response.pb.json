@@ -1,0 +1,8 @@
+{
+    "file": [
+        {
+            "name": "uEmptySchema.pas",
+            "content": "/// <remarks>\n/// This unit corresponds to the protobuf schema definition (.proto file) <c>empty_schema.proto</c>.\n/// </remarks>\nunit uEmptySchema;\n\ninterface\n\nimplementation\n\nend.\n"
+        }
+    ]
+}
