@@ -5,9 +5,11 @@
     <RootNamespace>Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Tests</RootNamespace>
 
     <IsPackable>false</IsPackable>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Google.Protobuf.Tools" Version="3.13.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.5.0" />
     <PackageReference Include="xunit" Version="2.4.0" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.0" />
@@ -18,9 +20,42 @@
     <ProjectReference Include="..\protoc-gen-delphi\protoc-gen-delphi.csproj" />
   </ItemGroup>
 
+  <!-- Include published version of tested project for integration tests -->
+  <!-- Solution based on https://github.com/dotnet/sdk/issues/1675#issuecomment-675590262 -->
+  <Target Name="AddExeDependencyForBuild" BeforeTargets="CopyFilesToOutputDirectory">
+  <MSBuild Projects="..\protoc-gen-delphi\protoc-gen-delphi.csproj"
+           Targets="Publish"
+           Properties="PublishDir=$([System.IO.Path]::GetFullPath($(OutDir)));PublishReadyToRun=false"
+           BuildInParallel="$(BuildInParallel)" />
+  </Target>
+
+  <Target Name="CopyProtobufTools" AfterTargets="Build">
+    <ItemGroup>
+      <ProtobufTools Include="$(PkgGoogle_Protobuf_Tools)/tools/**/*.*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(ProtobufTools)" DestinationFolder="$(TargetDir)/Google.Protobuf.Tools/tools/%(RecursiveDir)" SkipUnchangedFiles="true" />
+  </Target>
+
   <ItemGroup>
-    <EmbeddedResource Include="known-answer-test-vectors\*.request.pb.json" />
-    <EmbeddedResource Include="known-answer-test-vectors\*.response.pb.json" />
+    <!-- Each known protoc output file tree is stored in a marked sub-directory -->
+    <EmbeddedResource Include="test-vectors/known-protoc-outputs/**/*.protoc-output/**/*"
+                      LogicalName="[known protoc output][expected output folder]%(RecursiveDir)%(Filename)%(Extension)" />
+    <!-- For each known protoc output file tree, there is either an input folder... -->
+    <EmbeddedResource Include="test-vectors/known-protoc-outputs/**/*.protoc-input/**/*"
+                      LogicalName="[known protoc output][input folder]%(RecursiveDir)%(Filename)%(Extension)" />
+    <!-- ... or a single input .proto file with matching name -->
+    <EmbeddedResource Include="test-vectors/known-protoc-outputs/**/*.proto"
+                      Exclude="test-vectors/known-protoc-outputs/**/*.protoc-input/**/*"
+                      LogicalName="[known protoc output][input schema file]%(RecursiveDir)%(Filename)%(Extension)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Each known response to protoc is stored in a JSON-encoded file -->
+    <EmbeddedResource Include="test-vectors/known-responses-to-protoc/**/*.response.pb.json"
+                      LogicalName="[known response to protoc][expected response]%(RecursiveDir)%(Filename)%(Extension)" />
+    <!-- For each known response to protoc, there is a request stored in a JSON-encoded file with matching name -->
+    <EmbeddedResource Include="test-vectors/known-responses-to-protoc/**/*.request.pb.json"
+                      LogicalName="[known response to protoc][request]%(RecursiveDir)%(Filename)%(Extension)" />
   </ItemGroup>
 
 </Project>
