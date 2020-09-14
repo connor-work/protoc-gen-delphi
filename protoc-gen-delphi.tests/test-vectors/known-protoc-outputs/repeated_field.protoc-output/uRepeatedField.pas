@@ -102,7 +102,7 @@ end;
 
 destructor TMessageX.Destroy;
 begin
-  FFieldX.Clear;
+  FFieldX.Free;
   inherited;
 end;
 
