@@ -132,7 +132,7 @@ end;
 
 procedure TMessageX.ClearOwnFields;
 begin
-  FFieldX := PROTOBUF_UINT32_DEFAULT_VALUE;
+  FFieldX := PROTOBUF_DEFAULT_VALUE_UINT32;
 end;
 
 function TMessageX.GetFieldX: UInt32;

@@ -144,7 +144,7 @@ end;
 
 procedure TMessageX.ClearOwnFields;
 begin
-  FFieldX := PROTOBUF_ENUM_DEFAULT_VALUE;
+  FFieldX := PROTOBUF_DEFAULT_VALUE_ENUM;
 end;
 
 function TMessageX.GetFieldX: TEnumX;

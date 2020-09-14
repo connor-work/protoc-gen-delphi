@@ -1,5 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <Version>0.0.1-00-inject-develop</Version>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <RootNamespace>Work.Connor.Protobuf.Delphi.ProtocGenDelphi</RootNamespace>
@@ -12,7 +13,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Work.Connor.Delphi.CodeWriter" Version="0.0.1" />
+    <PackageReference Include="Work.Connor.Delphi.CodeWriter" Version="0.0.1-*" />
   </ItemGroup>
   <ItemGroup>
     <Protobuf Include="../proto/google/protobuf/compiler\plugin.proto" GrpcServices="None" Link="Protos\plugin.proto" />
