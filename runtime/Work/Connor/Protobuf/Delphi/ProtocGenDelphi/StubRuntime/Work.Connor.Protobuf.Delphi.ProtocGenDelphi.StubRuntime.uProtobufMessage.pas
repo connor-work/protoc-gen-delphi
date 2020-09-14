@@ -91,6 +91,17 @@ type
     procedure EncodeField<T>(aValue: T; aField: TProtobufFieldNumber; aCodec: TProtobufWireCodec<T>; aDest: TStream);
 
     /// <summary>
+    /// Encodes a protobuf field with a specific protobuf message type (<i>message field</i>) using the protobuf binary wire format and writes it to a stream.
+    /// </summary>
+    /// <param name="T">Delphi type representing the protobuf message type of the field</param>
+    /// <param name="aField">Protobuf field number of the field</param>
+    /// <param name="aDest">The stream that the encoded field is written to</param>
+    /// <remarks>
+    /// This should be used within an implementation of <see cref="Encode"/>, after calling the ancestor class implementation.
+    /// </remarks>
+    procedure EncodeMessageField<T: TMessage>(aValue: T; aField: TProtobufFieldNumber; aDest: TStream);
+
+    /// <summary>
     /// TODO doc
     /// </summary>
     procedure EncodeRepeatedField<T>(aSource: TProtobufRepeatedField<T>; aField: TProtobufFieldNumber; aCodec: TProtobufWireCodec<T>; aDest: TStream);
@@ -99,6 +110,23 @@ type
     /// TODO doc
     /// </summary>
     function DecodeUnknownField<T>(aField: TProtobufFieldNumber; aCodec: TProtobufWireCodec<T>): T;
+
+    /// <summary>
+    /// Decodes a previously unknown protobuf field with a specific protobuf message type (<i>message field</i>).
+    /// If the field is present, an instance representing the embedded message is constructed and filled using <see cref="Create"/> and <see cref="Decode"/>.
+    /// The field is then no longer considered unknown.
+    /// If the field is present multiple times, the last value is used, see https://developers.google.com/protocol-buffers/docs/encoding#optional.
+    /// If the field is absent, <c>nil</c> is returned (which is the representation of the default value).
+    /// </summary>
+    /// <param name="T">Delphi type representing the protobuf message type of the field</param>
+    /// <param name="aField">Protobuf field number of the field</param>
+    /// <returns>The decoded field value</returns>
+    /// <remarks>
+    /// This should be used within an implementation of <see cref="Decode"/>, after calling the ancestor class implementation.
+    /// This method is not idempotent. The state of this instance is changed by the call, since decoding "consumes" the unknown field.
+    /// Ownership of the returned object, if one is allocated, is transferred to the caller (which should be an instance of a descendant class).
+    /// </remarks>
+    function DecodeUnknownMessageField<T: TMessage>(aField: TProtobufFieldNumber): T;
     
     /// <summary>
     /// TODO doc

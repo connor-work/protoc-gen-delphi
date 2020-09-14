@@ -42,6 +42,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
             FieldDescriptorProto.Types.Type.String => "UnicodeString",
             FieldDescriptorProto.Types.Type.Uint32 => "UInt32",
             FieldDescriptorProto.Types.Type.Enum => generator.Invoke(field.TypeName),
+            FieldDescriptorProto.Types.Type.Message => generator.Invoke(field.TypeName),
             _ => throw new NotImplementedException()
         };
 
@@ -57,6 +58,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
             FieldDescriptorProto.Types.Type.String => "UnicodeString",
             FieldDescriptorProto.Types.Type.Uint32 => "UInt32",
             FieldDescriptorProto.Types.Type.Enum => "TProtobufEnumFieldValue",
+            FieldDescriptorProto.Types.Type.Message => generator.Invoke(field.TypeName),
             _ => throw new NotImplementedException()
         };
 
@@ -66,6 +68,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// </summary>
         /// <param name="fieldType">The protobuf field type</param>
         /// <returns>Delphi identifier of the codec instance</returns>
+        /// <remarks>This is not used for protobuf message types</remarks>
         internal static string GetDelphiWireCodec(this FieldDescriptorProto.Types.Type fieldType) => fieldType switch
         {
             FieldDescriptorProto.Types.Type.String => "gProtobufWireCodecString",
@@ -84,6 +87,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
             FieldDescriptorProto.Types.Type.String => "PROTOBUF_DEFAULT_VALUE_STRING",
             FieldDescriptorProto.Types.Type.Uint32 => "PROTOBUF_DEFAULT_VALUE_UINT32",
             FieldDescriptorProto.Types.Type.Enum => "PROTOBUF_DEFAULT_VALUE_ENUM",
+            FieldDescriptorProto.Types.Type.Message => "PROTOBUF_DEFAULT_VALUE_MESSAGE",
             _ => throw new NotImplementedException()
         };
     }
@@ -441,12 +445,25 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
             FieldDeclaration delphiField = GenerateAndInjectField(field, delphiPropertyName, privateDelphiType, delphiClass);
             GenerateAndInjectProperty(field, delphiField, delphiPropertyName, publicDelphiType, delphiClass, skeleton);
             // Fill the message skeleton with the runtime field logic
-            string wireCodec = field.Type.GetDelphiWireCodec();
+            (_, MethodDeclaration destroyDeclaration) = skeleton.Destroy;
             (_, MethodDeclaration encodeDeclaration) = skeleton.Encode;
             (_, MethodDeclaration decodeDeclaration) = skeleton.Decode;
             (_, MethodDeclaration clearOwnFieldsDeclaration) = skeleton.ClearOwnFields;
-            encodeDeclaration.Statements.Add($"EncodeField<{privateDelphiType}>({delphiField.Name}, {delphiFieldNumberConst.Identifier}, {wireCodec}, aDest);");
-            decodeDeclaration.Statements.Add($"{delphiField.Name} := DecodeUnknownField<{privateDelphiType}>({delphiFieldNumberConst.Identifier}, {wireCodec});");
+            // TODO handling of absent type (unknown if message or enum)
+            if (field.Type == FieldDescriptorProto.Types.Type.Message)
+            {
+                destroyDeclaration.Statements.Insert(destroyDeclaration.Statements.Count - 1, $"{delphiField.Name}.Free;");
+                encodeDeclaration.Statements.Add($"EncodeMessageField<{privateDelphiType}>({delphiField.Name}, {delphiFieldNumberConst.Identifier}, aDest);");
+                decodeDeclaration.Statements.Add($"{delphiField.Name}.Free;");
+                decodeDeclaration.Statements.Add($"{delphiField.Name} := DecodeUnknownMessageField<{privateDelphiType}>({delphiFieldNumberConst.Identifier});");
+                clearOwnFieldsDeclaration.Statements.Add($"{delphiField.Name}.Free;");
+            }
+            else
+            {
+                string wireCodec = field.Type.GetDelphiWireCodec();
+                encodeDeclaration.Statements.Add($"EncodeField<{privateDelphiType}>({delphiField.Name}, {delphiFieldNumberConst.Identifier}, {wireCodec}, aDest);");
+                decodeDeclaration.Statements.Add($"{delphiField.Name} := DecodeUnknownField<{privateDelphiType}>({delphiFieldNumberConst.Identifier}, {wireCodec});");
+            }
             clearOwnFieldsDeclaration.Statements.Add($"{delphiField.Name} := {field.Type.GetDelphiDefaultValueConstant()};");
         }
 
@@ -523,7 +540,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// <returns>The injected field declaration</returns>
         private MethodDeclaration GenerateAndInjectGetter(FieldDescriptorProto field, FieldDeclaration delphiField, string delphiPropertyName, string delphiType, ClassDeclaration delphiClass, MessageClassSkeleton skeleton)
         {
-            // TODO handling of absent type (unknown if message or enum) and message type
+            // TODO handling of absent type (unknown if message or enum)
             string valueExpression = field.Type == FieldDescriptorProto.Types.Type.Enum ? $"{ConstructDelphiTypeName(field.TypeName)}({delphiField.Name})"
                                                                                         : delphiField.Name;
             MethodDeclaration getter = new MethodDeclaration()
@@ -582,9 +599,12 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
                 Name = "aValue",
                 Type = delphiType
             };
-            // TODO handling of absent type (unknown if message or enum) and message type
+            // TODO handling of absent type (unknown if message or enum)
+            List<string> statements = new List<string>();
+            if (field.Type == FieldDescriptorProto.Types.Type.Message) statements.Add($"{delphiField.Name}.Free;");
             string valueExpression = field.Type == FieldDescriptorProto.Types.Type.Enum ? $"Ord({setterParameter.Name})"
                                                                                         : setterParameter.Name;
+            statements.Add($"{delphiField.Name} := {valueExpression};");
             MethodDeclaration setter = new MethodDeclaration()
             {
                 Class = delphiClass.Name,
@@ -594,7 +614,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
                     Type = Prototype.Types.Type.Procedure,
                     ParameterList = { setterParameter }
                 },
-                Statements = { $"{delphiField.Name} := {valueExpression};" }
+                Statements = { statements }
             };
             skeleton.PropertyAccessors.Add(setter);
             delphiClass.MemberList.Add(new ClassMemberDeclaration()
