@@ -41,7 +41,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// <param name="fieldTypeName">The protobuf field descriptor's type name field value</param>
         /// <param name="generator">Function that generates a Delphi type name for a protobuf message type or enumerated type name</param>
         /// <returns>Corresponding Delphi type identifier</returns>
-        internal static string GetPublicDelphiType(this FieldDescriptorProto.Types.Type fieldType, string fieldTypeName, Func<string, string> generator) => fieldType switch
+        internal static string GetPublicDelphiSingleValueType(this FieldDescriptorProto.Types.Type fieldType, string fieldTypeName, Func<string, string> generator) => fieldType switch
         {
             FieldDescriptorProto.Types.Type.String => "UnicodeString",
             FieldDescriptorProto.Types.Type.Uint32 => "UInt32",
@@ -58,7 +58,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// <param name="fieldTypeName">The protobuf field descriptor's type name field value</param>
         /// <param name="generator">Function that generates a Delphi type name for a protobuf message type or enumerated type name</param>
         /// <returns>Corresponding Delphi type identifier</returns>
-        internal static string GetPrivateDelphiType(this FieldDescriptorProto.Types.Type fieldType, string fieldTypeName, Func<string, string> generator) => fieldType switch
+        internal static string GetPrivateDelphiSingleValueType(this FieldDescriptorProto.Types.Type fieldType, string fieldTypeName, Func<string, string> generator) => fieldType switch
         {
             FieldDescriptorProto.Types.Type.String => "UnicodeString",
             FieldDescriptorProto.Types.Type.Uint32 => "UInt32",
@@ -68,7 +68,17 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         };
 
         /// <summary>
-        /// Determines the Delphi type identifier of the Delphi type that is used to represent protobuf field values of a specific protobuf field,
+        /// Determines the Delphi type identifier of the Delphi type that is used to represent protobuf field values within repeated fields, of a specific protobuf field type,
+        /// when communicating with client code.
+        /// </summary>
+        /// <param name="fieldType">The protobuf field descriptor's type field value</param>
+        /// <param name="fieldTypeName">The protobuf field descriptor's type name field value</param>
+        /// <param name="generator">Function that generates a Delphi type name for a protobuf message type or enumerated type name</param>
+        /// <returns>Corresponding Delphi type identifier</returns>
+        internal static string GetPublicDelphiElementType(this FieldDescriptorProto.Types.Type fieldType, string fieldTypeName, Func<string, string> generator) => fieldType.GetPublicDelphiSingleValueType(fieldTypeName, generator);
+
+        /// <summary>
+        /// Determines the Delphi type identifier of the Delphi type that is used to represent the protobuf field contents of a specific protobuf field,
         /// when communicating with client code.
         /// </summary>
         /// <param name="field">The protobuf field</param>
@@ -76,13 +86,13 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// <returns>Corresponding Delphi type identifier</returns>
         internal static string GetPublicDelphiType(this FieldDescriptorProto field, Func<string, string> generator) => field.Label switch
         {
-            FieldDescriptorProto.Types.Label.Optional => GetPublicDelphiType(field.Type, field.TypeName, generator),
-            FieldDescriptorProto.Types.Label.Repeated => $"TProtobufRepeatedField<{GetPublicDelphiType(field.Type, field.TypeName, generator)}>",
+            FieldDescriptorProto.Types.Label.Optional => GetPublicDelphiSingleValueType(field.Type, field.TypeName, generator),
+            FieldDescriptorProto.Types.Label.Repeated => $"TProtobufRepeatedField<{GetPublicDelphiElementType(field.Type, field.TypeName, generator)}>",
             _ => throw new NotImplementedException()
         };
 
         /// <summary>
-        /// Determines the Delphi type identifier of the Delphi type that is used to represent protobuf field values of a specific protobuf field,
+        /// Determines the Delphi type identifier of the Delphi type that is used to represent the protobuf field contents of a specific protobuf field,
         /// when communicating with internal (runtime) code.
         /// </summary>
         /// <param name="field">The protobuf field</param>
@@ -90,8 +100,8 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// <returns>Corresponding Delphi type identifier</returns>
         internal static string GetPrivateDelphiType(this FieldDescriptorProto field, Func<string, string> generator) => field.Label switch
         {
-            FieldDescriptorProto.Types.Label.Optional => GetPrivateDelphiType(field.Type, field.TypeName, generator),
-            FieldDescriptorProto.Types.Label.Repeated => $"TProtobufRepeatedField<{GetPublicDelphiType(field.Type, field.TypeName, generator)}>",
+            FieldDescriptorProto.Types.Label.Optional => GetPrivateDelphiSingleValueType(field.Type, field.TypeName, generator),
+            FieldDescriptorProto.Types.Label.Repeated => $"TProtobufRepeatedField<{GetPublicDelphiElementType(field.Type, field.TypeName, generator)}>",
             _ => throw new NotImplementedException()
         };
 
@@ -481,6 +491,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
             FieldDeclaration delphiField = GenerateAndInjectField(field, delphiPropertyName, privateDelphiType, delphiClass);
             GenerateAndInjectProperty(field, delphiField, delphiPropertyName, publicDelphiType, delphiClass, skeleton);
             // Fill the message skeleton with the runtime field logic
+            (_, MethodDeclaration createDeclaration) = skeleton.Create;
             (_, MethodDeclaration destroyDeclaration) = skeleton.Destroy;
             (_, MethodDeclaration encodeDeclaration) = skeleton.Encode;
             (_, MethodDeclaration decodeDeclaration) = skeleton.Decode;
@@ -497,10 +508,23 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
             else
             {
                 string wireCodec = field.Type.GetDelphiWireCodec();
-                encodeDeclaration.Statements.Add($"EncodeField<{privateDelphiType}>({delphiField.Name}, {delphiFieldNumberConst.Identifier}, {wireCodec}, aDest);");
-                decodeDeclaration.Statements.Add($"{delphiField.Name} := DecodeUnknownField<{privateDelphiType}>({delphiFieldNumberConst.Identifier}, {wireCodec});");
+                if (field.Label == FieldDescriptorProto.Types.Label.Repeated)
+                {
+                    string delphiElementType = field.Type.GetPublicDelphiElementType(field.TypeName, name => ConstructDelphiTypeName(name));
+                    createDeclaration.Statements.Insert(createDeclaration.Statements.Count - 1, $"{delphiField.Name} = {privateDelphiType}.Create;");
+                    destroyDeclaration.Statements.Insert(destroyDeclaration.Statements.Count - 1, $"{delphiField.Name}.Free;");
+                    encodeDeclaration.Statements.Add($"EncodeRepeatedField<{delphiElementType}>({delphiField.Name}, {delphiFieldNumberConst.Identifier}, {wireCodec}, aDest);");
+                    decodeDeclaration.Statements.Add($"{delphiField.Name}.Clear;");
+                    decodeDeclaration.Statements.Add($"DecodeUnknownRepeatedField<{delphiElementType}>({delphiFieldNumberConst.Identifier}, {wireCodec}, {delphiField.Name});");
+                }
+                else
+                {
+                    encodeDeclaration.Statements.Add($"EncodeField<{privateDelphiType}>({delphiField.Name}, {delphiFieldNumberConst.Identifier}, {wireCodec}, aDest);");
+                    decodeDeclaration.Statements.Add($"{delphiField.Name} := DecodeUnknownField<{privateDelphiType}>({delphiFieldNumberConst.Identifier}, {wireCodec});");
+                }
             }
-            clearOwnFieldsDeclaration.Statements.Add($"{delphiField.Name} := {field.Type.GetDelphiDefaultValueConstant()};");
+            if (field.Label == FieldDescriptorProto.Types.Label.Repeated) clearOwnFieldsDeclaration.Statements.Add($"{delphiField.Name}.Clear;");
+            else clearOwnFieldsDeclaration.Statements.Add($"{delphiField.Name} := {field.Type.GetDelphiDefaultValueConstant()};");
         }
 
         /// <summary>
