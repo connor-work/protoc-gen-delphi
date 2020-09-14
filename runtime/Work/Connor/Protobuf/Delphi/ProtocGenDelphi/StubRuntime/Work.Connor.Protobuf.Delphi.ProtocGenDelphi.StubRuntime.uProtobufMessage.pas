@@ -61,7 +61,7 @@ type
     /// </summary>
     /// <remarks>
     /// The resulting instance state is equivalent to a newly constructed empty message.
-    /// For more details, see the documentation of <c>Create</c>.
+    /// For more details, see the documentation of <see cref="Create"/>.
     /// This procedure may cause the destruction of transitively owned objects.
     /// Developers must ensure that no shared ownership of current field values or further nested embedded objects is held.
     /// </remarks>
