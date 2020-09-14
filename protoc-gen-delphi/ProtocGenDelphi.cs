@@ -81,9 +81,9 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// <returns>Delphi identifier default value constant</returns>
         internal static string GetDelphiDefaultValueConstant(this FieldDescriptorProto.Types.Type fieldType) => fieldType switch
         {
-            FieldDescriptorProto.Types.Type.String => "PROTOBUF_STRING_DEFAULT_VALUE",
-            FieldDescriptorProto.Types.Type.Uint32 => "PROTOBUF_UINT32_DEFAULT_VALUE",
-            FieldDescriptorProto.Types.Type.Enum => "PROTOBUF_ENUM_DEFAULT_VALUE",
+            FieldDescriptorProto.Types.Type.String => "PROTOBUF_DEFAULT_VALUE_STRING",
+            FieldDescriptorProto.Types.Type.Uint32 => "PROTOBUF_DEFAULT_VALUE_UINT32",
+            FieldDescriptorProto.Types.Type.Enum => "PROTOBUF_DEFAULT_VALUE_ENUM",
             _ => throw new NotImplementedException()
         };
     }
