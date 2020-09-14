@@ -137,6 +137,11 @@ const
   /// </summary>
   PROTOBUF_DEFAULT_VALUE_ENUM = TProtobufEnumFieldValue(PROTOBUF_DEFAULT_VALUE_NUMERIC);
 
+  /// <summary>
+  /// Default value for a protobuf field of a message type
+  /// </summary>
+  PROTOBUF_DEFAULT_VALUE_MESSAGE = nil;
+
 implementation
 
 end.

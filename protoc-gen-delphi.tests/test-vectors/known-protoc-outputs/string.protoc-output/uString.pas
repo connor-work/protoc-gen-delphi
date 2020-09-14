@@ -132,7 +132,7 @@ end;
 
 procedure TMessageX.ClearOwnFields;
 begin
-  FFieldX := PROTOBUF_STRING_DEFAULT_VALUE;
+  FFieldX := PROTOBUF_DEFAULT_VALUE_STRING;
 end;
 
 function TMessageX.GetFieldX: UnicodeString;
