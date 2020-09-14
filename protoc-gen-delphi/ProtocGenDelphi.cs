@@ -692,13 +692,11 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         private void GenerateAndInjectProperty(FieldDescriptorProto field, FieldDeclaration delphiField, string delphiPropertyName, string delphiType, ClassDeclaration delphiClass, MessageClassSkeleton skeleton)
         {
             MethodDeclaration getter = GenerateAndInjectGetter(field, delphiField, delphiPropertyName, delphiType, delphiClass, skeleton);
-            MethodDeclaration setter = GenerateAndInjectSetter(field, delphiField, delphiPropertyName, delphiType, delphiClass, skeleton);
             PropertyDeclaration delphiProperty = new PropertyDeclaration()
             {
                 Name = delphiPropertyName,
                 Type = delphiType,
                 ReadSpecifier = getter.Prototype.Name,
-                WriteSpecifier = setter.Prototype.Name,
                 Comment = new AnnotationComment()
                 {
                     CommentLines =
@@ -710,6 +708,12 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
                     }
                 }
             };
+            // Do not generate a setter for repeated fields, the client code shall mutate the existing object
+            if (field.Label != FieldDescriptorProto.Types.Label.Repeated)
+            {
+                MethodDeclaration setter = GenerateAndInjectSetter(field, delphiField, delphiPropertyName, delphiType, delphiClass, skeleton);
+                delphiProperty.WriteSpecifier = setter.Prototype.Name;
+            }
             delphiClass.MemberList.Add(new ClassMemberDeclaration()
             {
                 Visibility = Visibility.Public,
