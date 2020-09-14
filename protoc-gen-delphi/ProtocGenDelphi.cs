@@ -77,6 +77,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         internal static string GetPublicDelphiType(this FieldDescriptorProto field, Func<string, string> generator) => field.Label switch
         {
             FieldDescriptorProto.Types.Label.Optional => GetPublicDelphiType(field.Type, field.TypeName, generator),
+            FieldDescriptorProto.Types.Label.Repeated => $"TProtobufRepeatedField<{GetPublicDelphiType(field.Type, field.TypeName, generator)}>",
             _ => throw new NotImplementedException()
         };
 
@@ -90,6 +91,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         internal static string GetPrivateDelphiType(this FieldDescriptorProto field, Func<string, string> generator) => field.Label switch
         {
             FieldDescriptorProto.Types.Label.Optional => GetPrivateDelphiType(field.Type, field.TypeName, generator),
+            FieldDescriptorProto.Types.Label.Repeated => $"TProtobufRepeatedField<{GetPublicDelphiType(field.Type, field.TypeName, generator)}>",
             _ => throw new NotImplementedException()
         };
 
@@ -466,7 +468,8 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// <param name="dependencyHandler"> Action to perform when a new Delphi interface dependency has been detected</param>
         private void CompileField(FieldDescriptorProto field, ClassDeclaration delphiClass, MessageClassSkeleton skeleton, Action<UnitReference> dependencyHandler)
         {
-            // Add the required runtime dependency for handling protobuf fields of this specific type
+            // Add the required runtime dependencies for handling protobuf fields of this specific type
+            if (field.Label == FieldDescriptorProto.Types.Label.Repeated) dependencyHandler.Invoke(runtime.GetDependencyForRepeatedField());
             dependencyHandler.Invoke(runtime.GetDependencyForFieldType(field.Type));
             // Delphi type exposed to client code
             string publicDelphiType = field.GetPublicDelphiType(name => ConstructDelphiTypeName(name));
