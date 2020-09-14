@@ -115,14 +115,14 @@ end;
 procedure TMessageX.Encode(aDest: TStream);
 begin
   inherited;
-  EncodeRepeatedField<UInt32>(FFieldX, PROTOBUF_FIELD_NUMBER_FIELD_X, gProtobufWireCodecUInt32, aDest);
+  EncodeRepeatedField<UInt32>(FFieldX, PROTOBUF_FIELD_NUMBER_FIELD_X, gProtobufWireCodecUint32, aDest);
 end;
 
 procedure TMessageX.Decode(aSource: TStream);
 begin
   inherited;
   FFieldX.Clear;
-  FFieldX := DecodeUnknownRepeatedField<UInt32>(PROTOBUF_FIELD_NUMBER_FIELD_X, gProtobufWireCodecUInt32);
+  DecodeUnknownRepeatedField<UInt32>(PROTOBUF_FIELD_NUMBER_FIELD_X, gProtobufWireCodecUint32, FFieldX);
 end;
 
 procedure TMessageX.ClearOwnFields;
