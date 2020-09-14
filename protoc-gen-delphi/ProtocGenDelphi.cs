@@ -30,6 +30,43 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
     /// </summary>
     public static partial class ProtobufExtensions
     {
+
+#pragma warning disable S4136 // Method overloads should be grouped together -> Method order is optimized for easier reading
+
+        /// <summary>
+        /// Determines the Delphi type identifier of the Delphi type that is used to represent single protobuf field values of a specific protobuf field type,
+        /// when communicating with client code.
+        /// </summary>
+        /// <param name="fieldType">The protobuf field descriptor's type field value</param>
+        /// <param name="fieldTypeName">The protobuf field descriptor's type name field value</param>
+        /// <param name="generator">Function that generates a Delphi type name for a protobuf message type or enumerated type name</param>
+        /// <returns>Corresponding Delphi type identifier</returns>
+        internal static string GetPublicDelphiType(this FieldDescriptorProto.Types.Type fieldType, string fieldTypeName, Func<string, string> generator) => fieldType switch
+        {
+            FieldDescriptorProto.Types.Type.String => "UnicodeString",
+            FieldDescriptorProto.Types.Type.Uint32 => "UInt32",
+            FieldDescriptorProto.Types.Type.Enum => generator.Invoke(fieldTypeName),
+            FieldDescriptorProto.Types.Type.Message => generator.Invoke(fieldTypeName),
+            _ => throw new NotImplementedException()
+        };
+
+        /// <summary>
+        /// Determines the Delphi type identifier of the Delphi type that is used to represent single protobuf field values of a specific protobuf field type,
+        /// when communicating with internal (runtime) code.
+        /// </summary>
+        /// <param name="fieldType">The protobuf field descriptor's type field value</param>
+        /// <param name="fieldTypeName">The protobuf field descriptor's type name field value</param>
+        /// <param name="generator">Function that generates a Delphi type name for a protobuf message type or enumerated type name</param>
+        /// <returns>Corresponding Delphi type identifier</returns>
+        internal static string GetPrivateDelphiType(this FieldDescriptorProto.Types.Type fieldType, string fieldTypeName, Func<string, string> generator) => fieldType switch
+        {
+            FieldDescriptorProto.Types.Type.String => "UnicodeString",
+            FieldDescriptorProto.Types.Type.Uint32 => "UInt32",
+            FieldDescriptorProto.Types.Type.Enum => "TProtobufEnumFieldValue",
+            FieldDescriptorProto.Types.Type.Message => generator.Invoke(fieldTypeName),
+            _ => throw new NotImplementedException()
+        };
+
         /// <summary>
         /// Determines the Delphi type identifier of the Delphi type that is used to represent protobuf field values of a specific protobuf field,
         /// when communicating with client code.
@@ -37,12 +74,9 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// <param name="field">The protobuf field</param>
         /// <param name="generator">Function that generates a Delphi type name for a protobuf message type or enumerated type name</param>
         /// <returns>Corresponding Delphi type identifier</returns>
-        internal static string GetPublicDelphiType(this FieldDescriptorProto field, Func<string, string> generator) => field.Type switch
+        internal static string GetPublicDelphiType(this FieldDescriptorProto field, Func<string, string> generator) => field.Label switch
         {
-            FieldDescriptorProto.Types.Type.String => "UnicodeString",
-            FieldDescriptorProto.Types.Type.Uint32 => "UInt32",
-            FieldDescriptorProto.Types.Type.Enum => generator.Invoke(field.TypeName),
-            FieldDescriptorProto.Types.Type.Message => generator.Invoke(field.TypeName),
+            FieldDescriptorProto.Types.Label.Optional => GetPublicDelphiType(field.Type, field.TypeName, generator),
             _ => throw new NotImplementedException()
         };
 
@@ -53,14 +87,13 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// <param name="field">The protobuf field</param>
         /// <param name="generator">Function that generates a Delphi type name for a protobuf message type or enumerated type name</param>
         /// <returns>Corresponding Delphi type identifier</returns>
-        internal static string GetPrivateDelphiType(this FieldDescriptorProto field, Func<string, string> generator) => field.Type switch
+        internal static string GetPrivateDelphiType(this FieldDescriptorProto field, Func<string, string> generator) => field.Label switch
         {
-            FieldDescriptorProto.Types.Type.String => "UnicodeString",
-            FieldDescriptorProto.Types.Type.Uint32 => "UInt32",
-            FieldDescriptorProto.Types.Type.Enum => "TProtobufEnumFieldValue",
-            FieldDescriptorProto.Types.Type.Message => generator.Invoke(field.TypeName),
+            FieldDescriptorProto.Types.Label.Optional => GetPrivateDelphiType(field.Type, field.TypeName, generator),
             _ => throw new NotImplementedException()
         };
+
+#pragma warning disable S4136 // Method overloads should be grouped together
 
         /// <summary>
         /// Determines the Delphi identifier of the runtime instance of <c>TProtobufWireCodec<!<![CDATA[<T>]]></c> that is used for encoding
