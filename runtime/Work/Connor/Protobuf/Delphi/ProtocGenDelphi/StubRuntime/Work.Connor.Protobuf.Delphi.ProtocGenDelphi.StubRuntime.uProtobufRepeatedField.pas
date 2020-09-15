@@ -13,7 +13,11 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
-unit Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufFieldCodec;
+/// <summary>
+/// "Stub runtime" <c>protobuf-delphi</c> runtime library implementation of support code for handling protobuf repeated fields 
+/// in generated Delphi code.
+/// </summary>
+unit Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufRepeatedField;
 
 {$IFDEF FPC}
   {$MODE DELPHI}
@@ -22,7 +26,65 @@ unit Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufFieldCodec
 interface
 
 type
-  
+  /// <summary>
+  /// TODO
+  /// </summary>
+  /// <typeparam name="T">TODO</typeparam>
+  TProtobufRepeatedField<T> = class(TEnumerable<T>)
+
+  public
+    /// <summary>
+    /// TODO
+    /// </summary>
+    constructor Create; virtual;
+
+    /// <summary>
+    /// TODO destroys transitively held resources, meaning field values of message type and their nested embedded objects
+    /// </summary>
+    destructor Destroy; override;
+
+    /// <summary>
+    /// TODO
+    /// </summary>
+    property Count: Integer read GetCount write SetCount;
+
+    /// <summary>
+    /// TODO
+    /// </summary>
+    /// <param name="aIndex">TODO</param>
+    property Values[aIndex: Integer]: T read GetValue write SetValue; default;
+
+    /// <summary>
+    /// TODO
+    /// </summary>
+    /// <param name="aValue">TODO</param>
+    /// <returns>TODO</return>
+    function Add(const aValue: T): Integer;
+
+    /// <summary>
+    /// TODO
+    /// </summary>
+    /// <returns>TODO</return>
+    function EmplaceAdd: T;
+
+    /// <summary>
+    /// TODO
+    /// </summary>
+    procedure Clear;
+
+    /// <summary>
+    /// TODO
+    /// </summary>
+    /// <param name="aIndex">TODO</param>
+    procedure Delete(aIndex: Integer);
+
+    /// <summary>
+    /// TODO
+    /// </summary>
+    /// <param name="aIndex">TODO</param>
+    /// <returns>TODO</returns>
+    function ExtractAt(aIndex: Integer): T;
+  end;
 
 implementation
 
