@@ -14,10 +14,9 @@
 /// limitations under the License.
 
 /// <summary>
-/// Runtime library support for <c>protoc-gen-delphi</c> <i>field codecs</i> that define the encoding/decoding of
-/// protobuf fields from/to the protobuf binary wire format.
+/// Runtime library support for protobuf enum types.
 /// </summary>
-unit Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufWireCodec;
+unit Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufEnum;
 
 {$IFDEF FPC}
   {$MODE DELPHI}
@@ -25,14 +24,18 @@ unit Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufWireCodec;
 
 interface
 
-/// <summary>
-/// <i>Field codec</i> for <c>protoc-gen-delphi</c> that defines the encoding/decoding of
-/// protobuf fields of a specific type (determined by descendant classes) from/to the protobuf binary wire format.
-/// </summary>
-/// <typeparam name="T">"Private" Delphi type representing values of the field within internal variables</typeparam>
-type
-  TProtobufWireCodec<T> = class abstract
-  end;
+uses
+  // Runtime library support for protobuf field encoding/decoding
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufWireCodec,
+  // For <see cref="TProtobufEnumFieldValue"/>
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.uProtobuf;
+
+var
+  /// <summary>
+  /// <i>Field codec</i> for <c>protoc-gen-delphi</c> that defines the encoding/decoding of
+  /// protobuf fields of enum types from/to the protobuf binary wire format.
+  /// </summary>
+  gProtobufWireCodecEnum: TProtobufWireCodec<TProtobufEnumFieldValue>;
 
 implementation
 

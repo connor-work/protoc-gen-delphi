@@ -13,6 +13,13 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
+/// <summary>
+/// Runtime library support for protobuf message types.
+/// </summary>
+/// <remarks>
+/// This unit defines the common ancestor class of all generated classes representing protobuf message types,
+/// <see cref="TProtobufMessage"/>. Client code may need to reference it in order to operate generic protobuf messages.
+/// </remarks>
 unit Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufMessage;
 
 {$IFDEF FPC}
@@ -22,17 +29,23 @@ unit Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufMessage;
 interface
 
 uses
-  SysUtils,
-  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.uProtobufTypes,
+  // Basic definitions of <c>protoc-gen-delphi</c>, independent of the runtime library implementation
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.uProtobuf,
+  // Runtime library support for protobuf field encoding/decoding
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufWireCodec,
-  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufRepeatedField;
+  // Runtime library support for protobuf repeated fields
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufRepeatedField,
+  // TStream for encoding and decoding of messages in the protobuf binary wire format
+  Classes,
+  // Helper code for the stub runtime library, not required by functional implementations of the runtime library
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uStub;
 
 type
   /// <summary>
   /// Common ancestor of all generated classes that represent protobuf message types.
   /// </summary>
   /// <remarks>
-  /// Can be used directly to handle message of unknown type.
+  /// Can be used directly to handle messages of unknown type.
   /// The message instance carries transitive ownership of embedded objects in protobuf field values,
   /// and is responsible for their deallocation.
   /// </remarks>
@@ -86,29 +99,46 @@ type
 
   protected
     /// <summary>
-    /// TODO doc
+    /// Encodes a protobuf field with a specific protobuf type using the protobuf binary wire format and writes it to a stream.
     /// </summary>
+    /// <typeparam name="T">"Private" Delphi type representing values of the field within internal variables</typeparam>
+    /// <param name="aField">Protobuf field number of the field</param>
+    /// <param name="aCodec">Field codec that specifies the encoding to the binary wire format of the protobuf type</param>
+    /// <param name="aDest">The stream that the encoded field is written to</param>
+    /// <remarks>
+    /// This method is not used for message fields, see <see cref="EncodeMessageField"/>.
+    /// This should be used within an implementation of <see cref="Encode"/>, after calling the ancestor class implementation.
+    /// </remarks>
     procedure EncodeField<T>(aValue: T; aField: TProtobufFieldNumber; aCodec: TProtobufWireCodec<T>; aDest: TStream);
 
     /// <summary>
     /// Encodes a protobuf field with a specific protobuf message type (<i>message field</i>) using the protobuf binary wire format and writes it to a stream.
     /// </summary>
-    /// <param name="T">Delphi type representing the protobuf message type of the field</param>
+    /// <typeparam name="T">Delphi type representing the protobuf message type of the field</typeparam>
     /// <param name="aField">Protobuf field number of the field</param>
     /// <param name="aDest">The stream that the encoded field is written to</param>
     /// <remarks>
     /// This should be used within an implementation of <see cref="Encode"/>, after calling the ancestor class implementation.
     /// </remarks>
-    procedure EncodeMessageField<T: TMessage>(aValue: T; aField: TProtobufFieldNumber; aDest: TStream);
+    procedure EncodeMessageField<T: TProtobufMessage>(aValue: T; aField: TProtobufFieldNumber; aDest: TStream);
 
     /// <summary>
-    /// TODO doc
+    /// TODO doc, TODO packing?
     /// </summary>
     procedure EncodeRepeatedField<T>(aSource: TProtobufRepeatedField<T>; aField: TProtobufFieldNumber; aCodec: TProtobufWireCodec<T>; aDest: TStream);
 
     /// <summary>
-    /// TODO doc
+    /// Decodes a previously unknown protobuf field with a specific protobuf type.
     /// </summary>
+    /// <typeparam name="T">"Private" Delphi type representing values of the field within internal variables</typeparam>
+    /// <param name="aField">Protobuf field number of the field</param>
+    /// <param name="aCodec">Field codec that specifies the decoding from the binary wire format of the protobuf type</param>
+    /// <returns>The decoded field value</returns>
+    /// <remarks>
+    /// This method is not used for message fields, see <see cref="DecodeUnknownMessageField"/>.
+    /// This should be used within an implementation of <see cref="Decode"/>, after calling the ancestor class implementation.
+    /// This method is not idempotent. The state of this instance is changed by the call, since decoding "consumes" the unknown field.
+    /// </remarks>
     function DecodeUnknownField<T>(aField: TProtobufFieldNumber; aCodec: TProtobufWireCodec<T>): T;
 
     /// <summary>
@@ -118,7 +148,7 @@ type
     /// If the field is present multiple times, the last value is used, see https://developers.google.com/protocol-buffers/docs/encoding#optional.
     /// If the field is absent, <c>nil</c> is returned (which is the representation of the default value).
     /// </summary>
-    /// <param name="T">Delphi type representing the protobuf message type of the field</param>
+    /// <typeparam name="T">Delphi type representing the protobuf message type of the field</typeparam>
     /// <param name="aField">Protobuf field number of the field</param>
     /// <returns>The decoded field value</returns>
     /// <remarks>
@@ -126,20 +156,15 @@ type
     /// This method is not idempotent. The state of this instance is changed by the call, since decoding "consumes" the unknown field.
     /// Ownership of the returned object, if one is allocated, is transferred to the caller (which should be an instance of a descendant class).
     /// </remarks>
-    function DecodeUnknownMessageField<T: TMessage>(aField: TProtobufFieldNumber): T;
+    function DecodeUnknownMessageField<T: TProtobufMessage>(aField: TProtobufFieldNumber): T;
     
     /// <summary>
     /// TODO doc
     /// </summary>
-    procedure DecodeUnknownRepeatedField<T>(aField: TProtobufFieldNumber; aCodec: TProtobufWireCodec<T>, aDest: TProtobufRepeatedField<T>);
+    procedure DecodeUnknownRepeatedField<T>(aField: TProtobufFieldNumber; aCodec: TProtobufWireCodec<T>; aDest: TProtobufRepeatedField<T>);
   end;
 
 implementation
-
-procedure NotImplementedInStub;
-begin
-  raise Exception.Create('This functionality is not implemented by the stub runtime');
-end;
 
 constructor TProtobufMessage.Create;
 begin
@@ -162,6 +187,36 @@ begin
 end;
 
 procedure TProtobufMessage.Decode(aSource: TStream);
+begin
+  NotImplementedInStub;
+end;
+
+procedure TProtobufMessage.EncodeField<T>(aValue: T; aField: TProtobufFieldNumber; aCodec: TProtobufWireCodec<T>; aDest: TStream);
+begin
+  NotImplementedInStub;
+end;
+
+procedure TProtobufMessage.EncodeMessageField<T>(aValue: T; aField: TProtobufFieldNumber; aDest: TStream);
+begin
+  NotImplementedInStub;
+end;
+
+procedure TProtobufMessage.EncodeRepeatedField<T>(aSource: TProtobufRepeatedField<T>; aField: TProtobufFieldNumber; aCodec: TProtobufWireCodec<T>; aDest: TStream);
+begin
+  NotImplementedInStub;
+end;
+
+function TProtobufMessage.DecodeUnknownField<T>(aField: TProtobufFieldNumber; aCodec: TProtobufWireCodec<T>): T;
+begin
+  NotImplementedInStub;
+end;
+
+function TProtobufMessage.DecodeUnknownMessageField<T>(aField: TProtobufFieldNumber): T;
+begin
+  NotImplementedInStub;
+end;
+
+procedure TProtobufMessage.DecodeUnknownRepeatedField<T>(aField: TProtobufFieldNumber; aCodec: TProtobufWireCodec<T>; aDest: TProtobufRepeatedField<T>);
 begin
   NotImplementedInStub;
 end;

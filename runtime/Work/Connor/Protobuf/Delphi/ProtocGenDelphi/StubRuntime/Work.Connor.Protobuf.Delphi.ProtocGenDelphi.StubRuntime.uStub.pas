@@ -14,10 +14,9 @@
 /// limitations under the License.
 
 /// <summary>
-/// Runtime library support for <c>protoc-gen-delphi</c> <i>field codecs</i> that define the encoding/decoding of
-/// protobuf fields from/to the protobuf binary wire format.
+/// Helper code used only by the stub runtime, not required for functional implementations of the runtime library for <c>protoc-gen-delphi</c>.
 /// </summary>
-unit Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufWireCodec;
+unit Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uStub;
 
 {$IFDEF FPC}
   {$MODE DELPHI}
@@ -25,15 +24,20 @@ unit Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufWireCodec;
 
 interface
 
+uses
+  // Raising of exceptions
+  SysUtils;
+
 /// <summary>
-/// <i>Field codec</i> for <c>protoc-gen-delphi</c> that defines the encoding/decoding of
-/// protobuf fields of a specific type (determined by descendant classes) from/to the protobuf binary wire format.
+/// Called by the stub runtime to signal that some functionality is not implemented.
 /// </summary>
-/// <typeparam name="T">"Private" Delphi type representing values of the field within internal variables</typeparam>
-type
-  TProtobufWireCodec<T> = class abstract
-  end;
+procedure NotImplementedInStub;
 
 implementation
+
+procedure NotImplementedInStub;
+begin
+  raise Exception.Create('This functionality is not implemented by the stub runtime');
+end;
 
 end.

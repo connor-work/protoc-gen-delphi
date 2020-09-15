@@ -14,10 +14,9 @@
 /// limitations under the License.
 
 /// <summary>
-/// Runtime library support for <c>protoc-gen-delphi</c> <i>field codecs</i> that define the encoding/decoding of
-/// protobuf fields from/to the protobuf binary wire format.
+/// Runtime library support for the protobuf type <c>uint32</c>.
 /// </summary>
-unit Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufWireCodec;
+unit Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufUint32;
 
 {$IFDEF FPC}
   {$MODE DELPHI}
@@ -25,14 +24,16 @@ unit Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufWireCodec;
 
 interface
 
-/// <summary>
-/// <i>Field codec</i> for <c>protoc-gen-delphi</c> that defines the encoding/decoding of
-/// protobuf fields of a specific type (determined by descendant classes) from/to the protobuf binary wire format.
-/// </summary>
-/// <typeparam name="T">"Private" Delphi type representing values of the field within internal variables</typeparam>
-type
-  TProtobufWireCodec<T> = class abstract
-  end;
+uses
+  // Runtime library support for protobuf field encoding/decoding
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufWireCodec;
+
+var
+  /// <summary>
+  /// <i>Field codec</i> for <c>protoc-gen-delphi</c> that defines the encoding/decoding of
+  /// protobuf fields of type <c>uint32</c> from/to the protobuf binary wire format.
+  /// </summary>
+  gProtobufWireCodecUint32: TProtobufWireCodec<UInt32>;
 
 implementation
 
