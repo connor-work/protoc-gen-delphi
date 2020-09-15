@@ -35,7 +35,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// when communicating with client code.
         /// </summary>
         /// <param name="field">The protobuf field</param>
-        /// <param name="generator">Function that generates a Delphi type name for a protobuf message type or enumerated type name</param>
+        /// <param name="generator">Function that generates a Delphi type name for a protobuf message type or enum type name</param>
         /// <returns>Corresponding Delphi type identifier</returns>
         internal static string GetPublicDelphiType(this FieldDescriptorProto field, Func<string, string> generator) => field.Type switch
         {
@@ -51,7 +51,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// when communicating with internal (runtime) code.
         /// </summary>
         /// <param name="field">The protobuf field</param>
-        /// <param name="generator">Function that generates a Delphi type name for a protobuf message type or enumerated type name</param>
+        /// <param name="generator">Function that generates a Delphi type name for a protobuf message type or enum type name</param>
         /// <returns>Corresponding Delphi type identifier</returns>
         internal static string GetPrivateDelphiType(this FieldDescriptorProto field, Func<string, string> generator) => field.Type switch
         {
@@ -207,7 +207,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         }
 
         /// <summary>
-        /// Constructs a Delphi type name for a type that represents a protobuf message type or enumerated type.
+        /// Constructs a Delphi type name for a type that represents a protobuf message type or enum type.
         /// </summary>
         /// <param name="typeName">The protobuf type's name</param>
         /// <returns>The Delphi type name</returns>
