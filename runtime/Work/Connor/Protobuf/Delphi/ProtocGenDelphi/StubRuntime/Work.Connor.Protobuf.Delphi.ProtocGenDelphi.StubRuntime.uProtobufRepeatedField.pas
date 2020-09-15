@@ -27,8 +27,9 @@ interface
 
 type
   /// <summary>
-  /// TODO (and how to document type parameter?)
+  /// TODO
   /// </summary>
+  /// <typeparam name="T">TODO</typeparam>
   TProtobufRepeatedField<T> = class(TEnumerable<T>)
 
   public
@@ -50,13 +51,21 @@ type
     /// <summary>
     /// TODO
     /// </summary>
-    property Values[Index: Integer]: T read GetValue write SetValue; default;
+    /// <param name="aIndex">TODO</param>
+    property Values[aIndex: Integer]: T read GetValue write SetValue; default;
 
     /// <summary>
     /// TODO
     /// </summary>
-    /// <param name="aValue"></param>
+    /// <param name="aValue">TODO</param>
+    /// <returns>TODO</return>
     function Add(const aValue: T): Integer;
+
+    /// <summary>
+    /// TODO
+    /// </summary>
+    /// <returns>TODO</return>
+    function EmplaceAdd: T;
 
     /// <summary>
     /// TODO
@@ -66,7 +75,15 @@ type
     /// <summary>
     /// TODO
     /// </summary>
+    /// <param name="aIndex">TODO</param>
     procedure Delete(aIndex: Integer);
+
+    /// <summary>
+    /// TODO
+    /// </summary>
+    /// <param name="aIndex">TODO</param>
+    /// <returns>TODO</returns>
+    function ExtractAt(aIndex: Integer): T;
   end;
 
 implementation
