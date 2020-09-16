@@ -26,8 +26,10 @@ unit Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufRepeatedFi
 interface
 
 uses
-  Generics.Collections, // For TEnumerable implementation
-  SysUtils; // For Exception in stubs
+  // For TEnumerable implementation
+  Generics.Collections,
+  // Helper code for the stub runtime library, not required by functional implementations of the runtime library
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uStub;
 
 type
   /// <summary>
@@ -109,12 +111,6 @@ type
     /// <param name="aIndex">TODO</param>
     /// <returns>TODO</returns>
     function ExtractAt(aIndex: Integer): T;
-
-  private
-    /// <summary>
-    /// Called by the stub runtime to signal that some functionality is not implemented.
-    /// </summary>
-    class procedure NotImplementedInStub;
   end;
 
 implementation
@@ -154,6 +150,11 @@ begin
   NotImplementedInStub;
 end;
 
+function TProtobufRepeatedField<T>.EmplaceAdd: T;
+begin
+  NotImplementedInStub;
+end;
+
 procedure TProtobufRepeatedField<T>.Clear;
 begin
   NotImplementedInStub;
@@ -164,9 +165,9 @@ begin
   NotImplementedInStub;
 end;
 
-class procedure TProtobufRepeatedField<T>.NotImplementedInStub;
+function TProtobufRepeatedField<T>.ExtractAt(aIndex: Integer): T;
 begin
-  raise Exception.Create('This functionality is not implemented by the stub runtime');
+  NotImplementedInStub;
 end;
 
 end.
