@@ -169,6 +169,23 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         private static readonly string messageRootClass = "TProtobufMessage";
 
         /// <summary>
+        /// Required unit reference for using runtime-independent support definitions for generated files (support code)
+        /// </summary>
+        private static readonly UnitReference supportCodeReference = new UnitReference()
+        {
+            Unit = new UnitIdentifier()
+            {
+                Unit = "uProtobuf",
+                Namespace = { "Work.Connor.Protobuf.Delphi.ProtocGenDelphi".Split(".") }
+            }
+        };
+
+        /// <summary>
+        /// Required unit reference for using Delphi classes
+        /// </summary>
+        private static readonly UnitReference classesReference = new UnitReference() { Unit = new UnitIdentifier() { Unit = "Classes" } };
+
+        /// <summary>
         /// Support definition for the targetted protobuf runtime
         /// </summary>
         private IRuntimeSupport runtime = IRuntimeSupport.Default;
@@ -433,8 +450,9 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// <param name="dependencyHandler"> Action to perform when a new Delphi interface dependency has been detected</param>
         private void CompileMessage(DescriptorProto messageType, Interface delphiInterface, Implementation delphiImplementation, Action<UnitReference> dependencyHandler)
         {
-            // Add the required runtime dependency for handling compiled messages
+            // Add the required dependencies for handling compiled messages
             dependencyHandler.Invoke(runtime.GetDependencyForMessages());
+            dependencyHandler.Invoke(classesReference);
             // Generate a corresponding message class
             ClassDeclaration delphiClass = GenerateClass(messageType);
             delphiInterface.Declarations.Add(new InterfaceDeclaration()
@@ -524,7 +542,11 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
                 }
             }
             if (field.Label == FieldDescriptorProto.Types.Label.Repeated) clearOwnFieldsDeclaration.Statements.Add($"{delphiField.Name}.Clear;");
-            else clearOwnFieldsDeclaration.Statements.Add($"{delphiField.Name} := {field.Type.GetDelphiDefaultValueConstant()};");
+            else
+            {
+                dependencyHandler.Invoke(supportCodeReference); // Required for default value constant
+                clearOwnFieldsDeclaration.Statements.Add($"{delphiField.Name} := {field.Type.GetDelphiDefaultValueConstant()};");
+            }
         }
 
         /// <summary>
