@@ -11,7 +11,9 @@ interface
 
 uses
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufMessage,
-  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufUint32;
+  Classes,
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufUint32,
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.uProtobuf;
 
 type
   /// <remarks>
