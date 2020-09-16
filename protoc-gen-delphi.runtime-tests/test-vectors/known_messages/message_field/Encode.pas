@@ -9,13 +9,12 @@ uses
 
 var
   lStdOut: THandleStream;
-  lMessage: TMessageX;
+  lMessage: TMessageY;
 begin
   lStdOut := THandleStream.Create(GetStdHandle(STD_OUTPUT_HANDLE));
 
-  lMessage := TMessageX.Create;
-  lMessage.FieldX := 133742069;
-  lMessage.FieldY := 'スゲーデン so uberuhaputo';
+  lMessage := TMessageY.Create;
+  lMessage.FieldX := TMessageX.Create;
   lMessage.Encode(lStdOut);
   lMessage.Free;
 
