@@ -25,12 +25,37 @@ unit Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufRepeatedFi
 
 interface
 
+uses
+  Generics.Collections, // For TEnumerable implementation
+  SysUtils; // For Exception in stubs
+
 type
   /// <summary>
   /// TODO
   /// </summary>
   /// <typeparam name="T">TODO</typeparam>
   TProtobufRepeatedField<T> = class(TEnumerable<T>)
+
+  private
+    /// <summary>
+    /// TODO
+    /// </summary>
+    function GetCount: Integer;
+
+    /// <summary>
+    /// TODO
+    /// </summary>
+    procedure SetCount(aCount: Integer);
+
+    /// <summary>
+    /// TODO
+    /// </summary>
+    function GetValue(aIndex: Integer): T;
+
+    /// <summary>
+    /// TODO
+    /// </summary>
+    procedure SetValue(aIndex: Integer; aValue: T);
 
   public
     /// <summary>
@@ -84,8 +109,64 @@ type
     /// <param name="aIndex">TODO</param>
     /// <returns>TODO</returns>
     function ExtractAt(aIndex: Integer): T;
+
+  private
+    /// <summary>
+    /// Called by the stub runtime to signal that some functionality is not implemented.
+    /// </summary>
+    class procedure NotImplementedInStub;
   end;
 
 implementation
+
+constructor TProtobufRepeatedField<T>.Create;
+begin
+  NotImplementedInStub;
+end;
+
+destructor TProtobufRepeatedField<T>.Destroy;
+begin
+  NotImplementedInStub;
+end;
+
+function TProtobufRepeatedField<T>.GetCount;
+begin
+  NotImplementedInStub;
+end;
+
+procedure TProtobufRepeatedField<T>.SetCount(aCount: Integer);
+begin
+  NotImplementedInStub;
+end;
+
+function TProtobufRepeatedField<T>.GetValue(aIndex: Integer): T;
+begin
+  NotImplementedInStub;
+end;
+
+procedure TProtobufRepeatedField<T>.SetValue(aIndex: Integer; aValue: T);
+begin
+  NotImplementedInStub;
+end;
+
+function TProtobufRepeatedField<T>.Add(const aValue: T): Integer;
+begin
+  NotImplementedInStub;
+end;
+
+procedure TProtobufRepeatedField<T>.Clear;
+begin
+  NotImplementedInStub;
+end;
+
+procedure TProtobufRepeatedField<T>.Delete(aIndex: Integer);
+begin
+  NotImplementedInStub;
+end;
+
+class procedure TProtobufRepeatedField<T>.NotImplementedInStub;
+begin
+  raise Exception.Create('This functionality is not implemented by the stub runtime');
+end;
 
 end.
