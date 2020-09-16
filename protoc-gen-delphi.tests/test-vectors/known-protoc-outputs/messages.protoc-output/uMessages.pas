@@ -3,6 +3,10 @@
 /// </remarks>
 unit uMessages;
 
+{$IFDEF FPC}
+  {$MODE DELPHI}
+{$ENDIF}
+
 interface
 
 uses

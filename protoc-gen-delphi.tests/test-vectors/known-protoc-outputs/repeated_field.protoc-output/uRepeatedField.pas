@@ -3,6 +3,10 @@
 /// </remarks>
 unit uRepeatedField;
 
+{$IFDEF FPC}
+  {$MODE DELPHI}
+{$ENDIF}
+
 interface
 
 uses

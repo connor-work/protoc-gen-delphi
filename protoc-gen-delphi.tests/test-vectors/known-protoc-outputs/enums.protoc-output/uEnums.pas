@@ -3,6 +3,10 @@
 /// </remarks>
 unit uEnums;
 
+{$IFDEF FPC}
+  {$MODE DELPHI}
+{$ENDIF}
+
 interface
 
 uses

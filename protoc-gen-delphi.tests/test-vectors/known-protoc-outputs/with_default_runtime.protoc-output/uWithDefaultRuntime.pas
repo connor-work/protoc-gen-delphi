@@ -3,6 +3,10 @@
 /// </remarks>
 unit uWithDefaultRuntime;
 
+{$IFDEF FPC}
+  {$MODE DELPHI}
+{$ENDIF}
+
 interface
 
 uses
