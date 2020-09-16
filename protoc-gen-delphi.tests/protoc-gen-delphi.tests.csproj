@@ -37,6 +37,15 @@
   </Target>
 
   <ItemGroup>
+    <!-- Runtime-independent support code for generated files -->
+    <EmbeddedResource Include="../runtime/Work/Connor/Protobuf/Delphi/ProtocGenDelphi/*.pas"
+                      LogicalName="[support code unit]%(Filename)%(Extension)" />
+    <!-- Source code of stub runtime library implementation -->
+    <EmbeddedResource Include="../runtime/Work/Connor/Protobuf/Delphi/ProtocGenDelphi/StubRuntime/*.pas"
+                      LogicalName="[stub runtime unit]%(Filename)%(Extension)" />
+  </ItemGroup>
+
+  <ItemGroup>
     <!-- Each known protoc output file tree is stored in a marked sub-directory -->
     <EmbeddedResource Include="test-vectors/known-protoc-outputs/**/*.protoc-output/**/*"
                       LogicalName="[known protoc output][expected output folder]%(RecursiveDir)%(Filename)%(Extension)" />
