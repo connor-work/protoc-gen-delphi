@@ -146,16 +146,23 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Tests
             }
 
             /// <summary>
+            /// Determines the Delphi namespace for the expected unit generated from a .proto file.
+            /// </summary>
+            /// <param name="name">Name of the .proto file</param>
+            /// <returns>Segments of the namespace identifier</returns>
+            private static IEnumerable<string> GetNamespaceSegmentsForProtoFile(string name) => name.Split(ProtocGenDelphi.protoFileNamePathSeparator)[0..^1].Select(segment => segment.ToPascalCase());
+
+            /// <summary>
             /// Names of all Delphi units that shall be referenced during the test compilation.
             /// </summary>
-            public IEnumerable<string> ReferencedUnits { get => InputProtoFileNames.Select(name => $"u{Path.GetFileName(name).Split(".")[0].ToPascalCase()}"); }
+            public IEnumerable<string> ReferencedUnits { get => InputProtoFileNames.Select(name => string.Join(".", GetNamespaceSegmentsForProtoFile(name).Append($"u{Path.GetFileName(name).Split(".")[0].ToPascalCase()}"))); }
 
             /// <summary>
             /// Determines the folders on the unit path for the test compilation.
             /// </summary>
             /// <param name="plugInOutputFolder">Folder containing all Delphi units produced by the plug-in</param>
             /// <returns>Paths of all folders on the unit path</returns>
-            public IEnumerable<string> GetUnitPathFolders(string plugInOutputFolder) => InputProtoFileNames.Select(name => Directory.GetParent(Path.Join(plugInOutputFolder, name)).FullName).Distinct();
+            public IEnumerable<string> GetUnitPathFolders(string plugInOutputFolder) => InputProtoFileNames.Select(name => Path.Join(GetNamespaceSegmentsForProtoFile(name).Prepend(plugInOutputFolder).ToArray())).Distinct();
 
             /// <summary>
             /// Creates a temporary file tree containing input files, required before using the test vector
@@ -229,6 +236,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Tests
         [MemberData(nameof(TestVectors))]
         public void ProducesOutputThatCanBeCompiled(TestVector vector)
         {
+            // TODO we should actually compile all from input folder (for import test)
             // Setup file tree as input for protoc, according to the test vector
             vector.SetupFileTree();
             // Create a scratch folder as output folder for the plug-in
@@ -285,7 +293,6 @@ end.
             fpc.StartInfo.ArgumentList.Add($"-FE{fpcOutputFolder}");
             fpc.StartInfo.ArgumentList.Add($"-Fu{supportCodeFolder}");
             fpc.StartInfo.ArgumentList.Add($"-Fu{runtimeFolder}");
-            fpc.StartInfo.ArgumentList.Add($"-Fu{plugInOutputFolder}");
             foreach (string unitPathFolder in vector.GetUnitPathFolders(plugInOutputFolder)) fpc.StartInfo.ArgumentList.Add($"-Fu{unitPathFolder}");
             fpc.StartInfo.ArgumentList.Add(fpcProgramFile);
             fpc.StartInfo.CreateNoWindow = true;
