@@ -49,6 +49,12 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         public UnitReference GetDependencyForMessages();
 
         /// <summary>
+        /// Provides the required unit reference for handling protobuf repeated fields.
+        /// </summary>
+        /// <returns>The Delphi unit reference</returns>
+        public UnitReference GetDependencyForRepeatedField();
+
+        /// <summary>
         /// Provides the required unit reference for handling protobuf fields of a specific field type. 
         /// </summary>
         /// <param name="type">The protobuf field type</param>
@@ -92,6 +98,8 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
             public UnitReference GetDependencyForEnums() => GetUnitReference("uProtobufEnum");
 
             public UnitReference GetDependencyForMessages() => GetUnitReference("uProtobufMessage");
+
+            public UnitReference GetDependencyForRepeatedField() => GetUnitReference("uProtobufRepeatedField");
 
             public UnitReference GetDependencyForFieldType(FieldDescriptorProto.Types.Type type)
             {
