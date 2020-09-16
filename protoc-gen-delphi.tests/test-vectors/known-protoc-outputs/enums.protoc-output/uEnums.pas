@@ -21,8 +21,7 @@ type
     /// This enumerated value corresponds to the protobuf enum constant <c>VALUE_X</c>.
     /// </remarks>
     EnumXValueX = 0
-  )
-  end;
+  );
 
 type
   /// <remarks>
