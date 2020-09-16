@@ -37,8 +37,7 @@ type
     /// This enumerated value corresponds to the protobuf enum constant <c>VALUE_Y</c>.
     /// </remarks>
     EnumYValueY = 3
-  )
-  end;
+  );
 
 implementation
 
