@@ -529,7 +529,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
                 if (field.Label == FieldDescriptorProto.Types.Label.Repeated)
                 {
                     string delphiElementType = field.Type.GetPublicDelphiElementType(field.TypeName, name => ConstructDelphiTypeName(name));
-                    createDeclaration.Statements.Insert(createDeclaration.Statements.Count - 1, $"{delphiField.Name} = {privateDelphiType}.Create;");
+                    createDeclaration.Statements.Insert(createDeclaration.Statements.Count - 1, $"{delphiField.Name} := {privateDelphiType}.Create;");
                     destroyDeclaration.Statements.Insert(destroyDeclaration.Statements.Count - 1, $"{delphiField.Name}.Free;");
                     encodeDeclaration.Statements.Add($"EncodeRepeatedField<{delphiElementType}>({delphiField.Name}, {delphiFieldNumberConst.Identifier}, {wireCodec}, aDest);");
                     decodeDeclaration.Statements.Add($"{delphiField.Name}.Clear;");
