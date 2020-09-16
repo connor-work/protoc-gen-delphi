@@ -101,7 +101,7 @@ implementation
 constructor TMessageX.Create;
 begin
   inherited;
-  FFieldX = TProtobufRepeatedField<UInt32>.Create;
+  FFieldX := TProtobufRepeatedField<UInt32>.Create;
   ClearOwnFields;
 end;
 
