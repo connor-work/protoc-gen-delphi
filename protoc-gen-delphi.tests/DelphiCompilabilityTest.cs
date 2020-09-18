@@ -21,6 +21,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
+using Work.Connor.Delphi;
 using Work.Connor.Delphi.CodeWriter;
 using Xunit;
 using Xunit.Abstractions;
@@ -146,9 +147,16 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Tests
             private static IEnumerable<string> GetNamespaceSegmentsForProtoFile(string name) => name.Split(ProtocGenDelphi.protoFileNamePathSeparator)[0..^1].Select(segment => segment.ToPascalCase());
 
             /// <summary>
-            /// Names of all Delphi units that shall be referenced during the test compilation.
+            /// All Delphi unit references that are required for test compilation.
             /// </summary>
-            public IEnumerable<string> ReferencedUnits => InputProtoFileNames.Select(name => string.Join(".", GetNamespaceSegmentsForProtoFile(name).Append($"u{Path.GetFileName(name).Split(".")[0].ToPascalCase()}")));
+            public IEnumerable<UnitReference> ReferencedUnits => InputProtoFileNames.Select(name => new UnitReference()
+            {
+                Unit = new UnitIdentifier()
+                {
+                    Namespace = { GetNamespaceSegmentsForProtoFile(name) },
+                    Unit = $"u{Path.GetFileName(name).Split(".")[0].ToPascalCase()}"
+                }
+            });
 
             /// <summary>
             /// Determines the folders on the unit path for the test compilation.
@@ -254,23 +262,12 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Tests
             string fpcOutputFolder = CreateScratchFolder();
             // Create a test runner program as input for FPC
             string fpcProgramFile = Path.Join(CreateScratchFolder(), "DelphiCompilationTestProgram.pas");
-            // TODO: Generate using Delphi Source Code Writer (needs to support "program")
-            // TODO: This currently supports only one referenced unit
-            File.WriteAllText(fpcProgramFile,
-$@"
-program DelphiCompilationTestProgram;
-
-{{$IFDEF FPC}}
-  {{$MODE DELPHI}}
-{{$ENDIF}}
-
-uses {vector.ReferencedUnits.First()};
-
-begin
-    
-end.
-"
-                );
+            Program fpcProgram = new Program()
+            {
+                Heading = "DelphiCompilationTestProgram",
+                UsesClause = { vector.ReferencedUnits }
+            };
+            File.WriteAllText(fpcProgramFile, fpcProgram.ToSourceCode());
             // Create a scratch folder to hold the runtime-independent support source code
             string supportCodeFolder = CreateScratchFolder();
             foreach ((string name, string content) in supportCodeUnitResources.ReadAllResources()) File.WriteAllText(Path.Join(supportCodeFolder, name), content);
