@@ -43,12 +43,12 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Tests
         /// <summary>
         /// Resource set of all test resource files within folders containing <c>protoc</c> input
         /// </summary>
-        private static readonly IResourceSet allInputFolderResources = testResources.Nest("[input folder]");
+        private static readonly IResourceSet allInputFolderResources = testResources.Nest("[input folder]").Or(IResourceSet.Root.Nest("[known schema folder]"));
 
         /// <summary>
         /// Resource set of all test resource files that are used as a single input protobuf schema definition file for <c>protoc</c>
         /// </summary>
-        private static readonly IResourceSet allInputFileResources = testResources.Nest("[input schema file]");
+        private static readonly IResourceSet allInputFileResources = testResources.Nest("[input schema file]").Or(IResourceSet.Root.Nest("[known schema file]"));
 
         /// <summary>
         /// Names of all known test vectors

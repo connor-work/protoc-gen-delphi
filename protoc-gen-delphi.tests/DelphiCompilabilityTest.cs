@@ -33,22 +33,15 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Tests
     /// </summary>
     public class DelphiCompilabilityTest
     {
-        // TODO separate input files, plus common schema folder?
-
-        /// <summary>
-        /// Resource set of all test resource files for this kind of test
-        /// </summary>
-        private static readonly IResourceSet testResources = IResourceSet.Root.Nest("[known protoc output]");
-
         /// <summary>
         /// Resource set of all test resource files within folders containing <c>protoc</c> input
         /// </summary>
-        private static readonly IResourceSet allInputFolderResources = testResources.Nest("[input folder]");
+        private static readonly IResourceSet allInputFolderResources = IResourceSet.Root.Nest("[known schema folder]");
 
         /// <summary>
         /// Resource set of all test resource files that are used as a single input protobuf schema definition file for <c>protoc</c>
         /// </summary>
-        private static readonly IResourceSet allInputFileResources = testResources.Nest("[input schema file]");
+        private static readonly IResourceSet allInputFileResources = IResourceSet.Root.Nest("[known schema file]");
 
         /// <summary>
         /// Resource set of all Delphi units that contain support source code for generated files
