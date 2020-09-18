@@ -62,10 +62,9 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Tests
         /// <summary>
         /// Names of all known test vectors
         /// </summary>
-        /// <returns>Enumeration of test vector names</returns>
-        private static IEnumerable<string> TestVectorNames() => allInputFolderResources.GetIDs().WhereSuffixed(new Regex($"{Regex.Escape(".protoc-input")}/.*"))
-                                                        .Concat(allInputFileResources.GetIDs().WhereSuffixed(new Regex(Regex.Escape(".proto"))))
-                                                        .Distinct();
+        private static IEnumerable<string> TestVectorNames => allInputFolderResources.GetIDs().WhereSuffixed(new Regex($"{Regex.Escape(".protoc-input")}/.*"))
+                                                      .Concat(allInputFileResources.GetIDs().WhereSuffixed(new Regex(Regex.Escape(".proto"))))
+                                                      .Distinct();
 
         /// <summary>
         /// Prefix to the name of .proto files in test input folders that shall be used as input files
@@ -121,29 +120,23 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Tests
             }
 #pragma warning restore CS8618
 
-            private void InitializeResourceSets()
-            {
-                inputFolderResources = allInputFolderResources.Nest($"{name}.protoc-input/");
-            }
+            private void InitializeResourceSets() => inputFolderResources = allInputFolderResources.Nest($"{name}.protoc-input/");
 
             /// <summary>
             /// Name of the optional test resource file that is used as a single input protobuf schema definition file for <c>protoc</c> for this test
             /// </summary>
-            private string InputSchemaFileName { get => $"{name}.proto"; }
+            private string InputSchemaFileName => $"{name}.proto";
 
             /// <summary>
             /// Name and contents of all .proto files that are used as <c>protoc</c> input for this test
             /// </summary>
-            private IEnumerable<(string, string)> ProtoFilesToSetup { get => inputFolderResources.ReadAllResources().Concat(allInputFileResources.ReadResources(new[] { InputSchemaFileName })); }
+            private IEnumerable<(string, string)> ProtoFilesToSetup => inputFolderResources.ReadAllResources().Concat(allInputFileResources.ReadResources(new[] { InputSchemaFileName }));
 
             /// <summary>
             /// Names of all .proto files that shall be specified for generation in the <c>protoc</c> arguments
             /// </summary>
-            private IEnumerable<string> InputProtoFileNames
-            {
-                get => inputFolderResources.GetIDs().Where(name => name.Contains(inputFilePrefix)).Concat(
-                       allInputFileResources.GetIDs().Where(name => name.Equals(InputSchemaFileName)));
-            }
+            private IEnumerable<string> InputProtoFileNames => inputFolderResources.GetIDs().Where(name => name.Contains(inputFilePrefix))
+                                                       .Concat(allInputFileResources.GetIDs().Where(name => name.Equals(InputSchemaFileName)));
 
             /// <summary>
             /// Determines the Delphi namespace for the expected unit generated from a .proto file.
@@ -155,7 +148,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Tests
             /// <summary>
             /// Names of all Delphi units that shall be referenced during the test compilation.
             /// </summary>
-            public IEnumerable<string> ReferencedUnits { get => InputProtoFileNames.Select(name => string.Join(".", GetNamespaceSegmentsForProtoFile(name).Append($"u{Path.GetFileName(name).Split(".")[0].ToPascalCase()}"))); }
+            public IEnumerable<string> ReferencedUnits => InputProtoFileNames.Select(name => string.Join(".", GetNamespaceSegmentsForProtoFile(name).Append($"u{Path.GetFileName(name).Split(".")[0].ToPascalCase()}")));
 
             /// <summary>
             /// Determines the folders on the unit path for the test compilation.
@@ -181,7 +174,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Tests
             /// <summary>
             /// Arguments to <c>protoc</c>
             /// </summary>
-            public IEnumerable<string> ProtocArgs { get => InputProtoFileNames.Prepend($"-I{inputFolder ?? throw new InvalidOperationException($"Test vector file tree was not setup using {nameof(SetupFileTree)}")}"); }
+            public IEnumerable<string> ProtocArgs => InputProtoFileNames.Prepend($"-I{inputFolder ?? throw new InvalidOperationException($"Test vector file tree was not setup using {nameof(SetupFileTree)}")}");
 
             public void Deserialize(IXunitSerializationInfo info)
             {
@@ -189,10 +182,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Tests
                 InitializeResourceSets();
             }
 
-            public void Serialize(IXunitSerializationInfo info)
-            {
-                info.AddValue(nameof(name), name);
-            }
+            public void Serialize(IXunitSerializationInfo info) => info.AddValue(nameof(name), name);
 
             public override string? ToString() => name;
         }
@@ -200,7 +190,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Tests
         /// <summary>
         /// All known test vectors
         /// </summary>
-        public static IEnumerable<object[]> TestVectors { get => TestVectorNames().Select(name => new object[] { new TestVector(name) }); }
+        public static IEnumerable<object[]> TestVectors => TestVectorNames.Select(name => new object[] { new TestVector(name) });
 
         /// <summary>
         /// Constructs an executable file name for the current platform.
@@ -229,7 +219,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Tests
         }
 
         /// <summary>
-        /// <see cref="ProtocGenDelphi"/> produces Delphi code when used as a <c>protoc</c> plug-in, that can be compiled
+        /// <see cref="ProtocGenDelphi"/> produces Delphi code when used as a <c>protoc</c> plug-in, that can be compiled using FPC.
         /// </summary>
         /// <param name="vector">Test vector</param>
         [Theory]
