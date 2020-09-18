@@ -3,12 +3,17 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <RootNamespace>protoc_gen_delphi.runtime_tests</RootNamespace>
-
-    <IsPackable>false</IsPackable>
+    <IsPackable>true</IsPackable>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>protoc-gen-delphi.runtime-tests</ToolCommandName>
+    <GenerateProgramFile>false</GenerateProgramFile>
+    <StartupObject></StartupObject>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.5.0" />
+    <!-- Include test CLI to allow stand-alone execution, approach based on https://github.com/microsoft/vstest/issues/2200#issuecomment-590835049 -->
+    <PackageReference Include="Microsoft.TestPlatform.CLI" Version="16.5.0" />
     <PackageReference Include="xunit" Version="2.4.0" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.0" />
     <PackageReference Include="coverlet.collector" Version="1.2.0" />
