@@ -6,7 +6,9 @@ program Decode;
 
 uses
   Com.GitHub.Pikaju.Protobuf.Delphi.Test.uProtobufTestUtility,
-  uEmptySchema;
+  uUint32,
+  Classes,
+  Windows;
 
 var
   lStdIn: THandleStream;
@@ -16,7 +18,7 @@ begin
 
   lMessage := TMessageX.Create;
   lMessage.Decode(lStdIn);
-  AssertTrue(lMessage.FieldX = EnumXFieldX, 'Enum value is parsed correctly.');
+  AssertTrue(lMessage.FieldX = 133742069, 'Uint32 is parsed correctly.');
   lMessage.Free;
 
   lStdIn.Free;

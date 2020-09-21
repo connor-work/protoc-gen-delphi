@@ -5,16 +5,18 @@ program Encode;
 {$ENDIF}
 
 uses
-  uString;
+  uMessageField,
+  Classes,
+  Windows;
 
 var
   lStdOut: THandleStream;
-  lMessage: TMessageX;
+  lMessage: TMessageY;
 begin
   lStdOut := THandleStream.Create(GetStdHandle(STD_OUTPUT_HANDLE));
 
-  lMessage := TMessageX.Create;
-  lMessage.FieldX := 'スゲーデン so uberuhaputo';
+  lMessage := TMessageY.Create;
+  lMessage.FieldX := TMessageX.Create;
   lMessage.Encode(lStdOut);
   lMessage.Free;
 

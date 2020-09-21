@@ -5,7 +5,10 @@ program Encode;
 {$ENDIF}
 
 uses
-  uFields;
+  uString,
+  Classes,
+  SysUtils,
+  Windows;
 
 var
   lStdOut: THandleStream;
@@ -14,8 +17,7 @@ begin
   lStdOut := THandleStream.Create(GetStdHandle(STD_OUTPUT_HANDLE));
 
   lMessage := TMessageX.Create;
-  lMessage.FieldX := 133742069;
-  lMessage.FieldY := 'スゲーデン so uberuhaputo';
+  lMessage.FieldX := 'スゲーデン so uberuhaputo';
   lMessage.Encode(lStdOut);
   lMessage.Free;
 

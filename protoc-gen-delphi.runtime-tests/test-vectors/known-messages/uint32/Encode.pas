@@ -5,16 +5,18 @@ program Encode;
 {$ENDIF}
 
 uses
-  uFields;
+  uUint32,
+  Classes,
+  Windows;
 
 var
   lStdOut: THandleStream;
-  lMessage: TMessageY;
+  lMessage: TMessageX;
 begin
   lStdOut := THandleStream.Create(GetStdHandle(STD_OUTPUT_HANDLE));
 
-  lMessage := TMessageY.Create;
-  lMessage.FieldX := TMessageX.Create;
+  lMessage := TMessageX.Create;
+  lMessage.FieldX := 133742069;
   lMessage.Encode(lStdOut);
   lMessage.Free;
 

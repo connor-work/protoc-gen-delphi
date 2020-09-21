@@ -6,7 +6,9 @@ program Decode;
 
 uses
   Com.GitHub.Pikaju.Protobuf.Delphi.Test.uProtobufTestUtility,
-  uUint32;
+  uString,
+  Classes,
+  Windows;
 
 var
   lStdIn: THandleStream;
@@ -16,7 +18,8 @@ begin
 
   lMessage := TMessageX.Create;
   lMessage.Decode(lStdIn);
-  AssertTrue(lMessage.FieldX = 133742069, 'Uint32 is parsed correctly.');
+  AssertTrue(lMessage.FieldX = 'スゲーデン so uberuhaputo', 'String is parsed correctly.');
+  AssertTrue(lMessage.FieldX = 'スゲーデン so uberuhaputos', 'String is parsed correctly.');
   lMessage.Free;
 
   lStdIn.Free;

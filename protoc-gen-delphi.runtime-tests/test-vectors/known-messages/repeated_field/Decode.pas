@@ -6,7 +6,9 @@ program Decode;
 
 uses
   Com.GitHub.Pikaju.Protobuf.Delphi.Test.uProtobufTestUtility,
-  uFields;
+  uRepeatedField,
+  Classes,
+  Windows;
 
 var
   lStdIn: THandleStream;

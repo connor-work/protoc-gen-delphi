@@ -5,7 +5,9 @@ program Encode;
 {$ENDIF}
 
 uses
-  uUint32;
+  uEnumField,
+  Classes,
+  Windows;
 
 var
   lStdOut: THandleStream;
@@ -14,7 +16,7 @@ begin
   lStdOut := THandleStream.Create(GetStdHandle(STD_OUTPUT_HANDLE));
 
   lMessage := TMessageX.Create;
-  lMessage.FieldX := 133742069;
+  lMessage.FieldX := EnumXValueX;
   lMessage.Encode(lStdOut);
   lMessage.Free;
 

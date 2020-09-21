@@ -32,6 +32,9 @@
     <!-- Source code of stub runtime library implementation -->
     <EmbeddedResource Include="../runtime/Work/Connor/Protobuf/Delphi/ProtocGenDelphi/StubRuntime/*.pas"
                       LogicalName="[stub runtime unit]%(Filename)%(Extension)" />
+    <!-- Support source code for Delphi tests -->
+    <EmbeddedResource Include="test-support/**/*.pas"
+                      LogicalName="[Delphi test support code unit]%(RecursiveDir)%(Filename)%(Extension)" />
   </ItemGroup>
 
   <ItemGroup>
@@ -39,5 +42,13 @@
     <EmbeddedResource Include="../test-vectors/known-schemata/**/*.protoc-input/**/*" LogicalName="[known schema folder]%(RecursiveDir)%(Filename)%(Extension)" />
     <!-- Known schema files -->
     <EmbeddedResource Include="../test-vectors/known-schemata/**/*.proto" Exclude="../test-vectors/known-schemata/**/*.protoc-input/**/*" LogicalName="[known schema file]%(RecursiveDir)%(Filename)%(Extension)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- For each known message, there is an encode/decode test consisting of two Delphi programs -->
+    <EmbeddedResource Include="test-vectors/known-messages/**/Encode.pas"
+                      LogicalName="[known message][encode program]%(RecursiveDir)" />
+    <EmbeddedResource Include="test-vectors/known-messages/**/Decode.pas"
+                      LogicalName="[known message][decode program]%(RecursiveDir)" />
   </ItemGroup>
 </Project>
