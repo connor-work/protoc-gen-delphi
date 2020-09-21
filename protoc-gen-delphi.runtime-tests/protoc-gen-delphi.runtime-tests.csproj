@@ -15,8 +15,8 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.5.0" />
     <!-- Include test CLI to allow stand-alone execution, approach based on https://github.com/microsoft/vstest/issues/2200#issuecomment-590835049 -->
     <PackageReference Include="Microsoft.TestPlatform.CLI" Version="16.5.0" />
-    <PackageReference Include="xunit" Version="2.4.0" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.0" />
+    <PackageReference Include="xunit" Version="2.4.1" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1" />
     <PackageReference Include="coverlet.collector" Version="1.2.0" />
     <PackageReference Include="Work.Connor.Delphi.CodeWriter" Version="0.0.1-*" />
   </ItemGroup>
