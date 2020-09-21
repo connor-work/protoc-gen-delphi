@@ -15,7 +15,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -50,7 +49,6 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.RuntimeTests
         /// Resource set of all Delphi units that form the stub runtime library implementation
         /// </summary>
         private static readonly IResourceSet stubRuntimeUnitResources = IResourceSet.Root.Nest("[stub runtime unit]");
-            // IResourceSet.External("C:\\work\\Software\\forks\\pikaju\\protobuf-delphi\\source\\unit"); // TODO
 
         /// <summary>
         /// Names of all known test vectors
