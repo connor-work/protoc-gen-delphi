@@ -51,11 +51,11 @@
 
   <ItemGroup>
     <!-- Known schema folders -->
-    <EmbeddedResource Include="test-vectors/known-schemata/**/*.protoc-input/**/*"
+    <EmbeddedResource Include="../test-vectors/known-schemata/**/*.protoc-input/**/*"
                       LogicalName="[known schema folder]%(RecursiveDir)%(Filename)%(Extension)" />
     <!-- Known schema files -->
-    <EmbeddedResource Include="test-vectors/known-schemata/**/*.proto"
-                      Exclude="test-vectors/known-schemata/**/*.protoc-input/**/*"
+    <EmbeddedResource Include="../test-vectors/known-schemata/**/*.proto"
+                      Exclude="../test-vectors/known-schemata/**/*.protoc-input/**/*"
                       LogicalName="[known schema file]%(RecursiveDir)%(Filename)%(Extension)" />
   </ItemGroup>
 
@@ -81,5 +81,4 @@
     <EmbeddedResource Include="test-vectors/known-responses-to-protoc/**/*.request.pb.json"
                       LogicalName="[known response to protoc][request]%(RecursiveDir)%(Filename)%(Extension)" />
   </ItemGroup>
-
 </Project>

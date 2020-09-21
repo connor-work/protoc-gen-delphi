@@ -18,15 +18,13 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
 using System.Text.RegularExpressions;
 using Work.Connor.Delphi;
 using Work.Connor.Delphi.CodeWriter;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Tests
+namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.RuntimeTests
 {
     /// <summary>
     /// Tests if Delphi code produced by <see cref="ProtocGenDelphi"/> as a plug-in to <c>protoc</c> can be compiled.
@@ -34,7 +32,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Tests
     public class DelphiCompilabilityTest
     {
         /// <summary>
-        /// Resource set of all test resource files within folders containing <c>protoc</c> input
+        /// Resource set of all test resource files within folders containing <c>protoc</c> input (and support files)
         /// </summary>
         private static readonly IResourceSet allInputFolderResources = IResourceSet.Root.Nest("[known schema folder]");
 
@@ -52,6 +50,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Tests
         /// Resource set of all Delphi units that form the stub runtime library implementation
         /// </summary>
         private static readonly IResourceSet stubRuntimeUnitResources = IResourceSet.Root.Nest("[stub runtime unit]");
+            // IResourceSet.External("C:\\work\\Software\\forks\\pikaju\\protobuf-delphi\\source\\unit"); // TODO
 
         /// <summary>
         /// Names of all known test vectors
@@ -88,7 +87,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Tests
             private string name;
 
             /// <summary>
-            /// Resource set of all test resource files that are used as <c>protoc</c> input for this test
+            /// Resource set of all test resource files that are used as <c>protoc</c> input or support files for this test
             /// </summary>
             private IResourceSet inputFolderResources;
 
@@ -114,6 +113,9 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Tests
             }
 #pragma warning restore CS8618
 
+            /// <summary>
+            /// Helper function that sets up the test vector's resource sets.
+            /// </summary>
             private void InitializeResourceSets() => inputFolderResources = allInputFolderResources.Nest($"{name}.protoc-input/");
 
             /// <summary>
@@ -124,13 +126,30 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Tests
             /// <summary>
             /// Name and contents of all .proto files that are used as <c>protoc</c> input for this test
             /// </summary>
-            private IEnumerable<(string, string)> ProtoFilesToSetup => inputFolderResources.ReadAllResources().Concat(allInputFileResources.ReadResources(new[] { InputSchemaFileName }));
+            private IEnumerable<(string, string)> ProtoFilesToSetup => inputFolderResources.ReadResources(inputFolderResources.GetIDs().Where(name => name.EndsWith($".{ProtocGenDelphi.protoFileExtension}")))
+                                                         .Concat(allInputFileResources.ReadResources(new[] { InputSchemaFileName }));
+
+            /// <summary>
+            /// Name and contents of all files that should be copied to the plug-in output folder before performing further tests (support files)
+            /// </summary>
+            public IEnumerable<(string, string)> SupportFiles => inputFolderResources.ReadResources(inputFolderResources.GetIDs().Where(name => !name.EndsWith($".{ProtocGenDelphi.protoFileExtension}")));
 
             /// <summary>
             /// Names of all .proto files that shall be specified for generation in the <c>protoc</c> arguments
             /// </summary>
-            private IEnumerable<string> InputProtoFileNames => inputFolderResources.GetIDs().Where(name => name.Contains(inputFilePrefix))
-                                                       .Concat(allInputFileResources.GetIDs().Where(name => name.Equals(InputSchemaFileName)));
+            public IEnumerable<string> InputProtoFileNames => inputFolderResources.GetIDs().Where(name => name.Contains(inputFilePrefix) && name.EndsWith($".{ProtocGenDelphi.protoFileExtension}"))
+                                                      .Concat(allInputFileResources.GetIDs().Where(name => name.Equals(InputSchemaFileName)));
+
+            /// <summary>
+            /// Paths of all folders that should be added to the <c>protoc</c> search path
+            /// </summary>
+            public IEnumerable<string> ProtoPath
+            {
+                get
+                {
+                    yield return inputFolder ?? throw new InvalidOperationException($"Test vector file tree was not setup using {nameof(SetupInputFileTree)}");
+                }
+            }
 
             /// <summary>
             /// Determines the Delphi namespace for the expected unit generated from a .proto file.
@@ -159,9 +178,9 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Tests
             public IEnumerable<string> GetUnitPathFolders(string plugInOutputFolder) => InputProtoFileNames.Select(name => Path.Join(GetNamespaceSegmentsForProtoFile(name).Prepend(plugInOutputFolder).ToArray())).Distinct();
 
             /// <summary>
-            /// Creates a temporary file tree containing input files, required before using the test vector
+            /// Creates a temporary file tree containing input files, required before using the test vector.
             /// </summary>
-            public void SetupFileTree()
+            public void SetupInputFileTree()
             {
                 inputFolder = CreateScratchFolder();
                 foreach ((string name, string content) in ProtoFilesToSetup)
@@ -171,11 +190,6 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Tests
                     File.WriteAllText(path, content);
                 }
             }
-
-            /// <summary>
-            /// Arguments to <c>protoc</c>
-            /// </summary>
-            public IEnumerable<string> ProtocArgs => InputProtoFileNames.Prepend($"-I{inputFolder ?? throw new InvalidOperationException($"Test vector file tree was not setup using {nameof(SetupFileTree)}")}");
 
             public void Deserialize(IXunitSerializationInfo info)
             {
@@ -194,97 +208,62 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Tests
         public static IEnumerable<object[]> TestVectors => TestVectorNames.Select(name => new object[] { new TestVector(name) });
 
         /// <summary>
-        /// Constructs an executable file name for the current platform.
-        /// </summary>
-        /// <param name="name">The base name, without extension</param>
-        /// <returns>The executable file name</returns>
-        private static string GetExecutableName(string name)
-        {
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) return $"{name}.exe";
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) return name;
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) return name;
-            throw new NotImplementedException("Unsupported OS");
-        }
-
-        /// <summary>
-        /// Determines the platform identifier in <c>protoc</c>'s path.
-        /// </summary>
-        /// <returns>The <c>protoc</c> platform identifier string</returns>
-        private static string GetProtocPlatform()
-        {
-            if (!Environment.Is64BitOperatingSystem) throw new NotImplementedException("Unsupported non-64-bit OS");
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) return "windows_x64";
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) return "macosx_x64";
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) return "linux_x64";
-            throw new NotImplementedException("Unsupported OS");
-        }
-
-        /// <summary>
-        /// <see cref="ProtocGenDelphi"/> produces Delphi code when used as a <c>protoc</c> plug-in, that can be compiled using FPC.
+        /// <see cref="ProtocGenDelphi"/> produces Delphi code when used as a <c>protoc</c> plug-in, that can be compiled using FPC, together with runtime library sources.
         /// </summary>
         /// <param name="vector">Test vector</param>
         [Theory]
         [MemberData(nameof(TestVectors))]
         public void ProducesOutputThatCanBeCompiled(TestVector vector)
         {
-            // TODO we should actually compile all from input folder (for import test)
-            // Setup file tree as input for protoc, according to the test vector
-            vector.SetupFileTree();
-            // Create a scratch folder as output folder for the plug-in
-            string plugInOutputFolder = CreateScratchFolder();
-            // Run protoc
-            using Process protoc = new Process();
-            protoc.StartInfo.FileName = Path.Join("Google.Protobuf.Tools", "tools", GetProtocPlatform(), GetExecutableName("protoc"));
-            // A leading dot seems to be required in the plugin folder name for protoc
-            protoc.StartInfo.ArgumentList.Add($"--plugin={Path.Join(".", GetExecutableName("protoc-gen-delphi"))}");
-            protoc.StartInfo.ArgumentList.Add($"--delphi_out={plugInOutputFolder}");
-            protoc.StartInfo.ArgumentList.Add($"--delphi_opt={ProtocGenDelphi.customRuntimeOption}={IRuntimeSupport.Stub.DelphiNamespace}");
-            foreach (string arg in vector.ProtocArgs) protoc.StartInfo.ArgumentList.Add(arg);
-            protoc.StartInfo.CreateNoWindow = true;
-            protoc.StartInfo.UseShellExecute = false;
-            protoc.StartInfo.RedirectStandardError = true;
-            string protocError = "";
-            protoc.Start();
-            protoc.ErrorDataReceived += delegate (object sender, DataReceivedEventArgs e) { protocError += e.Data; };
-            protoc.BeginErrorReadLine();
-            protoc.WaitForExit();
-            // Check protoc success
-            Assert.Equal(0, protoc.ExitCode);
+            //Debugger.Launch();
+            // Determine whether to test with embedded stub runtime library or external functional runtime library
+            IResourceSet runtimeUnitResources = RuntimeTestOptions.UseStubRuntimeLibrary ? stubRuntimeUnitResources
+                                                                                         : IResourceSet.External(RuntimeTestOptions.RuntimeLibrarySourcePath);
 
-            // Create a scratch folder as output folder for FPC
-            string fpcOutputFolder = CreateScratchFolder();
+            // Setup file tree as input for protoc, according to the test vector
+            vector.SetupInputFileTree();
+            // Run protoc
+            ProtocOperation.PlugInOperation plugIn = new ProtocOperation.PlugInOperation("delphi") { OutDir = CreateScratchFolder() };
+            if (RuntimeTestOptions.UseStubRuntimeLibrary) plugIn.Options[ProtocGenDelphi.customRuntimeOption] = IRuntimeSupport.Stub.DelphiNamespace;
+            ProtocOperation protoc = new ProtocOperation();
+            protoc.ProtoPath.AddRange(vector.ProtoPath);
+            protoc.ProtoFiles.AddRange(vector.InputProtoFileNames);
+            protoc.PlugIns.Add(plugIn);
+            (bool protocSuccess, _, string? protocError) = protoc.Perform();
+            Assert.True(protocSuccess, protocError!);
+
             // Create a test runner program as input for FPC
-            string fpcProgramFile = Path.Join(CreateScratchFolder(), "DelphiCompilationTestProgram.pas");
-            Program fpcProgram = new Program()
+            string programFile = Path.Join(CreateScratchFolder(), "DelphiCompilationTestProgram.pas");
+            Program program = new Program()
             {
                 Heading = "DelphiCompilationTestProgram",
                 UsesClause = { vector.ReferencedUnits }
             };
-            File.WriteAllText(fpcProgramFile, fpcProgram.ToSourceCode());
-            // Create a scratch folder to hold the runtime-independent support source code
-            string supportCodeFolder = CreateScratchFolder();
-            foreach ((string name, string content) in supportCodeUnitResources.ReadAllResources()) File.WriteAllText(Path.Join(supportCodeFolder, name), content);
-            // Create a scratch folder to hold the runtime source code
-            string runtimeFolder = CreateScratchFolder();
-            foreach ((string name, string content) in stubRuntimeUnitResources.ReadAllResources()) File.WriteAllText(Path.Join(runtimeFolder, name), content);
+            File.WriteAllText(programFile, program.ToSourceCode());
+
             // Run FPC
-            using Process fpc = new Process();
-            fpc.StartInfo.FileName = GetExecutableName("fpc");
-            fpc.StartInfo.ArgumentList.Add($"-FE{fpcOutputFolder}");
-            fpc.StartInfo.ArgumentList.Add($"-Fu{supportCodeFolder}");
-            fpc.StartInfo.ArgumentList.Add($"-Fu{runtimeFolder}");
-            foreach (string unitPathFolder in vector.GetUnitPathFolders(plugInOutputFolder)) fpc.StartInfo.ArgumentList.Add($"-Fu{unitPathFolder}");
-            fpc.StartInfo.ArgumentList.Add(fpcProgramFile);
-            fpc.StartInfo.CreateNoWindow = true;
-            fpc.StartInfo.UseShellExecute = false;
-            fpc.StartInfo.RedirectStandardOutput = true;
-            StringBuilder fpcOut = new StringBuilder();
-            fpc.Start();
-            fpc.OutputDataReceived += delegate (object sender, DataReceivedEventArgs e) { fpcOut.AppendLine(e.Data); };
-            fpc.BeginOutputReadLine();
-            fpc.WaitForExit();
-            // Check FPC success
-            Assert.Equal(0, fpc.ExitCode);
+            FpcOperation fpc = new FpcOperation(programFile) { OutputPath = CreateScratchFolder() };
+            fpc.UnitPath.AddRange(vector.GetUnitPathFolders(plugIn.OutDir));
+            // Adds units from a resource set to FPC
+            void addUnits(IEnumerable<(string name, string content)> resources, string rootFolder)
+            {
+                foreach ((string name, string content) in resources)
+                {
+                    string path = Path.Join(rootFolder, name);
+                    string folder = Directory.GetParent(path).FullName;
+                    Directory.CreateDirectory(folder);
+                    File.WriteAllText(path, content);
+                    if (!fpc.UnitPath.Contains(folder)) fpc.UnitPath.Add(folder);
+                }
+            }
+            // Create a scratch folder to hold the runtime-independent support source code
+            addUnits(supportCodeUnitResources.ReadAllResources(), CreateScratchFolder());
+            // Create a scratch folder to hold the runtime source code
+            addUnits(runtimeUnitResources.ReadAllResources(), CreateScratchFolder());
+            // Add support files (may contain required source code)
+            addUnits(vector.SupportFiles, CreateScratchFolder());
+            (bool fpcSuccess, _, string? fpcError) = fpc.Perform();
+            Assert.True(fpcSuccess, fpcError!);
         }
     }
 }

@@ -1,13 +1,14 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <RootNamespace>protoc_gen_delphi.runtime_tests</RootNamespace>
+    <RootNamespace>Work.Connor.Protobuf.Delphi.ProtocGenDelphi.RuntimeTests</RootNamespace>
     <IsPackable>true</IsPackable>
     <PackAsTool>true</PackAsTool>
-    <ToolCommandName>protoc-gen-delphi.runtime-tests</ToolCommandName>
+    <ToolCommandName>protoc-gen-delphi-runtime-tests</ToolCommandName>
     <GenerateProgramFile>false</GenerateProgramFile>
     <StartupObject></StartupObject>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
@@ -17,6 +18,26 @@
     <PackageReference Include="xunit" Version="2.4.0" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.0" />
     <PackageReference Include="coverlet.collector" Version="1.2.0" />
+    <PackageReference Include="Work.Connor.Delphi.CodeWriter" Version="0.0.1-*" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\protoc-gen-delphi\protoc-gen-delphi.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Runtime-independent support code for generated files -->
+    <EmbeddedResource Include="../runtime/Work/Connor/Protobuf/Delphi/ProtocGenDelphi/*.pas"
+                      LogicalName="[support code unit]%(Filename)%(Extension)" />
+    <!-- Source code of stub runtime library implementation -->
+    <EmbeddedResource Include="../runtime/Work/Connor/Protobuf/Delphi/ProtocGenDelphi/StubRuntime/*.pas"
+                      LogicalName="[stub runtime unit]%(Filename)%(Extension)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Known schema folders -->
+    <EmbeddedResource Include="../test-vectors/known-schemata/**/*.protoc-input/**/*" LogicalName="[known schema folder]%(RecursiveDir)%(Filename)%(Extension)" />
+    <!-- Known schema files -->
+    <EmbeddedResource Include="../test-vectors/known-schemata/**/*.proto" Exclude="../test-vectors/known-schemata/**/*.protoc-input/**/*" LogicalName="[known schema file]%(RecursiveDir)%(Filename)%(Extension)" />
+  </ItemGroup>
 </Project>
