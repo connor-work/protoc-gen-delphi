@@ -215,7 +215,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.RuntimeTests
         {
             // Determine whether to test with embedded stub runtime library or external functional runtime library
             IResourceSet runtimeUnitResources = RuntimeTestOptions.UseStubRuntimeLibrary ? stubRuntimeUnitResources
-                                                                                         : IResourceSet.External(RuntimeTestOptions.RuntimeLibrarySourcePath);
+                                                                                         : IResourceSet.External(RuntimeTestOptions.RuntimeLibrarySourcePath!);
 
             // Setup file tree as input for protoc, according to the test vector
             vector.SetupInputFileTree();
