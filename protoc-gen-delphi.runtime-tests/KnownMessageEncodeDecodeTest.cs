@@ -313,7 +313,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.RuntimeTests
             encode.StartInfo.UseShellExecute = false;
             encode.StartInfo.RedirectStandardOutput = true;
             using Process decode = new Process();
-            decode.StartInfo.FileName = encodeExeFile;
+            decode.StartInfo.FileName = decodeExeFile;
             decode.StartInfo.CreateNoWindow = true;
             decode.StartInfo.UseShellExecute = false;
             decode.StartInfo.RedirectStandardInput = true;
