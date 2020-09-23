@@ -6,7 +6,7 @@ program Decode;
 
 uses
   Com.GitHub.Pikaju.Protobuf.Delphi.Test.uProtobufTestUtility,
-  uEmptySchema,
+  uEnumField,
   Classes,
   Windows;
 
