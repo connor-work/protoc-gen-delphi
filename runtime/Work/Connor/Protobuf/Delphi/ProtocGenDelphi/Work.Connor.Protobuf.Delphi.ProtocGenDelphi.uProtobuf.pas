@@ -13,6 +13,10 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
+/// <summary>
+/// Basic definitions used by Delphi code generated from protobuf schema definitions using <c>protoc-gen-delphi</c>,
+/// and by compatible runtime library implementations.
+/// </summary>
 unit Work.Connor.Protobuf.Delphi.ProtocGenDelphi.uProtobuf;
 
 {$IFDEF FPC}
@@ -20,9 +24,6 @@ unit Work.Connor.Protobuf.Delphi.ProtocGenDelphi.uProtobuf;
 {$ENDIF}
 
 interface
-
-uses
-  System.SysUtils;
 
 type
   /// <summary>
@@ -37,7 +38,7 @@ type
   TProtobufFieldNumber = 1..536870911;
 
   /// <summary>
-  /// Type that can hold any protobuf enumerated value
+  /// Type that can hold any protobuf enum value
   /// </summary>
   TProtobufEnumFieldValue = System.Int32;
 
@@ -60,12 +61,12 @@ const
   /// <summary>
   /// Default value for a protobuf field of <c>double</c> protobuf type
   /// </summary>
-  PROTOBUF_DEFAULT_VALUE_DOUBLE = System.Double(PROTOBUF_DEFAULT_VALUE_NUMERIC);
+  PROTOBUF_DEFAULT_VALUE_DOUBLE = System.Double(0.0);
 
   /// <summary>
   /// Default value for a protobuf field of <c>float</c> protobuf type
   /// </summary>
-  PROTOBUF_DEFAULT_VALUE_FLOAT = System.Single(PROTOBUF_DEFAULT_VALUE_NUMERIC);
+  PROTOBUF_DEFAULT_VALUE_FLOAT = System.Single(0.0);
 
   /// <summary>
   /// Default value for a protobuf field of <c>int32</c> protobuf type
@@ -126,11 +127,6 @@ const
   /// Default value for a protobuf field of <c>string</c> protobuf type
   /// </summary>
   PROTOBUF_DEFAULT_VALUE_STRING = System.UnicodeString('');
-
-  /// <summary>
-  /// Default value for a protobuf field of <c>bytes</c> protobuf type
-  /// </summary>
-  PROTOBUF_DEFAULT_VALUE_BYTES = System.SysUtils.TBytes([]);
 
   /// <summary>
   /// Default value for a protobuf field of an enum type

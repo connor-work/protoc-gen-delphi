@@ -3,6 +3,10 @@
 /// </remarks>
 unit SpaceX.SpaceY.uInputFileNamespaceFromPath;
 
+{$IFDEF FPC}
+  {$MODE DELPHI}
+{$ENDIF}
+
 interface
 
 implementation
