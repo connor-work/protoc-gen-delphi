@@ -17,7 +17,7 @@ begin
   lStdIn := THandleStream.Create(GetStdHandle(STD_INPUT_HANDLE));
 
   lMessage := TMessageX.Create;
-  lMessage.Decode(lStdIn);
+  lMessage.DecodeDelimited(lStdIn);
   AssertTrue(lMessage.FieldX = EnumXFieldX, 'Enum value is parsed correctly.');
   lMessage.Free;
 

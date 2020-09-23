@@ -17,7 +17,7 @@ begin
   lStdIn := THandleStream.Create(GetStdHandle(STD_INPUT_HANDLE));
 
   lMessage := TMessageX.Create;
-  lMessage.Decode(lStdIn);
+  lMessage.DecodeDelimited(lStdIn);
   AssertTrue(lMessage.FieldX.Count = 9, 'The correct number of arguments is parsed.');
   AssertTrue(lMessage.FieldX[0] = 3, 'Index 0 is correctly decoded.');
   AssertTrue(lMessage.FieldX[1] = 1, 'Index 1 is correctly decoded.');

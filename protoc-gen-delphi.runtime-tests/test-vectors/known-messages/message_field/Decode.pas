@@ -18,7 +18,7 @@ begin
 
   lMessage := TMessageY.Create;
   AssertTrue(not Assigned(lMessage.FieldX), 'The embedded message starts off as nil.');
-  lMessage.Decode(lStdIn);
+  lMessage.DecodeDelimited(lStdIn);
   AssertTrue(Assigned(lMessage.FieldX), 'The embedded message is not nil.');
   lMessage.Free;
 

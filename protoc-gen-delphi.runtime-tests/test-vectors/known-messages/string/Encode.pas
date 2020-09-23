@@ -18,7 +18,7 @@ begin
 
   lMessage := TMessageX.Create;
   lMessage.FieldX := 'スゲーデン so uberuhaputo';
-  lMessage.Encode(lStdOut);
+  lMessage.EncodeDelimited(lStdOut);
   lMessage.Free;
 
   lStdOut.Free;

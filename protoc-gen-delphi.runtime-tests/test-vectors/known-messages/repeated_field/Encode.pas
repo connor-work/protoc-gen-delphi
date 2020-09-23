@@ -25,7 +25,7 @@ begin
   lMessage.FieldX.Add(2);
   lMessage.FieldX.Add(6);
   lMessage.FieldX.Add(5);
-  lMessage.Encode(lStdOut);
+  lMessage.EncodeDelimited(lStdOut);
   lMessage.Free;
 
   lStdOut.Free;

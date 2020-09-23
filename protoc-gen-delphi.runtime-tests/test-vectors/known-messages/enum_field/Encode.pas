@@ -17,7 +17,7 @@ begin
 
   lMessage := TMessageX.Create;
   lMessage.FieldX := EnumXValueX;
-  lMessage.Encode(lStdOut);
+  lMessage.EncodeDelimited(lStdOut);
   lMessage.Free;
 
   lStdOut.Free;

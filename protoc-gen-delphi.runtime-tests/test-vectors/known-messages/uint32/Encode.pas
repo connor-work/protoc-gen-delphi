@@ -17,7 +17,7 @@ begin
 
   lMessage := TMessageX.Create;
   lMessage.FieldX := 133742069;
-  lMessage.Encode(lStdOut);
+  lMessage.EncodeDelimited(lStdOut);
   lMessage.Free;
 
   lStdOut.Free;

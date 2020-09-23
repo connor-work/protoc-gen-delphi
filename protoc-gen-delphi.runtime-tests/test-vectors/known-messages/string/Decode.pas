@@ -17,7 +17,7 @@ begin
   lStdIn := THandleStream.Create(GetStdHandle(STD_INPUT_HANDLE));
 
   lMessage := TMessageX.Create;
-  lMessage.Decode(lStdIn);
+  lMessage.DecodeDelimited(lStdIn);
   AssertTrue(lMessage.FieldX = 'スゲーデン so uberuhaputo', 'String is parsed correctly.');
   AssertTrue(lMessage.FieldX = 'スゲーデン so uberuhaputos', 'String is parsed correctly.');
   lMessage.Free;
