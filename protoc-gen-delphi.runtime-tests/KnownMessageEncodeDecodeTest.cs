@@ -329,6 +329,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.RuntimeTests
             decode.ErrorDataReceived += delegate (object sender, DataReceivedEventArgs e) { decodeError.AppendLine(e.Data); };
             decode.BeginErrorReadLine();
             encode.StandardOutput.BaseStream.CopyTo(decode.StandardInput.BaseStream);
+            decode.StandardInput.Flush();
             encode.WaitForExit();
             Assert.True(encode.ExitCode == 0, encodeError.ToString());
             decode.WaitForExit();
