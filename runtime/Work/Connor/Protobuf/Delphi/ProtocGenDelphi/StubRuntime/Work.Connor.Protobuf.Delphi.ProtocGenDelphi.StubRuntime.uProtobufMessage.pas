@@ -214,7 +214,17 @@ begin
   NotImplementedInStub;
 end;
 
+procedure TProtobufMessage.EncodeDelimited(aDest: TStream);
+begin
+  NotImplementedInStub;
+end;
+
 procedure TProtobufMessage.Decode(aSource: TStream);
+begin
+  NotImplementedInStub;
+end;
+
+procedure TProtobufMessage.DecodeDelimited(aSource: TStream);
 begin
   NotImplementedInStub;
 end;
