@@ -256,9 +256,8 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.RuntimeTests
         public void ProducesOutputThatCanEncodeAndDecodeAKnownMessage(TestVector vector)
         {
             // TODO this test should actually be skipped, waiting for xUnit support https://github.com/xunit/xunit/issues/2073#issuecomment-673632823
-            //if (RuntimeTestOptions.UseStubRuntimeLibrary) return;
-            //IResourceSet runtimeUnitResources = IResourceSet.External(RuntimeTestOptions.RuntimeLibrarySourcePath!);
-            IResourceSet runtimeUnitResources = IResourceSet.External(@"C:\work\Software\forks\pikaju\protobuf-delphi\source");
+            if (RuntimeTestOptions.UseStubRuntimeLibrary) return;
+            IResourceSet runtimeUnitResources = IResourceSet.External(RuntimeTestOptions.RuntimeLibrarySourcePath!);
 
             // Setup file tree as input for protoc, according to the test vector
             vector.SetupInputFileTree();
