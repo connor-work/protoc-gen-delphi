@@ -19,7 +19,6 @@ begin
   lMessage := TMessageX.Create;
   lMessage.DecodeDelimited(lStdIn);
   AssertTrue(lMessage.FieldX = 'スゲーデン so uberuhaputo', 'String is parsed correctly.');
-  AssertTrue(lMessage.FieldX = 'スゲーデン so uberuhaputos', 'String is parsed correctly.');
   lMessage.Free;
 
   lStdIn.Free;
