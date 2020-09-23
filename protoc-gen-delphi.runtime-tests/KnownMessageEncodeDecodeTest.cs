@@ -313,6 +313,8 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.RuntimeTests
             encode.StartInfo.CreateNoWindow = true;
             encode.StartInfo.UseShellExecute = false;
             encode.StartInfo.RedirectStandardOutput = true;
+            encode.StartInfo.RedirectStandardError = true;
+            StringBuilder encodeError = new StringBuilder();
             using Process decode = new Process();
             decode.StartInfo.FileName = decodeExeFile;
             decode.StartInfo.CreateNoWindow = true;
@@ -322,10 +324,13 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.RuntimeTests
             StringBuilder decodeError = new StringBuilder();
             encode.Start();
             decode.Start();
+            encode.ErrorDataReceived += delegate (object sender, DataReceivedEventArgs e) { encodeError.AppendLine(e.Data); };
+            encode.BeginErrorReadLine();
             decode.ErrorDataReceived += delegate (object sender, DataReceivedEventArgs e) { decodeError.AppendLine(e.Data); };
             decode.BeginErrorReadLine();
             encode.StandardOutput.BaseStream.CopyTo(decode.StandardInput.BaseStream);
             encode.WaitForExit();
+            Assert.True(encode.ExitCode == 0, encodeError.ToString());
             decode.WaitForExit();
             Assert.True(decode.ExitCode == 0, decodeError.ToString());
         }
