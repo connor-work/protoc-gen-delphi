@@ -276,6 +276,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.RuntimeTests
             {
                 // Run FPC
                 FpcOperation fpc = new FpcOperation(programFile) { OutputPath = CreateScratchFolder() };
+                if (Debugger.IsAttached) fpc.GenerateDebugInfo = true;
                 fpc.UnitPath.AddRange(vector.GetUnitPathFolders(plugIn.OutDir));
                 // Adds units from a resource set to FPC
                 void addUnits(IEnumerable<(string name, string content)> resources, string rootFolder)

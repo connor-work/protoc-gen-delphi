@@ -49,11 +49,15 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.RuntimeTests
         public string InputFile { get; }
 
         /// <summary>
+        /// <see langword="true"/> if debug information shall be generated.
+        /// </summary>
+        public bool GenerateDebugInfo { get; set; } = false;
+
+        /// <summary>
         /// Constructs a new planned FPC invocation.
         /// </summary>
         /// <param name="InputFile">FPC input file, see <see cref="InputFile"/></param>
         public FpcOperation(string InputFile) => this.InputFile = InputFile;
-
 
         /// <summary>
         /// Constructs an executable file name for the current platform.
@@ -77,6 +81,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.RuntimeTests
             using Process fpc = new Process();
             // By default, fpc resides in PATH
             fpc.StartInfo.FileName = FpcExecutablePath ?? GetExecutableName("fpc");
+            if (GenerateDebugInfo) fpc.StartInfo.ArgumentList.Add("-g");
             foreach (string unitPathFolder in UnitPath) fpc.StartInfo.ArgumentList.Add($"-Fu{unitPathFolder}");
             if (OutputPath != null) fpc.StartInfo.ArgumentList.Add($"-FE{OutputPath}");
             fpc.StartInfo.ArgumentList.Add(InputFile);
