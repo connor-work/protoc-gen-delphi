@@ -25,7 +25,7 @@ unit Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufEnum;
 interface
 
 uses
-  // Runtime library support for protobuf field encoding/decoding
+  // Wire codec interface
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufWireCodec,
   // For <see cref="TProtobufEnumFieldValue"/>
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.uProtobuf;

@@ -14,7 +14,7 @@
 /// limitations under the License.
 
 /// <summary>
-/// "Stub runtime" <c>protobuf-delphi</c> runtime library implementation of support code for handling protobuf repeated fields 
+/// Runtime library implementation of support code for handling protobuf repeated fields 
 /// in generated Delphi code.
 /// </summary>
 unit Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufRepeatedField;

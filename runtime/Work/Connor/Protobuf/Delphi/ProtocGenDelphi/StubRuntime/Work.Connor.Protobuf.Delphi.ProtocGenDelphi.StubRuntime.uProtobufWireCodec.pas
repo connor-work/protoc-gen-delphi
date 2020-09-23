@@ -15,7 +15,7 @@
 
 /// <summary>
 /// Runtime library support for <c>protoc-gen-delphi</c> <i>field codecs</i> that define the encoding/decoding of
-/// protobuf fields from/to the protobuf binary wire format.
+/// protobuf fields from/to the protobuf binary wire format (<i>wire codecs</i>).
 /// </summary>
 unit Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufWireCodec;
 
@@ -25,12 +25,12 @@ unit Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufWireCodec;
 
 interface
 
-/// <summary>
-/// <i>Field codec</i> for <c>protoc-gen-delphi</c> that defines the encoding/decoding of
-/// protobuf fields of a specific type (determined by descendant classes) from/to the protobuf binary wire format.
-/// </summary>
-/// <typeparam name="T">"Private" Delphi type representing values of the field within internal variables</typeparam>
 type
+  /// <summary>
+  /// <i>Field codec</i> for <c>protoc-gen-delphi</c> that defines the encoding/decoding of
+  /// protobuf fields of a specific type (determined by descendant classes) from/to the protobuf binary wire format.
+  /// </summary>
+  /// <typeparam name="T">"Private" Delphi type representing values of the field within internal variables</typeparam>
   TProtobufWireCodec<T> = class abstract
   end;
 
