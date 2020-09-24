@@ -459,6 +459,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
             {
                 ClassDeclaration = delphiClass
             });
+            foreach (DescriptorProto nestedMessageType in messageType.NestedType) CompileMessage(nestedMessageType, delphiInterface, delphiImplementation, dependencyHandler);
             MessageClassSkeleton skeleton = new MessageClassSkeleton(delphiClass.Name);
             foreach (FieldDescriptorProto field in messageType.Field) CompileField(field, delphiClass, skeleton, dependencyHandler);
             skeleton.Inject(delphiClass, delphiImplementation);
