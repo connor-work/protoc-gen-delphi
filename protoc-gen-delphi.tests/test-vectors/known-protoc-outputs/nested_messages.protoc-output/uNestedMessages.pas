@@ -217,65 +217,65 @@ procedure TMessageX.ClearOwnFields;
 begin
 end;
 
-constructor TMessageX.TMessageY.Create;
+constructor TMessageY.Create;
 begin
   inherited;
   ClearOwnFields;
 end;
 
-destructor TMessageX.TMessageY.Destroy;
+destructor TMessageY.Destroy;
 begin
   inherited;
 end;
 
-procedure TMessageX.TMessageY.Clear;
-begin
-  inherited;
-  ClearOwnFields;
-end;
-
-procedure TMessageX.TMessageY.Encode(aDest: TStream);
-begin
-  inherited;
-end;
-
-procedure TMessageX.TMessageY.Decode(aSource: TStream);
-begin
-  inherited;
-end;
-
-procedure TMessageX.TMessageY.ClearOwnFields;
-begin
-end;
-
-constructor TMessageX.TMessageZ.Create;
+procedure TMessageY.Clear;
 begin
   inherited;
   ClearOwnFields;
 end;
 
-destructor TMessageX.TMessageZ.Destroy;
+procedure TMessageY.Encode(aDest: TStream);
 begin
   inherited;
 end;
 
-procedure TMessageX.TMessageZ.Clear;
+procedure TMessageY.Decode(aSource: TStream);
+begin
+  inherited;
+end;
+
+procedure TMessageY.ClearOwnFields;
+begin
+end;
+
+constructor TMessageZ.Create;
 begin
   inherited;
   ClearOwnFields;
 end;
 
-procedure TMessageX.TMessageZ.Encode(aDest: TStream);
+destructor TMessageZ.Destroy;
 begin
   inherited;
 end;
 
-procedure TMessageX.TMessageZ.Decode(aSource: TStream);
+procedure TMessageZ.Clear;
+begin
+  inherited;
+  ClearOwnFields;
+end;
+
+procedure TMessageZ.Encode(aDest: TStream);
 begin
   inherited;
 end;
 
-procedure TMessageX.TMessageZ.ClearOwnFields;
+procedure TMessageZ.Decode(aSource: TStream);
+begin
+  inherited;
+end;
+
+procedure TMessageZ.ClearOwnFields;
 begin
 end;
 
