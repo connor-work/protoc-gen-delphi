@@ -19,33 +19,6 @@ type
   /// This class corresponds to the protobuf message type <c>MessageX</c>.
   /// </remarks>
   TMessageX = class(TProtobufMessage)
-  type
-    /// <remarks>
-    /// This enumerated type corresponds to the protobuf enum <c>EnumX</c>.
-    /// </remarks>
-    TEnumX = (
-      /// <remarks>
-      /// This enumerated value corresponds to the protobuf enum constant <c>VALUE_X</c>.
-      /// </remarks>
-      EnumXValueX = 0
-    );
-
-  type
-    /// <remarks>
-    /// This enumerated type corresponds to the protobuf enum <c>EnumY</c>.
-    /// </remarks>
-    TEnumY = (
-      /// <remarks>
-      /// This enumerated value corresponds to the protobuf enum constant <c>NONE</c>.
-      /// </remarks>
-      EnumYNone = 0,
-
-      /// <remarks>
-      /// This enumerated value corresponds to the protobuf enum constant <c>VALUE_Y</c>.
-      /// </remarks>
-      EnumYValueY = 3
-    );
-
   /// <summary>
   /// Creates an empty <see cref="TMessageX"/> that can be used as a protobuf message.
   /// Initially, all protobuf fields are absent, meaning that they are set to their default values.
@@ -96,6 +69,33 @@ type
   /// Renders those protobuf fields absent that belong to <see cref="TMessageX"/> (i.e., are not managed by an ancestor class), by setting them to their default values.
   /// </summary>
   private procedure ClearOwnFields;
+
+  type
+    /// <remarks>
+    /// This enumerated type corresponds to the protobuf enum <c>EnumX</c>.
+    /// </remarks>
+    TEnumX = (
+      /// <remarks>
+      /// This enumerated value corresponds to the protobuf enum constant <c>VALUE_X</c>.
+      /// </remarks>
+      EnumXValueX = 0
+    );
+
+  type
+    /// <remarks>
+    /// This enumerated type corresponds to the protobuf enum <c>EnumY</c>.
+    /// </remarks>
+    TEnumY = (
+      /// <remarks>
+      /// This enumerated value corresponds to the protobuf enum constant <c>NONE</c>.
+      /// </remarks>
+      EnumYNone = 0,
+
+      /// <remarks>
+      /// This enumerated value corresponds to the protobuf enum constant <c>VALUE_Y</c>.
+      /// </remarks>
+      EnumYValueY = 3
+    );
   end;
 
 implementation
