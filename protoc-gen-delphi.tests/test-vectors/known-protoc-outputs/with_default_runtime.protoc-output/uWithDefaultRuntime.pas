@@ -3,10 +3,15 @@
 /// </remarks>
 unit uWithDefaultRuntime;
 
+{$IFDEF FPC}
+  {$MODE DELPHI}
+{$ENDIF}
+
 interface
 
 uses
-  Com.GitHub.Pikaju.Protobuf.Delphi.uProtobufMessage;
+  Com.GitHub.Pikaju.Protobuf.Delphi.uProtobufMessage,
+  Classes;
 
 type
   /// <remarks>

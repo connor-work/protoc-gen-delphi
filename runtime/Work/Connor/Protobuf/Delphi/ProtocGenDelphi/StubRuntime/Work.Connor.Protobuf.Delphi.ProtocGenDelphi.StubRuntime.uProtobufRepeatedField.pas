@@ -14,7 +14,7 @@
 /// limitations under the License.
 
 /// <summary>
-/// "Stub runtime" <c>protobuf-delphi</c> runtime library implementation of support code for handling protobuf repeated fields 
+/// Runtime library implementation of support code for handling protobuf repeated fields 
 /// in generated Delphi code.
 /// </summary>
 unit Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufRepeatedField;
@@ -25,12 +25,39 @@ unit Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufRepeatedFi
 
 interface
 
+uses
+  // For TEnumerable implementation
+  Generics.Collections,
+  // Helper code for the stub runtime library, not required by functional implementations of the runtime library
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uStub;
+
 type
   /// <summary>
   /// TODO
   /// </summary>
   /// <typeparam name="T">TODO</typeparam>
   TProtobufRepeatedField<T> = class(TEnumerable<T>)
+
+  private
+    /// <summary>
+    /// TODO
+    /// </summary>
+    function GetCount: Integer;
+
+    /// <summary>
+    /// TODO
+    /// </summary>
+    procedure SetCount(aCount: Integer);
+
+    /// <summary>
+    /// TODO
+    /// </summary>
+    function GetValue(aIndex: Integer): T;
+
+    /// <summary>
+    /// TODO
+    /// </summary>
+    procedure SetValue(aIndex: Integer; aValue: T);
 
   public
     /// <summary>
@@ -87,5 +114,60 @@ type
   end;
 
 implementation
+
+constructor TProtobufRepeatedField<T>.Create;
+begin
+  NotImplementedInStub;
+end;
+
+destructor TProtobufRepeatedField<T>.Destroy;
+begin
+  NotImplementedInStub;
+end;
+
+function TProtobufRepeatedField<T>.GetCount;
+begin
+  NotImplementedInStub;
+end;
+
+procedure TProtobufRepeatedField<T>.SetCount(aCount: Integer);
+begin
+  NotImplementedInStub;
+end;
+
+function TProtobufRepeatedField<T>.GetValue(aIndex: Integer): T;
+begin
+  NotImplementedInStub;
+end;
+
+procedure TProtobufRepeatedField<T>.SetValue(aIndex: Integer; aValue: T);
+begin
+  NotImplementedInStub;
+end;
+
+function TProtobufRepeatedField<T>.Add(const aValue: T): Integer;
+begin
+  NotImplementedInStub;
+end;
+
+function TProtobufRepeatedField<T>.EmplaceAdd: T;
+begin
+  NotImplementedInStub;
+end;
+
+procedure TProtobufRepeatedField<T>.Clear;
+begin
+  NotImplementedInStub;
+end;
+
+procedure TProtobufRepeatedField<T>.Delete(aIndex: Integer);
+begin
+  NotImplementedInStub;
+end;
+
+function TProtobufRepeatedField<T>.ExtractAt(aIndex: Integer): T;
+begin
+  NotImplementedInStub;
+end;
 
 end.

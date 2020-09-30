@@ -3,6 +3,10 @@
 /// </remarks>
 unit uEnums;
 
+{$IFDEF FPC}
+  {$MODE DELPHI}
+{$ENDIF}
+
 interface
 
 uses
@@ -17,8 +21,7 @@ type
     /// This enumerated value corresponds to the protobuf enum constant <c>VALUE_X</c>.
     /// </remarks>
     EnumXValueX = 0
-  )
-  end;
+  );
 
 type
   /// <remarks>
@@ -34,8 +37,7 @@ type
     /// This enumerated value corresponds to the protobuf enum constant <c>VALUE_Y</c>.
     /// </remarks>
     EnumYValueY = 3
-  )
-  end;
+  );
 
 implementation
 

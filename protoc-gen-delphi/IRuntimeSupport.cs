@@ -82,18 +82,14 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
             /// </summary>
             /// <param name="unit">The unqualified unit name</param>
             /// <returns>The unit reference</returns>
-            private UnitReference GetUnitReference(string unit)
+            private UnitReference GetUnitReference(string unit) => new UnitReference()
             {
-                UnitIdentifier identifier = new UnitIdentifier()
+                Unit = new UnitIdentifier()
                 {
-                    Unit = unit
-                };
-                identifier.Namespace.Add(DelphiNamespace.Split("."));
-                return new UnitReference()
-                {
-                    Unit = identifier
-                };
-            }
+                    Unit = unit,
+                    Namespace = { DelphiNamespace.Split(".") }
+                }
+            };
 
             public UnitReference GetDependencyForEnums() => GetUnitReference("uProtobufEnum");
 

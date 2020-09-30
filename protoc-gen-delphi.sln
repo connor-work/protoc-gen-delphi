@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "protoc-gen-delphi", "protoc
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "protoc-gen-delphi.tests", "protoc-gen-delphi.tests\protoc-gen-delphi.tests.csproj", "{BBB0D657-2E5D-48A5-B04F-083FB16AABA9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "protoc-gen-delphi.runtime-tests", "protoc-gen-delphi.runtime-tests\protoc-gen-delphi.runtime-tests.csproj", "{B81A6F20-6B0A-400F-A63E-617AB397A973}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -44,5 +46,17 @@ Global
 		{BBB0D657-2E5D-48A5-B04F-083FB16AABA9}.Release|x64.Build.0 = Release|Any CPU
 		{BBB0D657-2E5D-48A5-B04F-083FB16AABA9}.Release|x86.ActiveCfg = Release|Any CPU
 		{BBB0D657-2E5D-48A5-B04F-083FB16AABA9}.Release|x86.Build.0 = Release|Any CPU
+		{B81A6F20-6B0A-400F-A63E-617AB397A973}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B81A6F20-6B0A-400F-A63E-617AB397A973}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B81A6F20-6B0A-400F-A63E-617AB397A973}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{B81A6F20-6B0A-400F-A63E-617AB397A973}.Debug|x64.Build.0 = Debug|Any CPU
+		{B81A6F20-6B0A-400F-A63E-617AB397A973}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{B81A6F20-6B0A-400F-A63E-617AB397A973}.Debug|x86.Build.0 = Debug|Any CPU
+		{B81A6F20-6B0A-400F-A63E-617AB397A973}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B81A6F20-6B0A-400F-A63E-617AB397A973}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B81A6F20-6B0A-400F-A63E-617AB397A973}.Release|x64.ActiveCfg = Release|Any CPU
+		{B81A6F20-6B0A-400F-A63E-617AB397A973}.Release|x64.Build.0 = Release|Any CPU
+		{B81A6F20-6B0A-400F-A63E-617AB397A973}.Release|x86.ActiveCfg = Release|Any CPU
+		{B81A6F20-6B0A-400F-A63E-617AB397A973}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

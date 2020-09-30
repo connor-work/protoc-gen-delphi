@@ -62,8 +62,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Tests
         /// <summary>
         /// Names of all known test vectors
         /// </summary>
-        /// <returns>Enumeration of test vector names</returns>
-        private static IEnumerable<string> TestVectorNames() => allExpectedResponseResources.GetIDs().WhereSuffixed(new Regex(Regex.Escape($".{responseFileExtension}"))).Distinct();
+        private static IEnumerable<string> TestVectorNames => allExpectedResponseResources.GetIDs().WhereSuffixed(new Regex(Regex.Escape($".{responseFileExtension}")));
 
         /// <summary>
         /// Formatter settings for encoding protobuf messages as JSON for test data. Can be used when creating new test vectors.
@@ -101,14 +100,15 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Tests
             /// Constructs a new test vector.
             /// </summary>
             /// <param name="name">Name of the test vector</param>
-            public TestVector(string name) { this.name = name; }
+            public TestVector(string name) => this.name = name;
 
             /// <summary>
             /// Request from <c>protoc</c>
             /// </summary>
             public CodeGeneratorRequest Request
             {
-                get {
+                get
+                {
                     string resourceName = $"{name}.{requestFileExtension}";
                     using StreamReader reader = new StreamReader(allRequestResources.GetResourceStream(resourceName) ?? throw new FileNotFoundException(resourceName));
                     return jsonParser.Parse<CodeGeneratorRequest>(reader);
@@ -127,15 +127,9 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Tests
                 }
             }
 
-            public void Deserialize(IXunitSerializationInfo info)
-            {
-                name = info.GetValue<string>(nameof(name));
-            }
+            public void Deserialize(IXunitSerializationInfo info) => name = info.GetValue<string>(nameof(name));
 
-            public void Serialize(IXunitSerializationInfo info)
-            {
-                info.AddValue(nameof(name), name);
-            }
+            public void Serialize(IXunitSerializationInfo info) => info.AddValue(nameof(name), name);
 
             public override string? ToString() => name;
         }
@@ -143,7 +137,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Tests
         /// <summary>
         /// All known test vectors
         /// </summary>
-        public static IEnumerable<object[]> TestVectors { get => TestVectorNames().Select(name => new object[] { new TestVector(name) }); }
+        public static IEnumerable<object[]> TestVectors => TestVectorNames.Select(name => new object[] { new TestVector(name) });
 
         /// <summary>
         /// <see cref="ProtocGenDelphi"/> handles a request from <c>protoc</c> with the expected response.
@@ -152,6 +146,5 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Tests
         [Theory]
         [MemberData(nameof(TestVectors))]
         public void ProducesExpectedResponse(TestVector vector) => Assert.Equal(vector.ExpectedResponse, new ProtocGenDelphi().HandleRequest(vector.Request));
-
     }
 }

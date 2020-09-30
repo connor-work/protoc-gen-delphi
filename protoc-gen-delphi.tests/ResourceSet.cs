@@ -125,6 +125,13 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Tests
         public IResourceSet Nest(string prefix) => new NestedResourceSet(this, prefix);
 
         /// <summary>
+        /// Derives a combined resource set that looks up resources in a backing resource set if they are not present in this one.
+        /// </summary>
+        /// <param name="backingSet">The backing resource set</param>
+        /// <returns>Combined resource set</returns>
+        public IResourceSet Or(IResourceSet backingSet) => new CombinedResourceSet(this, backingSet);
+
+        /// <summary>
         /// Root resource set containing all embedded resources. The ID of a resource is equal to its logical name, with all sequences of slashes (<c>/</c>) and backslashes <c>\</c> replaced by a single slash.
         /// </summary>
         private class RootResourceSet : IResourceSet
@@ -191,6 +198,37 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Tests
             public IEnumerable<string> GetIDs() => parent.GetIDs().WherePrefixed(new Regex(Regex.Escape(prefix)));
 
             public Stream? GetResourceStream(string resourceID) => parent.GetResourceStream($"{prefix}{resourceID}");
+        }
+
+        /// <summary>
+        /// Resource set that combines two resource sets by looking up resources in the second set if they are not present in the first.
+        /// </summary>
+        private class CombinedResourceSet : IResourceSet
+        {
+            /// <summary>
+            /// First combined resource set
+            /// </summary>
+            private readonly IResourceSet first;
+
+            /// <summary>
+            /// Second combined resource set (shadowed by first)
+            /// </summary>
+            private readonly IResourceSet second;
+
+            /// <summary>
+            /// Constructs a combined resource set that looks up resources in the second set if they are not present in the first.
+            /// </summary>
+            /// <param name="first">First resource set</param>
+            /// <param name="second">Second resource set, shadowed by <paramref name="first" /></param>
+            public CombinedResourceSet(IResourceSet first, IResourceSet second)
+            {
+                this.first = first;
+                this.second = second;
+            }
+
+            public IEnumerable<string> GetIDs() => first.GetIDs().Concat(second.GetIDs()).Distinct();
+
+            public Stream? GetResourceStream(string resourceID) => first.GetResourceStream(resourceID) ?? second.GetResourceStream(resourceID);
         }
     }
 }

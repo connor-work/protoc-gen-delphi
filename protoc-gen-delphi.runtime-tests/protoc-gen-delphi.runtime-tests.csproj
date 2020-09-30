@@ -1,0 +1,54 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <RootNamespace>Work.Connor.Protobuf.Delphi.ProtocGenDelphi.RuntimeTests</RootNamespace>
+    <IsPackable>true</IsPackable>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>protoc-gen-delphi-runtime-tests</ToolCommandName>
+    <GenerateProgramFile>false</GenerateProgramFile>
+    <StartupObject></StartupObject>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.5.0" />
+    <!-- Include test CLI to allow stand-alone execution, approach based on https://github.com/microsoft/vstest/issues/2200#issuecomment-590835049 -->
+    <PackageReference Include="Microsoft.TestPlatform.CLI" Version="16.5.0" />
+    <PackageReference Include="xunit" Version="2.4.1" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1" />
+    <PackageReference Include="coverlet.collector" Version="1.2.0" />
+    <PackageReference Include="Work.Connor.Delphi.CodeWriter" Version="0.0.1-*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\protoc-gen-delphi\protoc-gen-delphi.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Runtime-independent support code for generated files -->
+    <EmbeddedResource Include="../runtime/Work/Connor/Protobuf/Delphi/ProtocGenDelphi/*.pas"
+                      LogicalName="[support code unit]%(Filename)%(Extension)" />
+    <!-- Source code of stub runtime library implementation -->
+    <EmbeddedResource Include="../runtime/Work/Connor/Protobuf/Delphi/ProtocGenDelphi/StubRuntime/*.pas"
+                      LogicalName="[stub runtime unit]%(Filename)%(Extension)" />
+    <!-- Support source code for Delphi tests -->
+    <EmbeddedResource Include="test-support/**/*.pas"
+                      LogicalName="[Delphi test support code unit]%(RecursiveDir)%(Filename)%(Extension)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Known schema folders -->
+    <EmbeddedResource Include="../test-vectors/known-schemata/**/*.protoc-input/**/*" LogicalName="[known schema folder]%(RecursiveDir)%(Filename)%(Extension)" />
+    <!-- Known schema files -->
+    <EmbeddedResource Include="../test-vectors/known-schemata/**/*.proto" Exclude="../test-vectors/known-schemata/**/*.protoc-input/**/*" LogicalName="[known schema file]%(RecursiveDir)%(Filename)%(Extension)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- For each known message, there is an encode/decode test consisting of two Delphi programs -->
+    <EmbeddedResource Include="test-vectors/known-messages/**/Encode.pas"
+                      LogicalName="[known message][encode program]%(RecursiveDir)" />
+    <EmbeddedResource Include="test-vectors/known-messages/**/Decode.pas"
+                      LogicalName="[known message][decode program]%(RecursiveDir)" />
+  </ItemGroup>
+</Project>

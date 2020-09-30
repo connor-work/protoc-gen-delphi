@@ -3,10 +3,16 @@
 /// </remarks>
 unit uMessageField;
 
+{$IFDEF FPC}
+  {$MODE DELPHI}
+{$ENDIF}
+
 interface
 
 uses
-  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufMessage;
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufMessage,
+  Classes,
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.uProtobuf;
 
 type
   /// <remarks>

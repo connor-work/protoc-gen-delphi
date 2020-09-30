@@ -43,18 +43,17 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Tests
         /// <summary>
         /// Resource set of all test resource files within folders containing <c>protoc</c> input
         /// </summary>
-        private static readonly IResourceSet allInputFolderResources = testResources.Nest("[input folder]");
+        private static readonly IResourceSet allInputFolderResources = testResources.Nest("[input folder]").Or(IResourceSet.Root.Nest("[known schema folder]"));
 
         /// <summary>
         /// Resource set of all test resource files that are used as a single input protobuf schema definition file for <c>protoc</c>
         /// </summary>
-        private static readonly IResourceSet allInputFileResources = testResources.Nest("[input schema file]");
+        private static readonly IResourceSet allInputFileResources = testResources.Nest("[input schema file]").Or(IResourceSet.Root.Nest("[known schema file]"));
 
         /// <summary>
         /// Names of all known test vectors
         /// </summary>
-        /// <returns>Enumeration of test vector names</returns>
-        private static IEnumerable<string> TestVectorNames() => allExpectedOutputFolderResources.GetIDs().WhereSuffixed(new Regex($"{Regex.Escape(".protoc-output")}/.*")).Distinct();
+        private static IEnumerable<string> TestVectorNames => allExpectedOutputFolderResources.GetIDs().WhereSuffixed(new Regex($"{Regex.Escape(".protoc-output")}/.*")).Distinct();
 
         /// <summary>
         /// Marker string in the name of of test vectors that indicates that the default runtime shall be used
@@ -130,21 +129,18 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Tests
             /// <summary>
             /// Name of the optional test resource file that is used as a single input protobuf schema definition file for <c>protoc</c> for this test
             /// </summary>
-            private string InputSchemaFileName { get => $"{name}.proto"; }
+            private string InputSchemaFileName => $"{name}.proto";
 
             /// <summary>
             /// Name and contents of all .proto files that are used as <c>protoc</c> input for this test
             /// </summary>
-            private IEnumerable<(string, string)> ProtoFilesToSetup { get => inputFolderResources.ReadAllResources().Concat(allInputFileResources.ReadResources(new[] { InputSchemaFileName })); }
+            private IEnumerable<(string, string)> ProtoFilesToSetup => inputFolderResources.ReadAllResources().Concat(allInputFileResources.ReadResources(new[] { InputSchemaFileName }));
 
             /// <summary>
             /// Names of all .proto files that shall be specified for generation in the <c>protoc</c> arguments
             /// </summary>
-            private IEnumerable<string> InputProtoFileNames
-            {
-                get => inputFolderResources.GetIDs().Where(name => name.Contains(inputFilePrefix)).Concat(
-                       allInputFileResources.GetIDs().Where(name => name.Equals(InputSchemaFileName)));
-            }
+            private IEnumerable<string> InputProtoFileNames => inputFolderResources.GetIDs().Where(name => name.Contains(inputFilePrefix))
+                                                       .Concat(allInputFileResources.GetIDs().Where(name => name.Equals(InputSchemaFileName)));
 
             /// <summary>
             /// Creates a temporary file tree containing input files, required before using the test vector
@@ -163,14 +159,15 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Tests
             /// <summary>
             /// Arguments to <c>protoc</c>
             /// </summary>
-            public IEnumerable<string> ProtocArgs { get => InputProtoFileNames.Prepend($"-I{inputFolder ?? throw new InvalidOperationException($"Test vector file tree was not setup using {nameof(SetupFileTree)}")}"); }
+            public IEnumerable<string> ProtocArgs => InputProtoFileNames.Prepend($"-I{inputFolder ?? throw new InvalidOperationException($"Test vector file tree was not setup using {nameof(SetupFileTree)}")}");
 
             /// <summary>
             /// Mapping of file paths of expected plug-in output files to their expected content
             /// </summary>
             public IDictionary<string, string> ExpectedOutputFiles
             {
-                get {
+                get
+                {
                     Dictionary<string, string> files = new Dictionary<string, string>();
                     foreach (string expectedOutputFile in expectedOutputFolderResources.GetIDs())
                     {
@@ -185,7 +182,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Tests
             /// <summary>
             /// <see langword="true"/> if the default runtime for <c>protoc-gen-delphi</c> shall be used instead of the stub runtime
             /// </summary>
-            public bool ShallUseDefaultRuntime { get => name.Contains(defaultRuntimeMarker); }
+            public bool ShallUseDefaultRuntime => name.Contains(defaultRuntimeMarker);
 
             public void Deserialize(IXunitSerializationInfo info)
             {
@@ -193,10 +190,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Tests
                 InitializeResourceSets();
             }
 
-            public void Serialize(IXunitSerializationInfo info)
-            {
-                info.AddValue(nameof(name), name);
-            }
+            public void Serialize(IXunitSerializationInfo info) => info.AddValue(nameof(name), name);
 
             public override string? ToString() => name;
         }
@@ -204,7 +198,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Tests
         /// <summary>
         /// All known test vectors
         /// </summary>
-        public static IEnumerable<object[]> TestVectors { get => TestVectorNames().Select(name => new object[] { new TestVector(name) }); }
+        public static IEnumerable<object[]> TestVectors => TestVectorNames.Select(name => new object[] { new TestVector(name) });
 
         /// <summary>
         /// Constructs an executable file name for the current platform.

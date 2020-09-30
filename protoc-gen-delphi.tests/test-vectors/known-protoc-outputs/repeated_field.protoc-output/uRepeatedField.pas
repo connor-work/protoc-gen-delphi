@@ -3,10 +3,15 @@
 /// </remarks>
 unit uRepeatedField;
 
+{$IFDEF FPC}
+  {$MODE DELPHI}
+{$ENDIF}
+
 interface
 
 uses
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufMessage,
+  Classes,
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufRepeatedField,
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufUint32;
 
@@ -96,7 +101,7 @@ implementation
 constructor TMessageX.Create;
 begin
   inherited;
-  FFieldX = TProtobufRepeatedField<UInt32>.Create;
+  FFieldX := TProtobufRepeatedField<UInt32>.Create;
   ClearOwnFields;
 end;
 

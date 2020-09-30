@@ -3,11 +3,17 @@
 /// </remarks>
 unit uFields;
 
+{$IFDEF FPC}
+  {$MODE DELPHI}
+{$ENDIF}
+
 interface
 
 uses
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufMessage,
+  Classes,
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufUint32,
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.uProtobuf,
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufString;
 
 type

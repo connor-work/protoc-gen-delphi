@@ -5,6 +5,8 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <RootNamespace>Work.Connor.Protobuf.Delphi.ProtocGenDelphi</RootNamespace>
     <Nullable>enable</Nullable>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>protoc-gen-delphi</ToolCommandName>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Google.Protobuf" Version="3.13.0" />
