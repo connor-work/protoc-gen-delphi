@@ -103,6 +103,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
                 {
                     FieldDescriptorProto.Types.Type.String => "uProtobufString",
                     FieldDescriptorProto.Types.Type.Uint32 => "uProtobufUint32",
+                    FieldDescriptorProto.Types.Type.Bool => "uProtobufBool",
                     FieldDescriptorProto.Types.Type.Enum => "uProtobufEnum",
                     FieldDescriptorProto.Types.Type.Message => "uProtobufMessage",
                     _ => throw new NotImplementedException()

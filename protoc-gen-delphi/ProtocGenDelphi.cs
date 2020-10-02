@@ -45,6 +45,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         {
             FieldDescriptorProto.Types.Type.String => "UnicodeString",
             FieldDescriptorProto.Types.Type.Uint32 => "UInt32",
+            FieldDescriptorProto.Types.Type.Bool => "Boolean",
             FieldDescriptorProto.Types.Type.Enum => generator.Invoke(fieldTypeName),
             FieldDescriptorProto.Types.Type.Message => generator.Invoke(fieldTypeName),
             _ => throw new NotImplementedException()
@@ -62,6 +63,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         {
             FieldDescriptorProto.Types.Type.String => "UnicodeString",
             FieldDescriptorProto.Types.Type.Uint32 => "UInt32",
+            FieldDescriptorProto.Types.Type.Bool => "Boolean",
             FieldDescriptorProto.Types.Type.Enum => "TProtobufEnumFieldValue",
             FieldDescriptorProto.Types.Type.Message => generator.Invoke(fieldTypeName),
             _ => throw new NotImplementedException()
@@ -118,6 +120,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         {
             FieldDescriptorProto.Types.Type.String => "gProtobufWireCodecString",
             FieldDescriptorProto.Types.Type.Uint32 => "gProtobufWireCodecUint32",
+            FieldDescriptorProto.Types.Type.Bool => "gProtobufWireCodecBool",
             FieldDescriptorProto.Types.Type.Enum => "gProtobufWireCodecEnum",
             _ => throw new NotImplementedException()
         };
@@ -131,6 +134,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         {
             FieldDescriptorProto.Types.Type.String => "PROTOBUF_DEFAULT_VALUE_STRING",
             FieldDescriptorProto.Types.Type.Uint32 => "PROTOBUF_DEFAULT_VALUE_UINT32",
+            FieldDescriptorProto.Types.Type.Bool => "PROTOBUF_DEFAULT_VALUE_BOOL",
             FieldDescriptorProto.Types.Type.Enum => "PROTOBUF_DEFAULT_VALUE_ENUM",
             FieldDescriptorProto.Types.Type.Message => "PROTOBUF_DEFAULT_VALUE_MESSAGE",
             _ => throw new NotImplementedException()
