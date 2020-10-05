@@ -103,7 +103,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         internal static string GetPrivateDelphiType(this FieldDescriptorProto field, Func<string, string> generator) => field.Label switch
         {
             FieldDescriptorProto.Types.Label.Optional => GetPrivateDelphiSingleValueType(field.Type, field.TypeName, generator),
-            FieldDescriptorProto.Types.Label.Repeated => $"TProtobufRepeatedField<{GetPublicDelphiElementType(field.Type, field.TypeName, generator)}>",
+            FieldDescriptorProto.Types.Label.Repeated => GetDelphiRepeatedFieldSubclass(field.Type, field.TypeName, generator),
             _ => throw new NotImplementedException()
         };
 
@@ -122,6 +122,24 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
             FieldDescriptorProto.Types.Type.Uint32 => "gProtobufWireCodecUint32",
             FieldDescriptorProto.Types.Type.Bool => "gProtobufWireCodecBool",
             FieldDescriptorProto.Types.Type.Enum => "gProtobufWireCodecEnum",
+            _ => throw new NotImplementedException()
+        };
+
+        /// <summary>
+        /// Determines the Delphi identifier of the subclass of <c>TProtobufRepeatedField<!<![CDATA[<T>]]></c> that represents repeated fields of
+        /// a specific protobuf field type.
+        /// </summary>
+        /// <param name="fieldType">The protobuf field descriptor's type field value</param>
+        /// <param name="fieldTypeName">The protobuf field descriptor's type name field value</param>
+        /// <param name="generator">Function that generates a Delphi type name for a protobuf message type or enumerated type name</param>
+        /// <returns>Delphi identifier of class</returns>
+        internal static string GetDelphiRepeatedFieldSubclass(this FieldDescriptorProto.Types.Type fieldType, string fieldTypeName, Func<string, string> generator) => fieldType switch
+        {
+            FieldDescriptorProto.Types.Type.String => "TProtobufRepeatedStringField",
+            FieldDescriptorProto.Types.Type.Uint32 => "TProtobufRepeatedUint32Field",
+            FieldDescriptorProto.Types.Type.Bool => "TProtobufRepeatedBoolField",
+            FieldDescriptorProto.Types.Type.Enum => $"TProtobufRepeatedEnumField<{generator.Invoke(fieldTypeName)}>",
+            FieldDescriptorProto.Types.Type.Message => $"TProtobufRepeatedMessageField<{generator.Invoke(fieldTypeName)}>",
             _ => throw new NotImplementedException()
         };
 
