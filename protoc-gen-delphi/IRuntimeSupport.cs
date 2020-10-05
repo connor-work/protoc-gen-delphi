@@ -49,10 +49,10 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         public UnitReference GetDependencyForMessages();
 
         /// <summary>
-        /// Provides the required unit references for handling protobuf repeated fields.
+        /// Provides the required unit reference for handling protobuf repeated fields.
         /// </summary>
-        /// <returns>The Delphi unit references</returns>
-        public UnitReference[] GetDependenciesForRepeatedField(FieldDescriptorProto.Types.Type type);
+        /// <returns>The Delphi unit reference</returns>
+        public UnitReference GetDependencyForRepeatedField();
 
         /// <summary>
         /// Provides the required unit reference for handling protobuf fields of a specific field type. 
@@ -95,13 +95,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
 
             public UnitReference GetDependencyForMessages() => GetUnitReference("uProtobufMessage");
 
-            public UnitReference[] GetDependenciesForRepeatedField(FieldDescriptorProto.Types.Type type) => new UnitReference[]
-            {
-                GetUnitReference("uProtobufRepeatedField"),
-                type == FieldDescriptorProto.Types.Type.Message
-                    ? GetUnitReference("uProtobufRepeatedMessageField")
-                    : GetUnitReference("uProtobufRepeatedBasicField"),
-            };
+            public UnitReference GetDependencyForRepeatedField() => GetUnitReference("uProtobufRepeatedField");
 
             public UnitReference GetDependencyForFieldType(FieldDescriptorProto.Types.Type type)
             {
