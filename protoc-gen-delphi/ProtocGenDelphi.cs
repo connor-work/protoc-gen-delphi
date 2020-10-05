@@ -501,8 +501,11 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         private void CompileField(FieldDescriptorProto field, ClassDeclaration delphiClass, MessageClassSkeleton skeleton, Action<UnitReference> dependencyHandler)
         {
             // Add the required runtime dependencies for handling protobuf fields of this specific type
-            if (field.Label == FieldDescriptorProto.Types.Label.Repeated) dependencyHandler.Invoke(runtime.GetDependencyForRepeatedField());
-            dependencyHandler.Invoke(runtime.GetDependencyForFieldType(field.Type));
+            if (field.Label == FieldDescriptorProto.Types.Label.Repeated)
+            {
+                foreach (UnitReference dependency in runtime.GetDependenciesForRepeatedFieldType(field.Type)) dependencyHandler.Invoke(dependency);
+            }
+            else dependencyHandler.Invoke(runtime.GetDependencyForSingularFieldType(field.Type));
             // Delphi type exposed to client code
             string publicDelphiType = field.GetPublicDelphiType(name => ConstructDelphiTypeName(name));
             // Delphi type used for internal representation
