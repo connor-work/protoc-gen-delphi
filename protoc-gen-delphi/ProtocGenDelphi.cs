@@ -103,11 +103,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         internal static string GetPrivateDelphiType(this FieldDescriptorProto field, Func<string, string> generator) => field.Label switch
         {
             FieldDescriptorProto.Types.Label.Optional => GetPrivateDelphiSingleValueType(field.Type, field.TypeName, generator),
-            FieldDescriptorProto.Types.Label.Repeated => field.Type switch
-            {
-                FieldDescriptorProto.Types.Type.Message => $"TProtobufRepeatedMessageField<{GetPublicDelphiElementType(field.Type, field.TypeName, generator)}>",
-                _ => $"TProtobufRepeatedBasicField<{GetPublicDelphiElementType(field.Type, field.TypeName, generator)}>",
-            },
+            FieldDescriptorProto.Types.Label.Repeated => $"TProtobufRepeatedField<{GetPublicDelphiElementType(field.Type, field.TypeName, generator)}>",
             _ => throw new NotImplementedException()
         };
 
@@ -505,8 +501,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         private void CompileField(FieldDescriptorProto field, ClassDeclaration delphiClass, MessageClassSkeleton skeleton, Action<UnitReference> dependencyHandler)
         {
             // Add the required runtime dependencies for handling protobuf fields of this specific type
-            if (field.Label == FieldDescriptorProto.Types.Label.Repeated)
-                Array.ForEach(runtime.GetDependenciesForRepeatedField(field.Type), dependencyHandler.Invoke);
+            if (field.Label == FieldDescriptorProto.Types.Label.Repeated) dependencyHandler.Invoke(runtime.GetDependencyForRepeatedField());
             dependencyHandler.Invoke(runtime.GetDependencyForFieldType(field.Type));
             // Delphi type exposed to client code
             string publicDelphiType = field.GetPublicDelphiType(name => ConstructDelphiTypeName(name));
