@@ -13,7 +13,8 @@ uses
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufMessage,
   Classes,
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufRepeatedField,
-  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufUint32;
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufUint32,
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufRepeatedUint32;
 
 type
   /// <remarks>
@@ -28,7 +29,7 @@ type
   /// <summary>
   /// Holds the decoded value of the protobuf field <c>fieldX</c>.
   /// </summary>
-  private var FFieldX: TProtobufRepeatedField<UInt32>;
+  private var FFieldX: TProtobufRepeatedUint32Field;
 
   /// <summary>
   /// Getter for <see cref="FieldX"/>.
@@ -101,7 +102,7 @@ implementation
 constructor TMessageX.Create;
 begin
   inherited;
-  FFieldX := TProtobufRepeatedField<UInt32>.Create;
+  FFieldX := TProtobufRepeatedUint32Field.Create;
   ClearOwnFields;
 end;
 
