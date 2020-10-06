@@ -326,9 +326,11 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
             // Compile protobuf dependencies (imports)
             foreach (FileDescriptorProto dependency in dependencies) CompileDependency(dependency, dependencyHandler);
             // Compile enums
-            foreach (EnumDescriptorProto @enum in protoFile.EnumType) CompileEnum(@enum, delphiUnit.Interface, dependencyHandler);
+            Action<EnumDeclaration> enumInjection = @enum => delphiUnit.Interface.Declarations.Add(new InterfaceDeclaration() { EnumDeclaration = @enum });
+            foreach (EnumDescriptorProto @enum in protoFile.EnumType) CompileEnum(@enum, enumInjection, dependencyHandler);
             // Compile message types
-            foreach (DescriptorProto messageType in protoFile.MessageType) CompileMessage(messageType, delphiUnit.Interface, delphiUnit.Implementation, dependencyHandler);
+            Action<ClassDeclaration> classInjection = @class => delphiUnit.Interface.Declarations.Add(new InterfaceDeclaration() { ClassDeclaration = @class });
+            foreach (DescriptorProto messageType in protoFile.MessageType) CompileMessage(messageType, classInjection, delphiUnit.Implementation, dependencyHandler);
             return delphiUnit;
         }
 
@@ -381,21 +383,18 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         });
 
         /// <summary>
-        /// Compiles a protobuf enum by injecting code into a Delphi interface section.
+        /// Compiles a protobuf enum by injecting code into a Delphi interface section or a surrounding class.
         /// </summary>
         /// <param name="enum">The enum</param>
-        /// <param name="delphiInterface">The Delphi interface section</param>
+        /// <param name="interfaceInjection">Action that injects the interface part of the enum into an interface section or surrounding class</param>
         /// <param name="dependencyHandler"> Action to perform when a new Delphi interface dependency has been detected</param>
-        private void CompileEnum(EnumDescriptorProto @enum, Interface delphiInterface, Action<UnitReference> dependencyHandler)
+        private void CompileEnum(EnumDescriptorProto @enum, Action<EnumDeclaration> interfaceInjection, Action<UnitReference> dependencyHandler)
         {
             // Add the required runtime dependency for handling compiled enums
             dependencyHandler.Invoke(runtime.GetDependencyForEnums());
             // Generate a corresponding enumerated type
             EnumDeclaration delphiEnum = GenerateEnum(@enum);
-            delphiInterface.Declarations.Add(new InterfaceDeclaration()
-            {
-                EnumDeclaration = delphiEnum
-            });
+            interfaceInjection.Invoke(delphiEnum);
             foreach (EnumValueDescriptorProto value in @enum.Value) CompileEnumValue(value, @enum.Name.ToPascalCase(), delphiEnum);
         }
 
@@ -446,26 +445,27 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         }
 
         /// <summary>
-        /// Compiles a protobuf message type by injecting code into a Delphi interface section and a Delphi implementation section.
+        /// Compiles a protobuf message type by injecting code into a Delphi interface section or surrounding class and a Delphi implementation section.
         /// </summary>
         /// <param name="messageType">The message type</param>
-        /// <param name="delphiInterface">The Delphi interface section</param>
+        /// <param name="interfaceInjection">Action that injects the interface part of the class into an interface section or surrounding class</param>
         /// <param name="delphiImplementation">The Delphi implementation section</param>
         /// <param name="dependencyHandler"> Action to perform when a new Delphi interface dependency has been detected</param>
-        private void CompileMessage(DescriptorProto messageType, Interface delphiInterface, Implementation delphiImplementation, Action<UnitReference> dependencyHandler)
+        private void CompileMessage(DescriptorProto messageType, Action<ClassDeclaration> interfaceInjection, Implementation delphiImplementation, Action<UnitReference> dependencyHandler)
         {
             // Add the required dependencies for handling compiled messages
             dependencyHandler.Invoke(runtime.GetDependencyForMessages());
             dependencyHandler.Invoke(classesReference);
             // Generate a corresponding message class
             ClassDeclaration delphiClass = GenerateClass(messageType);
-            delphiInterface.Declarations.Add(new InterfaceDeclaration()
-            {
-                ClassDeclaration = delphiClass
-            });
+            interfaceInjection.Invoke(delphiClass);
             MessageClassSkeleton skeleton = new MessageClassSkeleton(delphiClass.Name);
             foreach (FieldDescriptorProto field in messageType.Field) CompileField(field, delphiClass, skeleton, dependencyHandler);
             skeleton.Inject(delphiClass, delphiImplementation);
+            Action<ClassDeclaration> nestedClassInjection = nestedClass => delphiClass.NestedTypeDeclarations.Add(new NestedTypeDeclaration() { ClassDeclaration = nestedClass });
+            foreach (DescriptorProto nestedMessageType in messageType.NestedType) CompileMessage(nestedMessageType, nestedClassInjection, delphiImplementation, dependencyHandler);            
+            Action<EnumDeclaration> nestedEnumInjection = nestedEnum => delphiClass.NestedTypeDeclarations.Add(new NestedTypeDeclaration() { EnumDeclaration = nestedEnum });
+            foreach (EnumDescriptorProto nestedEnumType in messageType.EnumType) CompileEnum(nestedEnumType, nestedEnumInjection, dependencyHandler);
         }
 
         /// <summary>
