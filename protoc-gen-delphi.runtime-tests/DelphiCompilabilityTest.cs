@@ -220,7 +220,12 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.RuntimeTests
             // Setup file tree as input for protoc, according to the test vector
             vector.SetupInputFileTree();
             // Run protoc
-            ProtocOperation.PlugInOperation plugIn = new ProtocOperation.PlugInOperation("delphi") { OutDir = CreateScratchFolder() };
+            ProtocOperation.PlugInOperation plugIn = new ProtocOperation.PlugInOperation("delphi")
+            {
+                ExecutableFolder = ".",
+                FallbackToPath = true,
+                OutDir = CreateScratchFolder()
+            };
             if (RuntimeTestOptions.UseStubRuntimeLibrary) plugIn.Options[ProtocGenDelphi.customRuntimeOption] = IRuntimeSupport.Stub.DelphiNamespace;
             ProtocOperation protoc = new ProtocOperation();
             protoc.ProtoPath.AddRange(vector.ProtoPath);
