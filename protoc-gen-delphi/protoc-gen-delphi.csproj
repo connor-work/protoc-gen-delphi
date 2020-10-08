@@ -1,10 +1,61 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <CoreVersion>0.2.0</CoreVersion>
+    <PrereleaseVersionSuffix></PrereleaseVersionSuffix>
+    <SnapshotVersion>true</SnapshotVersion>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <RootNamespace>Work.Connor.Protobuf.Delphi.ProtocGenDelphi</RootNamespace>
     <Nullable>enable</Nullable>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>protoc-gen-delphi</ToolCommandName>
   </PropertyGroup>
+
+  <!-- Pass StableVersion=true to mark this version as stable -->
+  <!-- Pass LocalVersion=false to mark this version as a CI build -->
+  <!-- Pass PrivateVersionOwner=my-org to mark this version as owned by "my-org" (inofficial CI) -->
+  <PropertyGroup>
+    <StableVersion>false</StableVersion>
+    <LocalVersion>true</LocalVersion>
+    <CoreVersion Condition=" '$(CoreVersion)' == '' ">0.0.1</CoreVersion>
+    <SnapshotVersion Condition=" '$(SnapshotVersion)' == '' ">false</SnapshotVersion>
+    <VersionDate>$([System.DateTime]::UtcNow.ToString(yyyyMMddHHmmss))</VersionDate>
+  </PropertyGroup>
+
+  <!-- Determine version stability -->
+  <PropertyGroup Condition=" '$(SnapshotVersion)' == 'false' ">
+    <VersionStability Condition=" '$(StableVersion)' == 'false' ">unstable</VersionStability>
+    <VersionStability Condition=" '$(StableVersion)' == 'true' ">stable</VersionStability>
+  </PropertyGroup>
+  <PropertyGroup>
+    <VersionStability Condition=" '$(SnapshotVersion)' == 'true' ">snapshot</VersionStability>
+  <!-- Determine if this is a stable public version-->
+    <IsStablePublicVersion Condition=" '$(LocalVersion)' == 'false'
+                                   And '$(PrivateVersionOwner)' == ''
+                                   And '$(VersionStability)' == 'stable' ">true</IsStablePublicVersion>
+    <IsStablePublicVersion Condition=" '$(IsStablePublicVersion)' == '' ">false</IsStablePublicVersion>
+  </PropertyGroup>
+  <!-- Construct version tags-->
+  <PropertyGroup Condition=" '$(LocalVersion)' == 'false' ">
+    <ComputedVersionOwnerTag Condition=" '$(PrivateVersionOwner)' == '' ">00-public</ComputedVersionOwnerTag>
+    <ComputedVersionOwnerTag Condition=" '$(PrivateVersionOwner)' != '' ">10-private.$(PrivateVersionOwner)</ComputedVersionOwnerTag>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ComputedVersionOwnerTag Condition=" '$(LocalVersion)' == 'true' ">20-local</ComputedVersionOwnerTag>
+    <ComputedVersionStabilityTag  Condition=" '$(VersionStability)' == 'snapshot' ">00-snapshot.$(VersionDate)</ComputedVersionStabilityTag>
+    <ComputedVersionStabilityTag  Condition=" '$(VersionStability)' == 'unstable' ">10-unstable.$(VersionDate)</ComputedVersionStabilityTag>
+    <ComputedVersionStabilityTag  Condition=" '$(VersionStability)' == 'stable' ">20-final</ComputedVersionStabilityTag>
+  </PropertyGroup>
+  <!-- Append version tags, except for stable public versions -->
+  <PropertyGroup Condition=" '$(IsStablePublicVersion)' == 'false' ">
+    <Version Condition=" '$(PrereleaseVersionSuffix)' != '' ">$(CoreVersion)-$(PrereleaseVersionSuffix).$(ComputedVersionOwnerTag).$(ComputedVersionStabilityTag)</Version>
+    <Version Condition=" '$(PrereleaseVersionSuffix)' == '' ">$(CoreVersion)-zz-release.$(ComputedVersionOwnerTag).$(ComputedVersionStabilityTag)</Version>
+  </PropertyGroup>
+    <PropertyGroup Condition=" '$(IsStablePublicVersion)' == 'true' ">
+    <Version Condition=" '$(PrereleaseVersionSuffix)' != '' ">$(CoreVersion)-$(PrereleaseVersionSuffix).official</Version>
+    <Version Condition=" '$(PrereleaseVersionSuffix)' == '' ">$(CoreVersion)</Version>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="Google.Protobuf" Version="3.13.0" />
     <PackageReference Include="Grpc.Tools" Version="2.31.0" PrivateAssets="all" />
@@ -12,8 +63,9 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Work.Connor.Delphi.CodeWriter" Version="1.0.0" />
+    <PackageReference Include="Work.Connor.Delphi.CodeWriter" Version="0.2.0-*" />
   </ItemGroup>
+
   <ItemGroup>
     <Protobuf Include="../proto/google/protobuf/compiler\plugin.proto" GrpcServices="None" Link="Protos\plugin.proto" />
   </ItemGroup>

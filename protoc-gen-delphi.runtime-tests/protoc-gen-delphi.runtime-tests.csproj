@@ -1,0 +1,112 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <!-- TODO: Version should be always same as protoc-gen-delphi -->
+    <CoreVersion>0.2.0</CoreVersion>
+    <PrereleaseVersionSuffix></PrereleaseVersionSuffix>
+    <SnapshotVersion>true</SnapshotVersion>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <RootNamespace>Work.Connor.Protobuf.Delphi.ProtocGenDelphi.RuntimeTests</RootNamespace>
+    <IsPackable>true</IsPackable>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>protoc-gen-delphi-runtime-tests</ToolCommandName>
+    <GenerateProgramFile>false</GenerateProgramFile>
+    <StartupObject></StartupObject>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <!-- Pass StableVersion=true to mark this version as stable -->
+  <!-- Pass LocalVersion=false to mark this version as a CI build -->
+  <!-- Pass PrivateVersionOwner=my-org to mark this version as owned by "my-org" (inofficial CI) -->
+  <PropertyGroup>
+    <StableVersion>false</StableVersion>
+    <LocalVersion>true</LocalVersion>
+    <CoreVersion Condition=" '$(CoreVersion)' == '' ">0.0.1</CoreVersion>
+    <SnapshotVersion Condition=" '$(SnapshotVersion)' == '' ">false</SnapshotVersion>
+    <VersionDate>$([System.DateTime]::UtcNow.ToString(yyyyMMddHHmmss))</VersionDate>
+  </PropertyGroup>
+
+  <!-- Determine version stability -->
+  <PropertyGroup Condition=" '$(SnapshotVersion)' == 'false' ">
+    <VersionStability Condition=" '$(StableVersion)' == 'false' ">unstable</VersionStability>
+    <VersionStability Condition=" '$(StableVersion)' == 'true' ">stable</VersionStability>
+  </PropertyGroup>
+  <PropertyGroup>
+    <VersionStability Condition=" '$(SnapshotVersion)' == 'true' ">snapshot</VersionStability>
+  <!-- Determine if this is a stable public version-->
+    <IsStablePublicVersion Condition=" '$(LocalVersion)' == 'false'
+                                   And '$(PrivateVersionOwner)' == ''
+                                   And '$(VersionStability)' == 'stable' ">true</IsStablePublicVersion>
+    <IsStablePublicVersion Condition=" '$(IsStablePublicVersion)' == '' ">false</IsStablePublicVersion>
+  </PropertyGroup>
+  <!-- Construct version tags-->
+  <PropertyGroup Condition=" '$(LocalVersion)' == 'false' ">
+    <ComputedVersionOwnerTag Condition=" '$(PrivateVersionOwner)' == '' ">00-public</ComputedVersionOwnerTag>
+    <ComputedVersionOwnerTag Condition=" '$(PrivateVersionOwner)' != '' ">10-private.$(PrivateVersionOwner)</ComputedVersionOwnerTag>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ComputedVersionOwnerTag Condition=" '$(LocalVersion)' == 'true' ">20-local</ComputedVersionOwnerTag>
+    <ComputedVersionStabilityTag  Condition=" '$(VersionStability)' == 'snapshot' ">00-snapshot.$(VersionDate)</ComputedVersionStabilityTag>
+    <ComputedVersionStabilityTag  Condition=" '$(VersionStability)' == 'unstable' ">10-unstable.$(VersionDate)</ComputedVersionStabilityTag>
+    <ComputedVersionStabilityTag  Condition=" '$(VersionStability)' == 'stable' ">20-final</ComputedVersionStabilityTag>
+  </PropertyGroup>
+  <!-- Append version tags, except for stable public versions -->
+  <PropertyGroup Condition=" '$(IsStablePublicVersion)' == 'false' ">
+    <Version Condition=" '$(PrereleaseVersionSuffix)' != '' ">$(CoreVersion)-$(PrereleaseVersionSuffix).$(ComputedVersionOwnerTag).$(ComputedVersionStabilityTag)</Version>
+    <Version Condition=" '$(PrereleaseVersionSuffix)' == '' ">$(CoreVersion)-zz-release.$(ComputedVersionOwnerTag).$(ComputedVersionStabilityTag)</Version>
+  </PropertyGroup>
+    <PropertyGroup Condition=" '$(IsStablePublicVersion)' == 'true' ">
+    <Version Condition=" '$(PrereleaseVersionSuffix)' != '' ">$(CoreVersion)-$(PrereleaseVersionSuffix).official</Version>
+    <Version Condition=" '$(PrereleaseVersionSuffix)' == '' ">$(CoreVersion)</Version>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.5.0" />
+    <!-- Include test CLI to allow stand-alone execution, approach based on https://github.com/microsoft/vstest/issues/2200#issuecomment-590835049 -->
+    <PackageReference Include="Microsoft.TestPlatform.CLI" Version="16.5.0" />
+    <PackageReference Include="xunit" Version="2.4.1" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1" />
+    <PackageReference Include="coverlet.collector" Version="1.2.0" />
+    <!-- TODO: Should always be same version as referenced by protoc-gen-delphi -->
+    <PackageReference Include="Work.Connor.Delphi.CodeWriter" Version="0.2.0-*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\protoc-gen-delphi\protoc-gen-delphi.csproj" />
+  </ItemGroup>
+
+  <!-- Include published version of tested project for integration tests -->
+  <!-- Solution based on https://github.com/dotnet/sdk/issues/1675#issuecomment-675590262 -->
+  <Target Name="AddExeDependencyForBuild" BeforeTargets="CopyFilesToOutputDirectory">
+  <MSBuild Projects="..\protoc-gen-delphi\protoc-gen-delphi.csproj"
+           Targets="Publish"
+           Properties="PublishDir=$([System.IO.Path]::GetFullPath($(OutDir)));PublishReadyToRun=false"
+           BuildInParallel="$(BuildInParallel)" />
+  </Target>
+
+  <ItemGroup>
+    <!-- Runtime-independent support code for generated files -->
+    <EmbeddedResource Include="../runtime/Work/Connor/Protobuf/Delphi/ProtocGenDelphi/*.pas"
+                      LogicalName="[support code unit]%(Filename)%(Extension)" />
+    <!-- Source code of stub runtime library implementation -->
+    <EmbeddedResource Include="../runtime/Work/Connor/Protobuf/Delphi/ProtocGenDelphi/StubRuntime/*.pas"
+                      LogicalName="[stub runtime unit]%(Filename)%(Extension)" />
+    <!-- Support source code for Delphi tests -->
+    <EmbeddedResource Include="test-support/**/*.pas"
+                      LogicalName="[Delphi test support code unit]%(RecursiveDir)%(Filename)%(Extension)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Known schema folders -->
+    <EmbeddedResource Include="../test-vectors/known-schemata/**/*.protoc-input/**/*" LogicalName="[known schema folder]%(RecursiveDir)%(Filename)%(Extension)" />
+    <!-- Known schema files -->
+    <EmbeddedResource Include="../test-vectors/known-schemata/**/*.proto" Exclude="../test-vectors/known-schemata/**/*.protoc-input/**/*" LogicalName="[known schema file]%(RecursiveDir)%(Filename)%(Extension)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- For each known message, there is an encode/decode test consisting of two Delphi programs -->
+    <EmbeddedResource Include="test-vectors/known-messages/**/Encode.pas"
+                      LogicalName="[known message][encode program]%(RecursiveDir)" />
+    <EmbeddedResource Include="test-vectors/known-messages/**/Decode.pas"
+                      LogicalName="[known message][decode program]%(RecursiveDir)" />
+  </ItemGroup>
+</Project>

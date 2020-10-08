@@ -1,0 +1,8 @@
+syntax = "proto3";
+
+message MessageX {
+}
+
+message MessageY {
+    MessageX fieldX = 1;
+}

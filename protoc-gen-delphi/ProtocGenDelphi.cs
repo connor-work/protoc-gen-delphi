@@ -30,35 +30,84 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
     /// </summary>
     public static partial class ProtobufExtensions
     {
+
+#pragma warning disable S4136 // Method overloads should be grouped together -> Method order is optimized for easier reading
+
         /// <summary>
-        /// Determines the Delphi type identifier of the Delphi type that is used to represent protobuf field values of a specific protobuf field,
+        /// Determines the Delphi type identifier of the Delphi type that is used to represent single protobuf field values of a specific protobuf field type,
+        /// when communicating with client code.
+        /// </summary>
+        /// <param name="fieldType">The protobuf field descriptor's type field value</param>
+        /// <param name="fieldTypeName">The protobuf field descriptor's type name field value</param>
+        /// <param name="generator">Function that generates a Delphi type name for a protobuf message type or enumerated type name</param>
+        /// <returns>Corresponding Delphi type identifier</returns>
+        internal static string GetPublicDelphiSingleValueType(this FieldDescriptorProto.Types.Type fieldType, string fieldTypeName, Func<string, string> generator) => fieldType switch
+        {
+            FieldDescriptorProto.Types.Type.String => "UnicodeString",
+            FieldDescriptorProto.Types.Type.Uint32 => "UInt32",
+            FieldDescriptorProto.Types.Type.Bool => "Boolean",
+            FieldDescriptorProto.Types.Type.Enum => generator.Invoke(fieldTypeName),
+            FieldDescriptorProto.Types.Type.Message => generator.Invoke(fieldTypeName),
+            _ => throw new NotImplementedException()
+        };
+
+        /// <summary>
+        /// Determines the Delphi type identifier of the Delphi type that is used to represent single protobuf field values of a specific protobuf field type,
+        /// when communicating with internal (runtime) code.
+        /// </summary>
+        /// <param name="fieldType">The protobuf field descriptor's type field value</param>
+        /// <param name="fieldTypeName">The protobuf field descriptor's type name field value</param>
+        /// <param name="generator">Function that generates a Delphi type name for a protobuf message type or enumerated type name</param>
+        /// <returns>Corresponding Delphi type identifier</returns>
+        internal static string GetPrivateDelphiSingleValueType(this FieldDescriptorProto.Types.Type fieldType, string fieldTypeName, Func<string, string> generator) => fieldType switch
+        {
+            FieldDescriptorProto.Types.Type.String => "UnicodeString",
+            FieldDescriptorProto.Types.Type.Uint32 => "UInt32",
+            FieldDescriptorProto.Types.Type.Bool => "Boolean",
+            FieldDescriptorProto.Types.Type.Enum => "TProtobufEnumFieldValue",
+            FieldDescriptorProto.Types.Type.Message => generator.Invoke(fieldTypeName),
+            _ => throw new NotImplementedException()
+        };
+
+        /// <summary>
+        /// Determines the Delphi type identifier of the Delphi type that is used to represent protobuf field values within repeated fields, of a specific protobuf field type,
+        /// when communicating with client code.
+        /// </summary>
+        /// <param name="fieldType">The protobuf field descriptor's type field value</param>
+        /// <param name="fieldTypeName">The protobuf field descriptor's type name field value</param>
+        /// <param name="generator">Function that generates a Delphi type name for a protobuf message type or enumerated type name</param>
+        /// <returns>Corresponding Delphi type identifier</returns>
+        internal static string GetPublicDelphiElementType(this FieldDescriptorProto.Types.Type fieldType, string fieldTypeName, Func<string, string> generator) => fieldType.GetPublicDelphiSingleValueType(fieldTypeName, generator);
+
+        /// <summary>
+        /// Determines the Delphi type identifier of the Delphi type that is used to represent the protobuf field contents of a specific protobuf field,
         /// when communicating with client code.
         /// </summary>
         /// <param name="field">The protobuf field</param>
         /// <param name="generator">Function that generates a Delphi type name for a protobuf message type or enumerated type name</param>
         /// <returns>Corresponding Delphi type identifier</returns>
-        internal static string GetPublicDelphiType(this FieldDescriptorProto field, Func<string, string> generator) => field.Type switch
+        internal static string GetPublicDelphiType(this FieldDescriptorProto field, Func<string, string> generator) => field.Label switch
         {
-            FieldDescriptorProto.Types.Type.String => "UnicodeString",
-            FieldDescriptorProto.Types.Type.Uint32 => "UInt32",
-            FieldDescriptorProto.Types.Type.Enum => generator.Invoke(field.TypeName),
+            FieldDescriptorProto.Types.Label.Optional => GetPublicDelphiSingleValueType(field.Type, field.TypeName, generator),
+            FieldDescriptorProto.Types.Label.Repeated => $"TProtobufRepeatedField<{GetPublicDelphiElementType(field.Type, field.TypeName, generator)}>",
             _ => throw new NotImplementedException()
         };
 
         /// <summary>
-        /// Determines the Delphi type identifier of the Delphi type that is used to represent protobuf field values of a specific protobuf field,
+        /// Determines the Delphi type identifier of the Delphi type that is used to represent the protobuf field contents of a specific protobuf field,
         /// when communicating with internal (runtime) code.
         /// </summary>
         /// <param name="field">The protobuf field</param>
         /// <param name="generator">Function that generates a Delphi type name for a protobuf message type or enumerated type name</param>
         /// <returns>Corresponding Delphi type identifier</returns>
-        internal static string GetPrivateDelphiType(this FieldDescriptorProto field, Func<string, string> generator) => field.Type switch
+        internal static string GetPrivateDelphiType(this FieldDescriptorProto field, Func<string, string> generator) => field.Label switch
         {
-            FieldDescriptorProto.Types.Type.String => "UnicodeString",
-            FieldDescriptorProto.Types.Type.Uint32 => "UInt32",
-            FieldDescriptorProto.Types.Type.Enum => "TProtobufEnumFieldValue",
+            FieldDescriptorProto.Types.Label.Optional => GetPrivateDelphiSingleValueType(field.Type, field.TypeName, generator),
+            FieldDescriptorProto.Types.Label.Repeated => GetDelphiRepeatedFieldSubclass(field.Type, field.TypeName, generator),
             _ => throw new NotImplementedException()
         };
+
+#pragma warning disable S4136 // Method overloads should be grouped together
 
         /// <summary>
         /// Determines the Delphi identifier of the runtime instance of <c>TProtobufWireCodec<!<![CDATA[<T>]]></c> that is used for encoding
@@ -66,11 +115,31 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// </summary>
         /// <param name="fieldType">The protobuf field type</param>
         /// <returns>Delphi identifier of the codec instance</returns>
+        /// <remarks>This is not used for protobuf message types</remarks>
         internal static string GetDelphiWireCodec(this FieldDescriptorProto.Types.Type fieldType) => fieldType switch
         {
             FieldDescriptorProto.Types.Type.String => "gProtobufWireCodecString",
             FieldDescriptorProto.Types.Type.Uint32 => "gProtobufWireCodecUint32",
+            FieldDescriptorProto.Types.Type.Bool => "gProtobufWireCodecBool",
             FieldDescriptorProto.Types.Type.Enum => "gProtobufWireCodecEnum",
+            _ => throw new NotImplementedException()
+        };
+
+        /// <summary>
+        /// Determines the Delphi identifier of the subclass of <c>TProtobufRepeatedField<!<![CDATA[<T>]]></c> that represents repeated fields of
+        /// a specific protobuf field type.
+        /// </summary>
+        /// <param name="fieldType">The protobuf field descriptor's type field value</param>
+        /// <param name="fieldTypeName">The protobuf field descriptor's type name field value</param>
+        /// <param name="generator">Function that generates a Delphi type name for a protobuf message type or enumerated type name</param>
+        /// <returns>Delphi identifier of class</returns>
+        internal static string GetDelphiRepeatedFieldSubclass(this FieldDescriptorProto.Types.Type fieldType, string fieldTypeName, Func<string, string> generator) => fieldType switch
+        {
+            FieldDescriptorProto.Types.Type.String => "TProtobufRepeatedStringField",
+            FieldDescriptorProto.Types.Type.Uint32 => "TProtobufRepeatedUint32Field",
+            FieldDescriptorProto.Types.Type.Bool => "TProtobufRepeatedBoolField",
+            FieldDescriptorProto.Types.Type.Enum => $"TProtobufRepeatedEnumField<{generator.Invoke(fieldTypeName)}>",
+            FieldDescriptorProto.Types.Type.Message => $"TProtobufRepeatedMessageField<{generator.Invoke(fieldTypeName)}>",
             _ => throw new NotImplementedException()
         };
 
@@ -81,9 +150,11 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// <returns>Delphi identifier default value constant</returns>
         internal static string GetDelphiDefaultValueConstant(this FieldDescriptorProto.Types.Type fieldType) => fieldType switch
         {
-            FieldDescriptorProto.Types.Type.String => "PROTOBUF_STRING_DEFAULT_VALUE",
-            FieldDescriptorProto.Types.Type.Uint32 => "PROTOBUF_UINT32_DEFAULT_VALUE",
-            FieldDescriptorProto.Types.Type.Enum => "PROTOBUF_ENUM_DEFAULT_VALUE",
+            FieldDescriptorProto.Types.Type.String => "PROTOBUF_DEFAULT_VALUE_STRING",
+            FieldDescriptorProto.Types.Type.Uint32 => "PROTOBUF_DEFAULT_VALUE_UINT32",
+            FieldDescriptorProto.Types.Type.Bool => "PROTOBUF_DEFAULT_VALUE_BOOL",
+            FieldDescriptorProto.Types.Type.Enum => "PROTOBUF_DEFAULT_VALUE_ENUM",
+            FieldDescriptorProto.Types.Type.Message => "PROTOBUF_DEFAULT_VALUE_MESSAGE",
             _ => throw new NotImplementedException()
         };
     }
@@ -118,6 +189,23 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// Name of the root base class of all generated Delphi classes for protobuf messages
         /// </summary>
         private static readonly string messageRootClass = "TProtobufMessage";
+
+        /// <summary>
+        /// Required unit reference for using runtime-independent support definitions for generated files (support code)
+        /// </summary>
+        private static readonly UnitReference supportCodeReference = new UnitReference()
+        {
+            Unit = new UnitIdentifier()
+            {
+                Unit = "uProtobuf",
+                Namespace = { "Work.Connor.Protobuf.Delphi.ProtocGenDelphi".Split(".") }
+            }
+        };
+
+        /// <summary>
+        /// Required unit reference for using Delphi classes
+        /// </summary>
+        private static readonly UnitReference classesReference = new UnitReference() { Unit = new UnitIdentifier() { Unit = "Classes" } };
 
         /// <summary>
         /// Support definition for the targetted protobuf runtime
@@ -203,7 +291,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         }
 
         /// <summary>
-        /// Constructs a Delphi type name for a type that represents a protobuf message type or enumerated type.
+        /// Constructs a Delphi type name for a type that represents a protobuf message type or enum type.
         /// </summary>
         /// <param name="typeName">The protobuf type's name</param>
         /// <returns>The Delphi type name</returns>
@@ -256,9 +344,11 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
             // Compile protobuf dependencies (imports)
             foreach (FileDescriptorProto dependency in dependencies) CompileDependency(dependency, dependencyHandler);
             // Compile enums
-            foreach (EnumDescriptorProto @enum in protoFile.EnumType) CompileEnum(@enum, delphiUnit.Interface, dependencyHandler);
+            Action<EnumDeclaration> enumInjection = @enum => delphiUnit.Interface.Declarations.Add(new InterfaceDeclaration() { EnumDeclaration = @enum });
+            foreach (EnumDescriptorProto @enum in protoFile.EnumType) CompileEnum(@enum, enumInjection, dependencyHandler);
             // Compile message types
-            foreach (DescriptorProto messageType in protoFile.MessageType) CompileMessage(messageType, delphiUnit.Interface, delphiUnit.Implementation, dependencyHandler);
+            Action<ClassDeclaration> classInjection = @class => delphiUnit.Interface.Declarations.Add(new InterfaceDeclaration() { ClassDeclaration = @class });
+            foreach (DescriptorProto messageType in protoFile.MessageType) CompileMessage(messageType, classInjection, delphiUnit.Implementation, dependencyHandler);
             return delphiUnit;
         }
 
@@ -311,21 +401,18 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         });
 
         /// <summary>
-        /// Compiles a protobuf enum by injecting code into a Delphi interface section.
+        /// Compiles a protobuf enum by injecting code into a Delphi interface section or a surrounding class.
         /// </summary>
         /// <param name="enum">The enum</param>
-        /// <param name="delphiInterface">The Delphi interface section</param>
+        /// <param name="interfaceInjection">Action that injects the interface part of the enum into an interface section or surrounding class</param>
         /// <param name="dependencyHandler"> Action to perform when a new Delphi interface dependency has been detected</param>
-        private void CompileEnum(EnumDescriptorProto @enum, Interface delphiInterface, Action<UnitReference> dependencyHandler)
+        private void CompileEnum(EnumDescriptorProto @enum, Action<EnumDeclaration> interfaceInjection, Action<UnitReference> dependencyHandler)
         {
             // Add the required runtime dependency for handling compiled enums
             dependencyHandler.Invoke(runtime.GetDependencyForEnums());
             // Generate a corresponding enumerated type
             EnumDeclaration delphiEnum = GenerateEnum(@enum);
-            delphiInterface.Declarations.Add(new InterfaceDeclaration()
-            {
-                EnumDeclaration = delphiEnum
-            });
+            interfaceInjection.Invoke(delphiEnum);
             foreach (EnumValueDescriptorProto value in @enum.Value) CompileEnumValue(value, @enum.Name.ToPascalCase(), delphiEnum);
         }
 
@@ -376,25 +463,27 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         }
 
         /// <summary>
-        /// Compiles a protobuf message type by injecting code into a Delphi interface section and a Delphi implementation section.
+        /// Compiles a protobuf message type by injecting code into a Delphi interface section or surrounding class and a Delphi implementation section.
         /// </summary>
         /// <param name="messageType">The message type</param>
-        /// <param name="delphiInterface">The Delphi interface section</param>
+        /// <param name="interfaceInjection">Action that injects the interface part of the class into an interface section or surrounding class</param>
         /// <param name="delphiImplementation">The Delphi implementation section</param>
         /// <param name="dependencyHandler"> Action to perform when a new Delphi interface dependency has been detected</param>
-        private void CompileMessage(DescriptorProto messageType, Interface delphiInterface, Implementation delphiImplementation, Action<UnitReference> dependencyHandler)
+        private void CompileMessage(DescriptorProto messageType, Action<ClassDeclaration> interfaceInjection, Implementation delphiImplementation, Action<UnitReference> dependencyHandler)
         {
-            // Add the required runtime dependency for handling compiled messages
+            // Add the required dependencies for handling compiled messages
             dependencyHandler.Invoke(runtime.GetDependencyForMessages());
+            dependencyHandler.Invoke(classesReference);
             // Generate a corresponding message class
             ClassDeclaration delphiClass = GenerateClass(messageType);
-            delphiInterface.Declarations.Add(new InterfaceDeclaration()
-            {
-                ClassDeclaration = delphiClass
-            });
+            interfaceInjection.Invoke(delphiClass);
             MessageClassSkeleton skeleton = new MessageClassSkeleton(delphiClass.Name);
             foreach (FieldDescriptorProto field in messageType.Field) CompileField(field, delphiClass, skeleton, dependencyHandler);
             skeleton.Inject(delphiClass, delphiImplementation);
+            Action<ClassDeclaration> nestedClassInjection = nestedClass => delphiClass.NestedTypeDeclarations.Add(new NestedTypeDeclaration() { ClassDeclaration = nestedClass });
+            foreach (DescriptorProto nestedMessageType in messageType.NestedType) CompileMessage(nestedMessageType, nestedClassInjection, delphiImplementation, dependencyHandler);            
+            Action<EnumDeclaration> nestedEnumInjection = nestedEnum => delphiClass.NestedTypeDeclarations.Add(new NestedTypeDeclaration() { EnumDeclaration = nestedEnum });
+            foreach (EnumDescriptorProto nestedEnumType in messageType.EnumType) CompileEnum(nestedEnumType, nestedEnumInjection, dependencyHandler);
         }
 
         /// <summary>
@@ -429,8 +518,12 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// <param name="dependencyHandler"> Action to perform when a new Delphi interface dependency has been detected</param>
         private void CompileField(FieldDescriptorProto field, ClassDeclaration delphiClass, MessageClassSkeleton skeleton, Action<UnitReference> dependencyHandler)
         {
-            // Add the required runtime dependency for handling protobuf fields of this specific type
-            dependencyHandler.Invoke(runtime.GetDependencyForFieldType(field.Type));
+            // Add the required runtime dependencies for handling protobuf fields of this specific type
+            if (field.Label == FieldDescriptorProto.Types.Label.Repeated)
+            {
+                foreach (UnitReference dependency in runtime.GetDependenciesForRepeatedFieldType(field.Type)) dependencyHandler.Invoke(dependency);
+            }
+            else dependencyHandler.Invoke(runtime.GetDependencyForSingularFieldType(field.Type));
             // Delphi type exposed to client code
             string publicDelphiType = field.GetPublicDelphiType(name => ConstructDelphiTypeName(name));
             // Delphi type used for internal representation
@@ -441,13 +534,44 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
             FieldDeclaration delphiField = GenerateAndInjectField(field, delphiPropertyName, privateDelphiType, delphiClass);
             GenerateAndInjectProperty(field, delphiField, delphiPropertyName, publicDelphiType, delphiClass, skeleton);
             // Fill the message skeleton with the runtime field logic
-            string wireCodec = field.Type.GetDelphiWireCodec();
+            (_, MethodDeclaration createDeclaration) = skeleton.Create;
+            (_, MethodDeclaration destroyDeclaration) = skeleton.Destroy;
             (_, MethodDeclaration encodeDeclaration) = skeleton.Encode;
             (_, MethodDeclaration decodeDeclaration) = skeleton.Decode;
             (_, MethodDeclaration clearOwnFieldsDeclaration) = skeleton.ClearOwnFields;
-            encodeDeclaration.Statements.Add($"EncodeField<{privateDelphiType}>({delphiField.Name}, {delphiFieldNumberConst.Identifier}, {wireCodec}, aDest);");
-            decodeDeclaration.Statements.Add($"{delphiField.Name} := DecodeUnknownField<{privateDelphiType}>({delphiFieldNumberConst.Identifier}, {wireCodec});");
-            clearOwnFieldsDeclaration.Statements.Add($"{delphiField.Name} := {field.Type.GetDelphiDefaultValueConstant()};");
+            // TODO handling of absent type (unknown if message or enum)
+            if (field.Type == FieldDescriptorProto.Types.Type.Message)
+            {
+                destroyDeclaration.Statements.Insert(destroyDeclaration.Statements.Count - 1, $"{delphiField.Name}.Free;");
+                encodeDeclaration.Statements.Add($"EncodeMessageField<{privateDelphiType}>({delphiField.Name}, {delphiFieldNumberConst.Identifier}, aDest);");
+                decodeDeclaration.Statements.Add($"{delphiField.Name}.Free;");
+                decodeDeclaration.Statements.Add($"{delphiField.Name} := DecodeUnknownMessageField<{privateDelphiType}>({delphiFieldNumberConst.Identifier});");
+                clearOwnFieldsDeclaration.Statements.Add($"{delphiField.Name}.Free;");
+            }
+            else
+            {
+                string wireCodec = field.Type.GetDelphiWireCodec();
+                if (field.Label == FieldDescriptorProto.Types.Label.Repeated)
+                {
+                    string delphiElementType = field.Type.GetPublicDelphiElementType(field.TypeName, name => ConstructDelphiTypeName(name));
+                    createDeclaration.Statements.Insert(createDeclaration.Statements.Count - 1, $"{delphiField.Name} := {privateDelphiType}.Create;");
+                    destroyDeclaration.Statements.Insert(destroyDeclaration.Statements.Count - 1, $"{delphiField.Name}.Free;");
+                    encodeDeclaration.Statements.Add($"EncodeRepeatedField<{delphiElementType}>({delphiField.Name}, {delphiFieldNumberConst.Identifier}, {wireCodec}, aDest);");
+                    decodeDeclaration.Statements.Add($"{delphiField.Name}.Clear;");
+                    decodeDeclaration.Statements.Add($"DecodeUnknownRepeatedField<{delphiElementType}>({delphiFieldNumberConst.Identifier}, {wireCodec}, {delphiField.Name});");
+                }
+                else
+                {
+                    encodeDeclaration.Statements.Add($"EncodeField<{privateDelphiType}>({delphiField.Name}, {delphiFieldNumberConst.Identifier}, {wireCodec}, aDest);");
+                    decodeDeclaration.Statements.Add($"{delphiField.Name} := DecodeUnknownField<{privateDelphiType}>({delphiFieldNumberConst.Identifier}, {wireCodec});");
+                }
+            }
+            if (field.Label == FieldDescriptorProto.Types.Label.Repeated) clearOwnFieldsDeclaration.Statements.Add($"{delphiField.Name}.Clear;");
+            else
+            {
+                dependencyHandler.Invoke(supportCodeReference); // Required for default value constant
+                clearOwnFieldsDeclaration.Statements.Add($"{delphiField.Name} := {field.Type.GetDelphiDefaultValueConstant()};");
+            }
         }
 
         /// <summary>
@@ -523,7 +647,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// <returns>The injected field declaration</returns>
         private MethodDeclaration GenerateAndInjectGetter(FieldDescriptorProto field, FieldDeclaration delphiField, string delphiPropertyName, string delphiType, ClassDeclaration delphiClass, MessageClassSkeleton skeleton)
         {
-            // TODO handling of absent type (unknown if message or enum) and message type
+            // TODO handling of absent type (unknown if message or enum)
             string valueExpression = field.Type == FieldDescriptorProto.Types.Type.Enum ? $"{ConstructDelphiTypeName(field.TypeName)}({delphiField.Name})"
                                                                                         : delphiField.Name;
             MethodDeclaration getter = new MethodDeclaration()
@@ -582,9 +706,12 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
                 Name = "aValue",
                 Type = delphiType
             };
-            // TODO handling of absent type (unknown if message or enum) and message type
+            // TODO handling of absent type (unknown if message or enum)
+            List<string> statements = new List<string>();
+            if (field.Type == FieldDescriptorProto.Types.Type.Message) statements.Add($"{delphiField.Name}.Free;");
             string valueExpression = field.Type == FieldDescriptorProto.Types.Type.Enum ? $"Ord({setterParameter.Name})"
                                                                                         : setterParameter.Name;
+            statements.Add($"{delphiField.Name} := {valueExpression};");
             MethodDeclaration setter = new MethodDeclaration()
             {
                 Class = delphiClass.Name,
@@ -594,7 +721,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
                     Type = Prototype.Types.Type.Procedure,
                     ParameterList = { setterParameter }
                 },
-                Statements = { $"{delphiField.Name} := {valueExpression};" }
+                Statements = { statements }
             };
             skeleton.PropertyAccessors.Add(setter);
             delphiClass.MemberList.Add(new ClassMemberDeclaration()
@@ -636,13 +763,11 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         private void GenerateAndInjectProperty(FieldDescriptorProto field, FieldDeclaration delphiField, string delphiPropertyName, string delphiType, ClassDeclaration delphiClass, MessageClassSkeleton skeleton)
         {
             MethodDeclaration getter = GenerateAndInjectGetter(field, delphiField, delphiPropertyName, delphiType, delphiClass, skeleton);
-            MethodDeclaration setter = GenerateAndInjectSetter(field, delphiField, delphiPropertyName, delphiType, delphiClass, skeleton);
             PropertyDeclaration delphiProperty = new PropertyDeclaration()
             {
                 Name = delphiPropertyName,
                 Type = delphiType,
                 ReadSpecifier = getter.Prototype.Name,
-                WriteSpecifier = setter.Prototype.Name,
                 Comment = new AnnotationComment()
                 {
                     CommentLines =
@@ -654,6 +779,12 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
                     }
                 }
             };
+            // Do not generate a setter for repeated fields, the client code shall mutate the existing object
+            if (field.Label != FieldDescriptorProto.Types.Label.Repeated)
+            {
+                MethodDeclaration setter = GenerateAndInjectSetter(field, delphiField, delphiPropertyName, delphiType, delphiClass, skeleton);
+                delphiProperty.WriteSpecifier = setter.Prototype.Name;
+            }
             delphiClass.MemberList.Add(new ClassMemberDeclaration()
             {
                 Visibility = Visibility.Public,

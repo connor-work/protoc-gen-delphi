@@ -3,6 +3,10 @@
 /// </remarks>
 unit uEmptySchema;
 
+{$IFDEF FPC}
+  {$MODE DELPHI}
+{$ENDIF}
+
 interface
 
 implementation

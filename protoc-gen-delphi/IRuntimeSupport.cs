@@ -15,6 +15,7 @@
 
 using Google.Protobuf.Reflection;
 using System;
+using System.Collections.Generic;
 using Work.Connor.Delphi;
 
 namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
@@ -49,11 +50,18 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         public UnitReference GetDependencyForMessages();
 
         /// <summary>
-        /// Provides the required unit reference for handling protobuf fields of a specific field type. 
+        /// Provides the required unit references for handling protobuf repeated fields of a specific field type.
         /// </summary>
         /// <param name="type">The protobuf field type</param>
         /// <returns>The Delphi unit reference</returns>
-        public UnitReference GetDependencyForFieldType(FieldDescriptorProto.Types.Type type);
+        public IEnumerable<UnitReference> GetDependenciesForRepeatedFieldType(FieldDescriptorProto.Types.Type type);
+
+        /// <summary>
+        /// Provides the required unit reference for handling protobuf singular fields of a specific field type. 
+        /// </summary>
+        /// <param name="type">The protobuf field type</param>
+        /// <returns>The Delphi unit reference</returns>
+        public UnitReference GetDependencyForSingularFieldType(FieldDescriptorProto.Types.Type type);
 
         /// <summary>
         /// Provides support definitions for a runtime library implementation that follows the structure of the reference stub runtime.
@@ -76,33 +84,43 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
             /// </summary>
             /// <param name="unit">The unqualified unit name</param>
             /// <returns>The unit reference</returns>
-            private UnitReference GetUnitReference(string unit)
+            private UnitReference GetUnitReference(string unit) => new UnitReference()
             {
-                UnitIdentifier identifier = new UnitIdentifier()
+                Unit = new UnitIdentifier()
                 {
-                    Unit = unit
-                };
-                identifier.Namespace.Add(DelphiNamespace.Split("."));
-                return new UnitReference()
-                {
-                    Unit = identifier
-                };
-            }
+                    Unit = unit,
+                    Namespace = { DelphiNamespace.Split(".") }
+                }
+            };
 
             public UnitReference GetDependencyForEnums() => GetUnitReference("uProtobufEnum");
 
             public UnitReference GetDependencyForMessages() => GetUnitReference("uProtobufMessage");
 
-            public UnitReference GetDependencyForFieldType(FieldDescriptorProto.Types.Type type)
+            public IEnumerable<UnitReference> GetDependenciesForRepeatedFieldType(FieldDescriptorProto.Types.Type type)
             {
-                return GetUnitReference(type switch
+                yield return GetUnitReference("uProtobufRepeatedField");
+                yield return GetDependencyForSingularFieldType(type);
+                yield return GetUnitReference(type switch
                 {
-                    FieldDescriptorProto.Types.Type.String => "uProtobufString",
-                    FieldDescriptorProto.Types.Type.Uint32 => "uProtobufUint32",
-                    FieldDescriptorProto.Types.Type.Enum => "uProtobufEnum",
+                    FieldDescriptorProto.Types.Type.String => "uProtobufRepeatedString",
+                    FieldDescriptorProto.Types.Type.Uint32 => "uProtobufRepeatedUint32",
+                    FieldDescriptorProto.Types.Type.Bool => "uProtobufRepeatedBool",
+                    FieldDescriptorProto.Types.Type.Enum => "uProtobufRepeatedEnum",
+                    FieldDescriptorProto.Types.Type.Message => "uProtobufRepeatedMessage",
                     _ => throw new NotImplementedException()
                 });
             }
+
+            public UnitReference GetDependencyForSingularFieldType(FieldDescriptorProto.Types.Type type) => GetUnitReference(type switch
+                {
+                    FieldDescriptorProto.Types.Type.String => "uProtobufString",
+                    FieldDescriptorProto.Types.Type.Uint32 => "uProtobufUint32",
+                    FieldDescriptorProto.Types.Type.Bool => "uProtobufBool",
+                    FieldDescriptorProto.Types.Type.Enum => "uProtobufEnum",
+                    FieldDescriptorProto.Types.Type.Message => "uProtobufMessage",
+                    _ => throw new NotImplementedException()
+                });
         }
     }
 }
