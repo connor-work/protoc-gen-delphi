@@ -45,9 +45,9 @@
   </PropertyGroup>
   <PropertyGroup>
     <ComputedVersionOwnerTag Condition=" '$(LocalVersion)' == 'true' ">20-local</ComputedVersionOwnerTag>
-    <ComputedVersionStabilityTag  Condition=" '$(VersionStability)' == 'snapshot' ">00-snapshot.$(VersionDate)</ComputedVersionStabilityTag>
-    <ComputedVersionStabilityTag  Condition=" '$(VersionStability)' == 'unstable' ">10-unstable.$(VersionDate)</ComputedVersionStabilityTag>
-    <ComputedVersionStabilityTag  Condition=" '$(VersionStability)' == 'stable' ">20-final</ComputedVersionStabilityTag>
+    <ComputedVersionStabilityTag Condition=" '$(VersionStability)' == 'snapshot' ">00-snapshot.$(VersionDate)</ComputedVersionStabilityTag>
+    <ComputedVersionStabilityTag Condition=" '$(VersionStability)' == 'unstable' ">10-unstable.$(VersionDate)</ComputedVersionStabilityTag>
+    <ComputedVersionStabilityTag Condition=" '$(VersionStability)' == 'stable' ">20-final</ComputedVersionStabilityTag>
   </PropertyGroup>
   <!-- Append version tags, except for stable public versions -->
   <PropertyGroup Condition=" '$(IsStablePublicVersion)' == 'false' ">
