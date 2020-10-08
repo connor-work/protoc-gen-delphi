@@ -21,7 +21,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.RuntimeTests
+namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Tests
 {
     // TODO this should be extracted to protobuf-tools
     /// <summary>
@@ -103,6 +103,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.RuntimeTests
             foreach (string plugInArg in PlugIns.SelectMany(plugIn => plugIn.ProtocArgs)) protoc.StartInfo.ArgumentList.Add(plugInArg);
             foreach (string protoPathFolder in ProtoPath) protoc.StartInfo.ArgumentList.Add($"--proto_path={protoPathFolder}");
             foreach (string protoFile in ProtoFiles) protoc.StartInfo.ArgumentList.Add(protoFile);
+            //throw new Exception(string.Join(" ", protoc.StartInfo.ArgumentList.Select(x => x.ToString())));
             protoc.StartInfo.CreateNoWindow = true;
             protoc.StartInfo.UseShellExecute = false;
             protoc.StartInfo.RedirectStandardError = true;

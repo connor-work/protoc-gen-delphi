@@ -125,7 +125,6 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Tests
                 expectedOutputFolderResources = allExpectedOutputFolderResources.Nest($"{name}.protoc-output/");
             }
 
-
             /// <summary>
             /// Name of the optional test resource file that is used as a single input protobuf schema definition file for <c>protoc</c> for this test
             /// </summary>
@@ -139,13 +138,24 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Tests
             /// <summary>
             /// Names of all .proto files that shall be specified for generation in the <c>protoc</c> arguments
             /// </summary>
-            private IEnumerable<string> InputProtoFileNames => inputFolderResources.GetIDs().Where(name => name.Contains(inputFilePrefix))
-                                                       .Concat(allInputFileResources.GetIDs().Where(name => name.Equals(InputSchemaFileName)));
+            public IEnumerable<string> InputProtoFileNames => inputFolderResources.GetIDs().Where(name => name.Contains(inputFilePrefix))
+                                                      .Concat(allInputFileResources.GetIDs().Where(name => name.Equals(InputSchemaFileName)));
+
+            /// <summary>
+            /// Paths of all folders that should be added to the <c>protoc</c> search path
+            /// </summary>
+            public IEnumerable<string> ProtoPath
+            {
+                get
+                {
+                    yield return inputFolder ?? throw new InvalidOperationException($"Test vector file tree was not setup using {nameof(SetupInputFileTree)}");
+                }
+            }
 
             /// <summary>
             /// Creates a temporary file tree containing input files, required before using the test vector
             /// </summary>
-            public void SetupFileTree()
+            public void SetupInputFileTree()
             {
                 inputFolder = CreateScratchFolder();
                 foreach ((string name, string content) in ProtoFilesToSetup)
@@ -155,11 +165,6 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Tests
                     File.WriteAllText(path, content);
                 }
             }
-
-            /// <summary>
-            /// Arguments to <c>protoc</c>
-            /// </summary>
-            public IEnumerable<string> ProtocArgs => InputProtoFileNames.Prepend($"-I{inputFolder ?? throw new InvalidOperationException($"Test vector file tree was not setup using {nameof(SetupFileTree)}")}");
 
             /// <summary>
             /// Mapping of file paths of expected plug-in output files to their expected content
@@ -201,19 +206,6 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Tests
         public static IEnumerable<object[]> TestVectors => TestVectorNames.Select(name => new object[] { new TestVector(name) });
 
         /// <summary>
-        /// Constructs an executable file name for the current platform.
-        /// </summary>
-        /// <param name="name">The base name, without extension</param>
-        /// <returns>The executable file name</returns>
-        private static string GetExecutableName(string name)
-        {
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) return $"{name}.exe";
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) return name;
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) return name;
-            throw new NotImplementedException("Unsupported OS");
-        }
-
-        /// <summary>
         /// Determines the platform identifier in <c>protoc</c>'s path.
         /// </summary>
         /// <returns>The <c>protoc</c> platform identifier string</returns>
@@ -235,32 +227,27 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Tests
         public void ProducesExpectedOutput(TestVector vector)
         {
             // Setup file tree as input for protoc, according to the test vector
-            vector.SetupFileTree();
-            // Create a scratch folder as output folder for the plug-in
-            string outputFolder = CreateScratchFolder();
+            vector.SetupInputFileTree();
+
             // Run protoc
-            using Process protoc = new Process();
-            protoc.StartInfo.FileName = Path.Join("Google.Protobuf.Tools", "tools", GetProtocPlatform(), GetExecutableName("protoc"));
-            // A leading dot seems to be required in the plugin folder name for protoc
-            protoc.StartInfo.ArgumentList.Add($"--plugin={Path.Join(".", GetExecutableName("protoc-gen-delphi"))}");
-            protoc.StartInfo.ArgumentList.Add($"--delphi_out={outputFolder}");
-            if (!vector.ShallUseDefaultRuntime) protoc.StartInfo.ArgumentList.Add($"--delphi_opt={ProtocGenDelphi.customRuntimeOption}={IRuntimeSupport.Stub.DelphiNamespace}");
-            foreach (string arg in vector.ProtocArgs) protoc.StartInfo.ArgumentList.Add(arg);
-            protoc.StartInfo.CreateNoWindow = true;
-            protoc.StartInfo.UseShellExecute = false;
-            protoc.StartInfo.RedirectStandardError = true;
-            string error = "";
-            protoc.Start();
-            protoc.ErrorDataReceived += delegate (object sender, DataReceivedEventArgs e) { error += e.Data; };
-            protoc.BeginErrorReadLine();
-            protoc.WaitForExit();
-            // Check protoc success
-            Assert.Equal(0, protoc.ExitCode);
+            ProtocOperation.PlugInOperation plugIn = new ProtocOperation.PlugInOperation("delphi")
+            {
+                ExecutableFolder = "exe-protoc-gen-delphi",
+                OutDir = CreateScratchFolder()
+            };
+            ProtocOperation protoc = new ProtocOperation { ProtocExecutableFolder = Path.Join("Google.Protobuf.Tools", "tools", GetProtocPlatform()) };
+            if (!vector.ShallUseDefaultRuntime) plugIn.Options[ProtocGenDelphi.customRuntimeOption] = IRuntimeSupport.Stub.DelphiNamespace;
+            protoc.ProtoPath.AddRange(vector.ProtoPath);
+            protoc.ProtoFiles.AddRange(vector.InputProtoFileNames);
+            protoc.PlugIns.Add(plugIn);
+            (bool protocSuccess, _, string? protocError) = protoc.Perform();
+            Assert.True(protocSuccess, protocError!);
+
             IDictionary<string, string> expectedOutputFiles = vector.ExpectedOutputFiles;
             // Check that expected files are generated
-            foreach ((string path, string expectedContent) in expectedOutputFiles) Assert.Equal(expectedContent, File.ReadAllText(Path.Join(outputFolder, path)));
+            foreach ((string path, string expectedContent) in expectedOutputFiles) Assert.Equal(expectedContent, File.ReadAllText(Path.Join(plugIn.OutDir, path)));
             // Check that no other files are generated
-            foreach (string path in Directory.GetFiles(outputFolder, "*", SearchOption.AllDirectories)) Assert.Contains(Path.GetRelativePath(outputFolder, path).Replace('\\', '/'), expectedOutputFiles.Keys);
+            foreach (string path in Directory.GetFiles(plugIn.OutDir, "*", SearchOption.AllDirectories)) Assert.Contains(Path.GetRelativePath(plugIn.OutDir, path).Replace('\\', '/'), expectedOutputFiles.Keys);
         }
     }
 }
