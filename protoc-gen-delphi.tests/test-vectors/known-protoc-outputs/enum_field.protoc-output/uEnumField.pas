@@ -3,11 +3,17 @@
 /// </remarks>
 unit uEnumField;
 
+{$IFDEF FPC}
+  {$MODE DELPHI}
+{$ENDIF}
+
 interface
 
 uses
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufEnum,
-  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufMessage;
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufMessage,
+  Classes,
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.uProtobuf;
 
 type
   /// <remarks>
@@ -18,8 +24,7 @@ type
     /// This enumerated value corresponds to the protobuf enum constant <c>VALUE_X</c>.
     /// </remarks>
     EnumXValueX = 0
-  )
-  end;
+  );
 
 type
   /// <remarks>
@@ -144,7 +149,7 @@ end;
 
 procedure TMessageX.ClearOwnFields;
 begin
-  FFieldX := PROTOBUF_ENUM_DEFAULT_VALUE;
+  FFieldX := PROTOBUF_DEFAULT_VALUE_ENUM;
 end;
 
 function TMessageX.GetFieldX: TEnumX;

@@ -3,6 +3,10 @@
 /// </remarks>
 unit uInputFileImports;
 
+{$IFDEF FPC}
+  {$MODE DELPHI}
+{$ENDIF}
+
 interface
 
 uses

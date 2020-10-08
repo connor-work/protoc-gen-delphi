@@ -3,11 +3,17 @@
 /// </remarks>
 unit uString;
 
+{$IFDEF FPC}
+  {$MODE DELPHI}
+{$ENDIF}
+
 interface
 
 uses
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufMessage,
-  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufString;
+  Classes,
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufString,
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.uProtobuf;
 
 type
   /// <remarks>
@@ -132,7 +138,7 @@ end;
 
 procedure TMessageX.ClearOwnFields;
 begin
-  FFieldX := PROTOBUF_STRING_DEFAULT_VALUE;
+  FFieldX := PROTOBUF_DEFAULT_VALUE_STRING;
 end;
 
 function TMessageX.GetFieldX: UnicodeString;
