@@ -222,7 +222,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.RuntimeTests
             // Run protoc
             ProtocOperation.PlugInOperation plugIn = new ProtocOperation.PlugInOperation("delphi")
             {
-                ExecutableFolder = ".",
+                ExecutableFolder = "exe-protoc-gen-delphi",
                 FallbackToPath = true,
                 OutDir = CreateScratchFolder()
             };
