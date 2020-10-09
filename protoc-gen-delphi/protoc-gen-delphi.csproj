@@ -10,6 +10,8 @@
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>protoc-gen-delphi</ToolCommandName>
     <RuntimeIdentifiers>linux-x64;osx-x64;win-x64</RuntimeIdentifiers>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
 
   <!-- Pass StableVersion=true to mark this version as stable -->

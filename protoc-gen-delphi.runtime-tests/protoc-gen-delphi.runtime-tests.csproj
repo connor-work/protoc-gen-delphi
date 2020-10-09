@@ -12,6 +12,8 @@
     <GenerateProgramFile>false</GenerateProgramFile>
     <StartupObject></StartupObject>
     <Nullable>enable</Nullable>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
 
   <!-- Pass StableVersion=true to mark this version as stable -->
