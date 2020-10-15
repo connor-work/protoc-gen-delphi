@@ -1,3 +1,3 @@
-brew "powershell"
+cask "powershell"
 brew "protobuf@3.13"
-cask "fpc"
+brew "fpc"
