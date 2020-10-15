@@ -14,6 +14,7 @@
 
 # Checks that all git-tracked files in the working directory have the expected end-of-line type
 # The optional end-of-line type ("lf", "crlf" or "mixed") can be specified using the git attribute "expected-eol"
+# Requires Powershell 7+ and Git
 
 # Index of the working copy's <eolinfo> value in the output of git ls-files --eol
 $lsFilesEolinfoWorkingIndex = 1
