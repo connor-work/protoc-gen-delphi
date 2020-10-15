@@ -44,6 +44,8 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         internal static string GetPublicDelphiSingleValueType(this FieldDescriptorProto.Types.Type fieldType, string fieldTypeName, Func<string, string> generator) => fieldType switch
         {
             FieldDescriptorProto.Types.Type.String => "UnicodeString",
+            FieldDescriptorProto.Types.Type.Float => "Single",
+            FieldDescriptorProto.Types.Type.Double => "Double",
             FieldDescriptorProto.Types.Type.Uint32 => "UInt32",
             FieldDescriptorProto.Types.Type.Bool => "Boolean",
             FieldDescriptorProto.Types.Type.Enum => generator.Invoke(fieldTypeName),
@@ -62,6 +64,8 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         internal static string GetPrivateDelphiSingleValueType(this FieldDescriptorProto.Types.Type fieldType, string fieldTypeName, Func<string, string> generator) => fieldType switch
         {
             FieldDescriptorProto.Types.Type.String => "UnicodeString",
+            FieldDescriptorProto.Types.Type.Float => "Single",
+            FieldDescriptorProto.Types.Type.Double => "Double",
             FieldDescriptorProto.Types.Type.Uint32 => "UInt32",
             FieldDescriptorProto.Types.Type.Bool => "Boolean",
             FieldDescriptorProto.Types.Type.Enum => "TProtobufEnumFieldValue",
@@ -119,6 +123,8 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         internal static string GetDelphiWireCodec(this FieldDescriptorProto.Types.Type fieldType) => fieldType switch
         {
             FieldDescriptorProto.Types.Type.String => "gProtobufWireCodecString",
+            FieldDescriptorProto.Types.Type.Float => "gProtobufWireCodecFloat",
+            FieldDescriptorProto.Types.Type.Double => "gProtobufWireCodecDouble",
             FieldDescriptorProto.Types.Type.Uint32 => "gProtobufWireCodecUint32",
             FieldDescriptorProto.Types.Type.Bool => "gProtobufWireCodecBool",
             FieldDescriptorProto.Types.Type.Enum => "gProtobufWireCodecEnum",
@@ -136,6 +142,8 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         internal static string GetDelphiRepeatedFieldSubclass(this FieldDescriptorProto.Types.Type fieldType, string fieldTypeName, Func<string, string> generator) => fieldType switch
         {
             FieldDescriptorProto.Types.Type.String => "TProtobufRepeatedStringField",
+            FieldDescriptorProto.Types.Type.Float => "TProtobufRepeatedFloatField",
+            FieldDescriptorProto.Types.Type.Double => "TProtobufRepeatedDoubleField",
             FieldDescriptorProto.Types.Type.Uint32 => "TProtobufRepeatedUint32Field",
             FieldDescriptorProto.Types.Type.Bool => "TProtobufRepeatedBoolField",
             FieldDescriptorProto.Types.Type.Enum => $"TProtobufRepeatedEnumField<{generator.Invoke(fieldTypeName)}>",
@@ -151,6 +159,8 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         internal static string GetDelphiDefaultValueConstant(this FieldDescriptorProto.Types.Type fieldType) => fieldType switch
         {
             FieldDescriptorProto.Types.Type.String => "PROTOBUF_DEFAULT_VALUE_STRING",
+            FieldDescriptorProto.Types.Type.Float => "PROTOBUF_DEFAULT_VALUE_FLOAT",
+            FieldDescriptorProto.Types.Type.Double => "PROTOBUF_DEFAULT_VALUE_DOUBLE",
             FieldDescriptorProto.Types.Type.Uint32 => "PROTOBUF_DEFAULT_VALUE_UINT32",
             FieldDescriptorProto.Types.Type.Bool => "PROTOBUF_DEFAULT_VALUE_BOOL",
             FieldDescriptorProto.Types.Type.Enum => "PROTOBUF_DEFAULT_VALUE_ENUM",
