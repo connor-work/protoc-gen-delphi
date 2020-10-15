@@ -5,6 +5,7 @@ addons:
     apt:
         packages:
             - powershell
+            - protobuf-compiler
             - fpc
 os: linux
 dist: xenial
@@ -15,8 +16,10 @@ before_install:
 before_script:
     - if [ "$TRAVIS_OS_NAME" = "osx" ]; then brew cask install powershell; fi
     - if [ "$TRAVIS_OS_NAME" = "osx" ]; then brew install fpc; fi
+    - if [ "$TRAVIS_OS_NAME" = "osx" ]; then brew install protobuf; fi
     - if [ "$TRAVIS_OS_NAME" = "windows" ]; then choco install pwsh; fi
     - if [ "$TRAVIS_OS_NAME" = "windows" ]; then choco install freepascal; fi
+    - if [ "$TRAVIS_OS_NAME" = "windows" ]; then choco install protoc; fi
     # Path refresh command based on https://travis-ci.community/t/windows-builds-refreshenv-command-not-found/5803/5
     - if [ "$TRAVIS_OS_NAME" = "windows" ]; then eval $(powershell -NonInteractive -Command 'write("export PATH=`"" + ([Environment]::GetEnvironmentVariable("PATH","Machine") + ";" + [Environment]::GetEnvironmentVariable("PATH","User")).replace("\","/").replace("C:","/c").replace(";",":") + ":`$PATH`"")'); fi
 
