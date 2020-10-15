@@ -23,6 +23,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Work.Connor.Delphi;
 using Work.Connor.Delphi.CodeWriter;
+using Work.Connor.Delphi.Tools;
 using Xunit;
 using Xunit.Abstractions;
 
