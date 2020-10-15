@@ -3,13 +3,11 @@ mono: none
 dotnet: 3.1.401
 addons:
     apt:
-        packages:
-            - powershell
-    apt:
         sources:
             - sourceline: 'deb http://de.archive.ubuntu.com/ubuntu groovy main universe'
         packages:
             - fp-compiler-3.2.0
+            - powershell
 
 os: linux
 dist: xenial
