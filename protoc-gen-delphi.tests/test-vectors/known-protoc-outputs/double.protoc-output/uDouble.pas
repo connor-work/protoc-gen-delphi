@@ -12,7 +12,7 @@ interface
 uses
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufMessage,
   Classes,
-  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufFloat,
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufDouble,
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.uProtobuf;
 
 type
