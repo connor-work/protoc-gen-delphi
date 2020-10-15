@@ -69,7 +69,7 @@
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1" />
     <PackageReference Include="coverlet.collector" Version="1.2.0" />
     <!-- TODO: Should always be same version as referenced by protoc-gen-delphi -->
-    <PackageReference Include="Work.Connor.Delphi.CodeWriter" Version="0.2.0-*" />
+    <PackageReference Include="Work.Connor.Delphi.CodeWriter" Version="0.3.0" />
   </ItemGroup>
 
   <ItemGroup>
