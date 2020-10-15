@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <CoreVersion>0.2.0</CoreVersion>
+    <CoreVersion>0.3.0</CoreVersion>
     <PrereleaseVersionSuffix></PrereleaseVersionSuffix>
     <SnapshotVersion>true</SnapshotVersion>
     <OutputType>Exe</OutputType>
