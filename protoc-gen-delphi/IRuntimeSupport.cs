@@ -104,6 +104,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
                 yield return GetUnitReference(type switch
                 {
                     FieldDescriptorProto.Types.Type.String => "uProtobufRepeatedString",
+                    FieldDescriptorProto.Types.Type.Float => "uProtobufRepeatedFloat",
                     FieldDescriptorProto.Types.Type.Uint32 => "uProtobufRepeatedUint32",
                     FieldDescriptorProto.Types.Type.Bool => "uProtobufRepeatedBool",
                     FieldDescriptorProto.Types.Type.Enum => "uProtobufRepeatedEnum",
@@ -115,6 +116,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
             public UnitReference GetDependencyForSingularFieldType(FieldDescriptorProto.Types.Type type) => GetUnitReference(type switch
                 {
                     FieldDescriptorProto.Types.Type.String => "uProtobufString",
+                    FieldDescriptorProto.Types.Type.Float => "uProtobufFloat",
                     FieldDescriptorProto.Types.Type.Uint32 => "uProtobufUint32",
                     FieldDescriptorProto.Types.Type.Bool => "uProtobufBool",
                     FieldDescriptorProto.Types.Type.Enum => "uProtobufEnum",
