@@ -16,7 +16,7 @@ before_install:
 before_script:
     - if [ "$TRAVIS_OS_NAME" = "osx" ]; then brew cask install powershell; fi
     - if [ "$TRAVIS_OS_NAME" = "osx" ]; then brew install fpc; fi
-    - if [ "$TRAVIS_OS_NAME" = "osx" ]; then brew install protobuf; fi
+    - if [ "$TRAVIS_OS_NAME" = "osx" ]; then brew install --force protobuf; fi
     - if [ "$TRAVIS_OS_NAME" = "windows" ]; then choco install pwsh; fi
     - if [ "$TRAVIS_OS_NAME" = "windows" ]; then choco install freepascal; fi
     - if [ "$TRAVIS_OS_NAME" = "windows" ]; then choco install protoc; fi
