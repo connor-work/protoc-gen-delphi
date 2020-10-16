@@ -3,10 +3,7 @@ mono: none
 dotnet: 3.1.401
 addons:
     apt:
-        sources:
-            - sourceline: 'deb http://de.archive.ubuntu.com/ubuntu groovy main universe'
         packages:
-            - fp-compiler-3.2.0
             - powershell
     homebrew:
         update: true
@@ -24,6 +21,11 @@ before_script:
             curl -LO https://github.com/protocolbuffers/protobuf/releases/download/v3.13.0/protoc-3.13.0-linux-x86_64.zip
             unzip protoc-3.13.0-linux-x86_64.zip -d $HOME/.local
             export PATH="$PATH:$HOME/.local/bin"
+        fi
+    - |
+        if [ "$TRAVIS_OS_NAME" = "linux" ]; then
+            curl -LO http://launchpadlibrarian.net/494661053/fp-compiler-3.2.0_3.2.0+dfsg-8build2_amd64.deb
+            sudo dpkg -i fp-compiler-3.2.0_3.2.0+dfsg-8build2_amd64.deb
         fi
     - if [ "$TRAVIS_OS_NAME" = "windows" ]; then choco install pwsh; fi
     - if [ "$TRAVIS_OS_NAME" = "windows" ]; then choco install freepascal; fi
