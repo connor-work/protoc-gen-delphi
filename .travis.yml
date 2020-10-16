@@ -21,16 +21,16 @@ before_script:
     - if [ "$TRAVIS_OS_NAME" = "windows" ]; then eval $(powershell -NonInteractive -Command 'write("export PATH=`"" + ([Environment]::GetEnvironmentVariable("PATH","Machine") + ";" + [Environment]::GetEnvironmentVariable("PATH","User")).replace("\","/").replace("C:","/c").replace(";",":") + ":`$PATH`"")'); fi
 
 stages:
-    - name: analyze
-      if: type != pull_request
+    - name: release test
+      if: type != pull_request AND branch = master
     - name: publish
-      if: type != pull_request
-    - name: test pull request
-      if: type = pull_request
+      if: type != pull_request AND branch = master
+    - name: development test
+      if: type = pull_request OR branch != master
 
 jobs:
     include:
-        -   stage: analyze
+        -   stage: release test
             name: Test on Linux
             os: linux
             script:
@@ -51,12 +51,12 @@ jobs:
         -   name: Deploy
             script:
                 - pwsh -Command "./script/travis-ci-deploy.ps1 -StableKey build-${TRAVIS_BUILD_NUMBER}-${TRAVIS_OS_NAME}-stable -Bucket (ConvertTo-SecureString -AsPlainText -Force -String ${THISDB_BUCKET}) -ThisDbApiKey (ConvertTo-SecureString -AsPlainText -Force -String ${THISDB_API_KEY}) -NuGetOrgApiKey (ConvertTo-SecureString -AsPlainText -Force -String ${NUGET_ORG_API_KEY})"
-        -   stage: test pull request
-            name: Test pull request on Linux
+        -   stage: development test
+            name: Test on Linux
             os: linux
             script:
                 - pwsh -Command "./script/travis-ci-test-pull-request.ps1"
-        -   name: Test pull request os macOS
+        -   name: Test on macOS
             os: osx
             script:
                 - pwsh -Command "./script/travis-ci-test-pull-request.ps1"
