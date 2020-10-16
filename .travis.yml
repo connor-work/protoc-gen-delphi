@@ -5,7 +5,10 @@ addons:
     apt:
         packages:
             - powershell
-            - fpc
+    homebrew:
+        update: true
+        brewfile: true
+
 os: linux
 dist: xenial
 
@@ -13,10 +16,22 @@ before_install:
     - if [ "$TRAVIS_OS_NAME" = "windows" ]; then choco install dotnetcore-sdk; fi
 
 before_script:
-    - if [ "$TRAVIS_OS_NAME" = "osx" ]; then brew cask install powershell; fi
-    - if [ "$TRAVIS_OS_NAME" = "osx" ]; then brew install fpc; fi
+    - |
+        if [ "$TRAVIS_OS_NAME" = "linux" ]; then
+            curl -LO https://github.com/protocolbuffers/protobuf/releases/download/v3.13.0/protoc-3.13.0-linux-x86_64.zip
+            unzip protoc-3.13.0-linux-x86_64.zip -d $HOME/.local
+            export PATH="$PATH:$HOME/.local/bin"
+        fi
+    - |
+        if [ "$TRAVIS_OS_NAME" = "linux" ]; then
+            curl -LO http://launchpadlibrarian.net/494661083/fp-units-rtl-3.2.0_3.2.0+dfsg-8build2_amd64.deb
+            sudo dpkg -i fp-units-rtl-3.2.0_3.2.0+dfsg-8build2_amd64.deb
+            curl -LO http://launchpadlibrarian.net/494661053/fp-compiler-3.2.0_3.2.0+dfsg-8build2_amd64.deb
+            sudo dpkg -i fp-compiler-3.2.0_3.2.0+dfsg-8build2_amd64.deb
+        fi
     - if [ "$TRAVIS_OS_NAME" = "windows" ]; then choco install pwsh; fi
     - if [ "$TRAVIS_OS_NAME" = "windows" ]; then choco install freepascal; fi
+    - if [ "$TRAVIS_OS_NAME" = "windows" ]; then choco install protoc; fi
     # Path refresh command based on https://travis-ci.community/t/windows-builds-refreshenv-command-not-found/5803/5
     - if [ "$TRAVIS_OS_NAME" = "windows" ]; then eval $(powershell -NonInteractive -Command 'write("export PATH=`"" + ([Environment]::GetEnvironmentVariable("PATH","Machine") + ";" + [Environment]::GetEnvironmentVariable("PATH","User")).replace("\","/").replace("C:","/c").replace(";",":") + ":`$PATH`"")'); fi
 
