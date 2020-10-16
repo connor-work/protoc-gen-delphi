@@ -24,6 +24,8 @@ before_script:
         fi
     - |
         if [ "$TRAVIS_OS_NAME" = "linux" ]; then
+            curl -LO http://launchpadlibrarian.net/494661083/fp-units-rtl-3.2.0_3.2.0+dfsg-8build2_amd64.deb
+            sudo dpkg -i fp-units-rtl-3.2.0_3.2.0+dfsg-8build2_amd64.deb
             curl -LO http://launchpadlibrarian.net/494661053/fp-compiler-3.2.0_3.2.0+dfsg-8build2_amd64.deb
             sudo dpkg -i fp-compiler-3.2.0_3.2.0+dfsg-8build2_amd64.deb
         fi
