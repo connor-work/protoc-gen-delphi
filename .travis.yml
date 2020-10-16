@@ -31,20 +31,20 @@ stages:
 jobs:
     include:
         -   stage: release test
-            name: Test on Linux
+            name: Release test on Linux
             os: linux
             script:
                 - pwsh -Command "./script/travis-ci-test.ps1 -StableKey build-${TRAVIS_BUILD_NUMBER}-${TRAVIS_OS_NAME}-stable -Bucket (ConvertTo-SecureString -AsPlainText -Force -String ${THISDB_BUCKET}) -ApiKey (ConvertTo-SecureString -AsPlainText -Force -String ${THISDB_API_KEY})"
         -   os: osx
-            name: Test on macOS
+            name: Release test on macOS
             script:
                 - pwsh -Command "./script/travis-ci-test.ps1 -StableKey build-${TRAVIS_BUILD_NUMBER}-${TRAVIS_OS_NAME}-stable -Bucket (ConvertTo-SecureString -AsPlainText -Force -String ${THISDB_BUCKET}) -ApiKey (ConvertTo-SecureString -AsPlainText -Force -String ${THISDB_API_KEY})"
         -   stage: publish
-            name: Check test results on Linux
+            name: Check release test results on Linux
             os: linux
             script:
                 - pwsh -Command "./script/travis-ci-check-stable.ps1 -StableKey build-${TRAVIS_BUILD_NUMBER}-${TRAVIS_OS_NAME}-stable -Bucket (ConvertTo-SecureString -AsPlainText -Force -String ${THISDB_BUCKET}) -ApiKey (ConvertTo-SecureString -AsPlainText -Force -String ${THISDB_API_KEY})"
-        -   name: Check test results on macOS
+        -   name: Check release test results on macOS
             os: osx
             script:
                 - pwsh -Command "./script/travis-ci-check-stable.ps1 -StableKey build-${TRAVIS_BUILD_NUMBER}-${TRAVIS_OS_NAME}-stable -Bucket (ConvertTo-SecureString -AsPlainText -Force -String ${THISDB_BUCKET}) -ApiKey (ConvertTo-SecureString -AsPlainText -Force -String ${THISDB_API_KEY})"
@@ -52,11 +52,11 @@ jobs:
             script:
                 - pwsh -Command "./script/travis-ci-deploy.ps1 -StableKey build-${TRAVIS_BUILD_NUMBER}-${TRAVIS_OS_NAME}-stable -Bucket (ConvertTo-SecureString -AsPlainText -Force -String ${THISDB_BUCKET}) -ThisDbApiKey (ConvertTo-SecureString -AsPlainText -Force -String ${THISDB_API_KEY}) -NuGetOrgApiKey (ConvertTo-SecureString -AsPlainText -Force -String ${NUGET_ORG_API_KEY})"
         -   stage: development test
-            name: Test on Linux
+            name: Development test on Linux
             os: linux
             script:
                 - pwsh -Command "./script/travis-ci-test-pull-request.ps1"
-        -   name: Test on macOS
+        -   name: Development test on macOS
             os: osx
             script:
                 - pwsh -Command "./script/travis-ci-test-pull-request.ps1"
