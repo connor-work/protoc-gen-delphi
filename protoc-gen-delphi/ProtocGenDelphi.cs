@@ -550,35 +550,41 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
             (_, MethodDeclaration decodeDeclaration) = skeleton.Decode;
             (_, MethodDeclaration clearOwnFieldsDeclaration) = skeleton.ClearOwnFields;
             // TODO handling of absent type (unknown if message or enum)
-            if (field.Type == FieldDescriptorProto.Types.Type.Message)
+            string? wireCodec = null;
+            if (field.Type != FieldDescriptorProto.Types.Type.Message) wireCodec = field.Type.GetDelphiWireCodec();
+            if (field.Label == FieldDescriptorProto.Types.Label.Repeated)
             {
+                string delphiElementType = field.Type.GetPublicDelphiElementType(field.TypeName, name => ConstructDelphiTypeName(name));
+                createDeclaration.Statements.Insert(createDeclaration.Statements.Count - 1, $"{delphiField.Name} := {privateDelphiType}.Create;");
                 destroyDeclaration.Statements.Insert(destroyDeclaration.Statements.Count - 1, $"{delphiField.Name}.Free;");
-                encodeDeclaration.Statements.Add($"EncodeMessageField<{privateDelphiType}>({delphiField.Name}, {delphiFieldNumberConst.Identifier}, aDest);");
-                decodeDeclaration.Statements.Add($"{delphiField.Name}.Free;");
-                decodeDeclaration.Statements.Add($"{delphiField.Name} := DecodeUnknownMessageField<{privateDelphiType}>({delphiFieldNumberConst.Identifier});");
-                clearOwnFieldsDeclaration.Statements.Add($"{delphiField.Name}.Free;");
-            }
-            else
-            {
-                string wireCodec = field.Type.GetDelphiWireCodec();
-                if (field.Label == FieldDescriptorProto.Types.Label.Repeated)
+                decodeDeclaration.Statements.Add($"{delphiField.Name}.Clear;");
+                clearOwnFieldsDeclaration.Statements.Add($"{delphiField.Name}.Clear;");
+                if (field.Type == FieldDescriptorProto.Types.Type.Message)
                 {
-                    string delphiElementType = field.Type.GetPublicDelphiElementType(field.TypeName, name => ConstructDelphiTypeName(name));
-                    createDeclaration.Statements.Insert(createDeclaration.Statements.Count - 1, $"{delphiField.Name} := {privateDelphiType}.Create;");
-                    destroyDeclaration.Statements.Insert(destroyDeclaration.Statements.Count - 1, $"{delphiField.Name}.Free;");
-                    encodeDeclaration.Statements.Add($"EncodeRepeatedField<{delphiElementType}>({delphiField.Name}, {delphiFieldNumberConst.Identifier}, {wireCodec}, aDest);");
-                    decodeDeclaration.Statements.Add($"{delphiField.Name}.Clear;");
-                    decodeDeclaration.Statements.Add($"DecodeUnknownRepeatedField<{delphiElementType}>({delphiFieldNumberConst.Identifier}, {wireCodec}, {delphiField.Name});");
+                    encodeDeclaration.Statements.Add($"EncodeRepeatedMessageField<{delphiElementType}>({delphiField.Name}, {delphiFieldNumberConst.Identifier}, aDest);");
+                    decodeDeclaration.Statements.Add($"DecodeUnknownRepeatedMessageField<{delphiElementType}>({delphiFieldNumberConst.Identifier}, {delphiField.Name});");
                 }
                 else
                 {
-                    encodeDeclaration.Statements.Add($"EncodeField<{privateDelphiType}>({delphiField.Name}, {delphiFieldNumberConst.Identifier}, {wireCodec}, aDest);");
-                    decodeDeclaration.Statements.Add($"{delphiField.Name} := DecodeUnknownField<{privateDelphiType}>({delphiFieldNumberConst.Identifier}, {wireCodec});");
+                    encodeDeclaration.Statements.Add($"EncodeRepeatedField<{delphiElementType}>({delphiField.Name}, {delphiFieldNumberConst.Identifier}, {wireCodec!}, aDest);");
+                    decodeDeclaration.Statements.Add($"DecodeUnknownRepeatedField<{delphiElementType}>({delphiFieldNumberConst.Identifier}, {wireCodec!}, {delphiField.Name});");
                 }
             }
-            if (field.Label == FieldDescriptorProto.Types.Label.Repeated) clearOwnFieldsDeclaration.Statements.Add($"{delphiField.Name}.Clear;");
             else
             {
+                if (field.Type == FieldDescriptorProto.Types.Type.Message)
+                {
+                    destroyDeclaration.Statements.Insert(destroyDeclaration.Statements.Count - 1, $"{delphiField.Name}.Free;");
+                    decodeDeclaration.Statements.Add($"{delphiField.Name}.Free;");
+                    encodeDeclaration.Statements.Add($"EncodeMessageField<{privateDelphiType}>({delphiField.Name}, {delphiFieldNumberConst.Identifier}, aDest);");
+                    decodeDeclaration.Statements.Add($"{delphiField.Name} := DecodeUnknownMessageField<{privateDelphiType}>({delphiFieldNumberConst.Identifier});");
+                    clearOwnFieldsDeclaration.Statements.Add($"{delphiField.Name}.Free;");
+                }
+                else
+                {
+                    encodeDeclaration.Statements.Add($"EncodeField<{privateDelphiType}>({delphiField.Name}, {delphiFieldNumberConst.Identifier}, {wireCodec!}, aDest);");
+                    decodeDeclaration.Statements.Add($"{delphiField.Name} := DecodeUnknownField<{privateDelphiType}>({delphiFieldNumberConst.Identifier}, {wireCodec!});");
+                }
                 dependencyHandler.Invoke(supportCodeReference); // Required for default value constant
                 clearOwnFieldsDeclaration.Statements.Add($"{delphiField.Name} := {field.Type.GetDelphiDefaultValueConstant()};");
             }
