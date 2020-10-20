@@ -29,7 +29,7 @@ uses
   // Support code for handling protobuf repeated fields
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufRepeatedField,
   // Runtime library support for protobuf message types
-  Com.GitHub.Pikaju.Protobuf.Delphi.uProtobufMessage;
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufMessage;
 
 type
   /// <summary>

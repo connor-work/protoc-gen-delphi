@@ -76,7 +76,7 @@ type
     /// <remarks>
     /// Developers must ensure that no shared ownership of the field values or further nested embedded objects is held.
     /// </remarks>
-    destructor Destroy;
+    destructor Destroy; override;
 
     /// <summary>
     /// Gets or sets the actual number of protobuf field values in the repeated field.
