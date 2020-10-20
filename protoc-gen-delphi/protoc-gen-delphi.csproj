@@ -1,7 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <CoreVersion>0.3.0</CoreVersion>
+    <CoreVersion>0.4.0</CoreVersion>
     <PrereleaseVersionSuffix></PrereleaseVersionSuffix>
+    <SnapshotVersion>true</SnapshotVersion>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <RootNamespace>Work.Connor.Protobuf.Delphi.ProtocGenDelphi</RootNamespace>
