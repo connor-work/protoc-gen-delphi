@@ -57,14 +57,14 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.RuntimeTests
         private static readonly IResourceSet supportCodeUnitResources = IResourceSet.Root.Nest("[support code unit]");
 
         /// <summary>
-        /// Resource set of all Delphi programs that encode a known message (IDs end with "/")
+        /// Resource set of all Delphi units that construct a known message (IDs end with "/")
         /// </summary>
-        private static readonly IResourceSet allEncodePrograms = testResources.Nest("[encode program]");
+        private static readonly IResourceSet allConstructorUnits = testResources.Nest("[constructor unit]");
 
         /// <summary>
-        /// Resource set of all Delphi programs that decode a known message and assert that the expected content is decoded (IDs end with "/")
+        /// Resource set of all Delphi units that validate a known message (IDs end with "/")
         /// </summary>
-        private static readonly IResourceSet allDecodePrograms = testResources.Nest("[decode program]");
+        private static readonly IResourceSet allValidatorUnits = testResources.Nest("[validator unit]");
 
         /// <summary>
         /// Resource set of all Delphi units that contain support source code for testing
@@ -72,9 +72,14 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.RuntimeTests
         private static readonly IResourceSet testSupportCodeUnitResources = IResourceSet.Root.Nest("[Delphi test support code unit]");
 
         /// <summary>
+        /// Resource set of all Delphi programs that contain support source code for testing
+        /// </summary>
+        private static readonly IResourceSet testSupportCodeProgramResources = IResourceSet.Root.Nest("[Delphi test support code program]");
+
+        /// <summary>
         /// Names of all known test vectors
         /// </summary>
-        private static IEnumerable<string> TestVectorNames => allDecodePrograms.GetIDs().WhereSuffixed(new Regex(Regex.Escape("/")));
+        private static IEnumerable<string> TestVectorNames => allValidatorUnits.GetIDs().WhereSuffixed(new Regex(Regex.Escape("/")));
 
         /// <summary>
         /// Prefix to the name of .proto files in test input folders that shall be used as input files
@@ -114,7 +119,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.RuntimeTests
             /// <summary>
             /// Name of the test vector
             /// </summary>
-            private string name;
+            public string name;
 
             /// <summary>
             /// Resource set of all test resource files that are used as <c>protoc</c> input or support files for this test
@@ -160,20 +165,24 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.RuntimeTests
                                                          .Concat(allInputFileResources.ReadResources(new[] { InputSchemaFileName }));
 
             /// <summary>
-            /// Source code for the encode program
+            /// Source code for message construction
             /// </summary>
-            public string EncodeProgramSource => allEncodePrograms.ReadResource($"{name}/") ?? throw new FileNotFoundException($"Encode program for {name}");
+            private string ConstructorUnitSource => allConstructorUnits.ReadResource($"{name}/") ?? throw new FileNotFoundException($"Constuctor unit for {name}");
 
             /// <summary>
-            /// Source code for the decode program
+            /// Source code for message validation
             /// </summary>
-            public string DecodeProgramSource => allDecodePrograms.ReadResource($"{name}/")!;
+            private string ValidatorUnitSource => allValidatorUnits.ReadResource($"{name}/")!;
 
             /// <summary>
-            /// Name and contents of all files that should be copied to the plug-in output folder before performing further tests (support files)
+            /// Name and contents of all files that should be copied to the plug-in output folder before performing tests
             /// </summary>
             public IEnumerable<(string, string)> SupportFiles => inputFolderResources.ReadResources(inputFolderResources.GetIDs().Where(name => !name.EndsWith($".{ProtocGenDelphi.protoFileExtension}")))
-                                                         .Concat(testSupportCodeUnitResources.ReadAllResources());
+                                                         .Concat(testSupportCodeUnitResources.ReadAllResources())
+                                                         .Concat(new (string, string)[] {
+                                                             ("uConstruct.pas", ConstructorUnitSource),
+                                                             ("uValidate.pas", ValidatorUnitSource)
+                                                         });
 
             /// <summary>
             /// Names of all .proto files that shall be specified for generation in the <c>protoc</c> arguments
@@ -303,42 +312,27 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.RuntimeTests
                 addUnits(vector.SupportFiles, CreateScratchFolder());
                 (bool fpcSuccess, _, string? fpcError) = fpc.Perform();
                 Assert.True(fpcSuccess, fpcError!);
-                return Path.Join(fpc.OutputPath, GetExecutableName(Regex.Replace(Path.GetFileName(programFile), $"{Regex.Escape($".{DelphiSourceCodeWriter.programSourceFileExtension}")}$", "")));
+                return Path.Join(fpc.OutputPath, GetExecutableName(Regex.Replace(Path.GetFileName(programFile), $"{Regex.Escape($".dpr")}$", "")));
             }
 
-            // Create and run encode/decode programs
-            string encodeProgramFile = Path.Join(CreateScratchFolder(), "KnownMessageEncode.pas");
-            File.WriteAllText(encodeProgramFile, vector.EncodeProgramSource);
-            string encodeExeFile = compile(encodeProgramFile);
-            string decodeProgramFile = Path.Join(CreateScratchFolder(), "KnownMessageDecode.pas");
-            File.WriteAllText(decodeProgramFile, vector.DecodeProgramSource);
-            string decodeExeFile = compile(decodeProgramFile);
-            using Process encode = new Process();
-            encode.StartInfo.FileName = encodeExeFile;
-            encode.StartInfo.CreateNoWindow = true;
-            encode.StartInfo.UseShellExecute = false;
-            encode.StartInfo.RedirectStandardOutput = true;
-            encode.StartInfo.RedirectStandardError = true;
-            StringBuilder encodeError = new StringBuilder();
-            using Process decode = new Process();
-            decode.StartInfo.FileName = decodeExeFile;
-            decode.StartInfo.CreateNoWindow = true;
-            decode.StartInfo.UseShellExecute = false;
-            decode.StartInfo.RedirectStandardInput = true;
-            decode.StartInfo.RedirectStandardError = true;
-            StringBuilder decodeError = new StringBuilder();
-            encode.Start();
-            decode.Start();
-            encode.ErrorDataReceived += delegate (object sender, DataReceivedEventArgs e) { encodeError.AppendLine(e.Data); };
-            encode.BeginErrorReadLine();
-            decode.ErrorDataReceived += delegate (object sender, DataReceivedEventArgs e) { decodeError.AppendLine(e.Data); };
-            decode.BeginErrorReadLine();
-            encode.StandardOutput.BaseStream.CopyTo(decode.StandardInput.BaseStream);
-            decode.StandardInput.Flush();
-            encode.WaitForExit();
-            Assert.True(encode.ExitCode == 0, encodeError.ToString());
-            decode.WaitForExit();
-            Assert.True(decode.ExitCode == 0, decodeError.ToString());
+            // Create message encode/decode test program
+            string programFile = Path.Join(CreateScratchFolder(), "MessageEncodeDecodeTest.dpr");
+            File.WriteAllText(programFile, testSupportCodeProgramResources.ReadResource("MessageEncodeDecodeTest.dpr")!);
+
+
+            // Run encode/decode test program
+            string executableFile = compile(programFile);
+            using Process process = new Process();
+            process.StartInfo.FileName = executableFile;
+            process.StartInfo.CreateNoWindow = true;
+            process.StartInfo.UseShellExecute = false;
+            process.StartInfo.RedirectStandardError = true;
+            StringBuilder error = new StringBuilder();
+            process.Start();
+            process.ErrorDataReceived += delegate (object sender, DataReceivedEventArgs e) { error.AppendLine(e.Data); };
+            process.BeginErrorReadLine();
+            process.WaitForExit();
+            Assert.True(process.ExitCode == 0, error.ToString());
         }
     }
 }

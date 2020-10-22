@@ -113,10 +113,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!-- For each known message, there is an encode/decode test consisting of two Delphi programs -->
-    <EmbeddedResource Include="test-vectors/known-messages/**/Encode.pas"
-                      LogicalName="[known message][encode program]%(RecursiveDir)" />
-    <EmbeddedResource Include="test-vectors/known-messages/**/Decode.pas"
-                      LogicalName="[known message][decode program]%(RecursiveDir)" />
+    <!-- For each known message, there is a unit that constructs it -->
+    <EmbeddedResource Include="test-vectors/known-messages/**/uConstruct.pas"
+                      LogicalName="[known message][constructor unit]%(RecursiveDir)" />
+    <!-- For each known message, there is a unit that validates it -->
+    <EmbeddedResource Include="test-vectors/known-messages/**/uValidate.pas"
+                      LogicalName="[known message][validator unit]%(RecursiveDir)" />
   </ItemGroup>
 </Project>
