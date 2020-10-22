@@ -69,7 +69,7 @@
     <PackageReference Include="coverlet.collector" Version="1.2.0" />
     <PackageReference Include="Work.Connor.Delphi.Tools" Version="0.3.0" />
     <!-- TODO: Should always be same version as referenced by protoc-gen-delphi -->
-    <PackageReference Include="Work.Connor.Delphi.CodeWriter" Version="0.3.0" />
+    <PackageReference Include="Work.Connor.Delphi.CodeWriter" Version="0.5.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -101,6 +101,8 @@
     <!-- Support source code for Delphi tests -->
     <EmbeddedResource Include="test-support/**/*.pas"
                       LogicalName="[Delphi test support code unit]%(RecursiveDir)%(Filename)%(Extension)" />
+    <EmbeddedResource Include="test-support/**/*.dpr"
+                      LogicalName="[Delphi test support code program]%(RecursiveDir)%(Filename)%(Extension)" />
   </ItemGroup>
 
   <ItemGroup>
