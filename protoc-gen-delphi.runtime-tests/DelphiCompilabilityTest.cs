@@ -236,7 +236,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.RuntimeTests
             Assert.True(protocSuccess, protocError!);
 
             // Create a test runner program as input for FPC
-            string programFile = Path.Join(CreateScratchFolder(), "DelphiCompilationTestProgram.pas");
+            string programFile = Path.Join(CreateScratchFolder(), "DelphiCompilationTestProgram.dpr");
             Program program = new Program()
             {
                 Heading = "DelphiCompilationTestProgram",

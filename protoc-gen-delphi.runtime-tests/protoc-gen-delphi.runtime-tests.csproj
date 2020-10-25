@@ -70,7 +70,7 @@
     <PackageReference Include="coverlet.collector" Version="1.2.0" />
     <PackageReference Include="Work.Connor.Delphi.Tools" Version="0.3.0" />
     <!-- TODO: Should always be same version as referenced by protoc-gen-delphi -->
-    <PackageReference Include="Work.Connor.Delphi.CodeWriter" Version="0.3.0" />
+    <PackageReference Include="Work.Connor.Delphi.CodeWriter" Version="0.5.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -102,6 +102,8 @@
     <!-- Support source code for Delphi tests -->
     <EmbeddedResource Include="test-support/**/*.pas"
                       LogicalName="[Delphi test support code unit]%(RecursiveDir)%(Filename)%(Extension)" />
+    <EmbeddedResource Include="test-support/**/*.dpr"
+                      LogicalName="[Delphi test support code program]%(RecursiveDir)%(Filename)%(Extension)" />
   </ItemGroup>
 
   <ItemGroup>
@@ -112,10 +114,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!-- For each known message, there is an encode/decode test consisting of two Delphi programs -->
-    <EmbeddedResource Include="test-vectors/known-messages/**/Encode.pas"
-                      LogicalName="[known message][encode program]%(RecursiveDir)" />
-    <EmbeddedResource Include="test-vectors/known-messages/**/Decode.pas"
-                      LogicalName="[known message][decode program]%(RecursiveDir)" />
+    <!-- For each known message, there is a unit that constructs it -->
+    <EmbeddedResource Include="test-vectors/known-messages/**/uConstruct.pas"
+                      LogicalName="[known message][constructor unit]%(RecursiveDir)" />
+    <!-- For each known message, there is a unit that validates it -->
+    <EmbeddedResource Include="test-vectors/known-messages/**/uValidate.pas"
+                      LogicalName="[known message][validator unit]%(RecursiveDir)" />
   </ItemGroup>
 </Project>
