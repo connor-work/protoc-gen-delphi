@@ -15,3 +15,6 @@
 
 # RAD Studio build output folder
 /Win32/Debug/
+
+# Buildable RAD Studio resource file
+/ProtocGenDelphiRuntime.res
