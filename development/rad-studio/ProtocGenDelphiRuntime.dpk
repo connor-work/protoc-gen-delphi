@@ -30,4 +30,11 @@ package ProtocGenDelphiRuntime;
 requires
   rtl;
 
+contains
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uIProtobufMessage in '..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uIProtobufMessage.pas',
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uProtobufMessage in '..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uProtobufMessage.pas',
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufMessage in '..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\StubRuntime\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufMessage.pas',
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uIProtobufMessageInternal in '..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uIProtobufMessageInternal.pas',
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uStubRuntime in '..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\StubRuntime\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uStubRuntime.pas';
+
 end.
