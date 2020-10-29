@@ -1,0 +1,2 @@
+# Use Windows line endings for RAD Studio projects
+/*.dproj expected-eol=crlf
