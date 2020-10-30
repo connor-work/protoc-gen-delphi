@@ -1,4 +1,4 @@
-/// <remarks>
+﻿/// <remarks>
 /// This unit corresponds to the protobuf schema definition (.proto file) <c>example_data.proto</c>.
 /// </remarks>
 unit uExampleData;
@@ -10,7 +10,7 @@ unit uExampleData;
 interface
 
 uses
-  Classes,
+  System.Classes,
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufUint32,
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uProtobufMessage,
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.uProtobuf;
@@ -67,9 +67,27 @@ type
     public procedure Decode(aSource: TStream); override;
 
     /// <summary>
+    /// Copies the protobuf data from another object to this one.
+    /// </summary>
+    /// <param name="aSource">Object to copy from</param>
+    /// <remarks>
+    /// The other object must be a protobuf message of the same type.
+    /// This performs a deep copy; hence, no ownership is shared.
+    /// This procedure may cause the destruction of transitively owned objects in this message instance.
+    /// Developers must ensure that no shared ownership of current field values or further nested embedded objects is held.
+    /// </remarks>
+    public procedure Assign(aSource: TPersistent); override;
+
+    /// <summary>
     /// Renders those protobuf fields absent that belong to <see cref="TMessageY"/> (i.e., are not managed by an ancestor class), by setting them to their default values.
     /// </summary>
     private procedure ClearOwnFields;
+
+    /// <summary>
+    /// Copies those protobuf fields that belong to <see cref="TMessageY"/> (i.e., are not managed by an ancestor class), during a call to <see cref="TInterfacedPersistent.Assign"/>.
+    /// </summary>
+    /// <param name="aSource">Source message to copy from</param>
+    private procedure AssignOwnFields(aSource: TMessageY);
   end;
 
   /// <remarks>
@@ -189,9 +207,27 @@ type
     public procedure Decode(aSource: TStream); override;
 
     /// <summary>
+    /// Copies the protobuf data from another object to this one.
+    /// </summary>
+    /// <param name="aSource">Object to copy from</param>
+    /// <remarks>
+    /// The other object must be a protobuf message of the same type.
+    /// This performs a deep copy; hence, no ownership is shared.
+    /// This procedure may cause the destruction of transitively owned objects in this message instance.
+    /// Developers must ensure that no shared ownership of current field values or further nested embedded objects is held.
+    /// </remarks>
+    public procedure Assign(aSource: TPersistent); override;
+
+    /// <summary>
     /// Renders those protobuf fields absent that belong to <see cref="TMessageX"/> (i.e., are not managed by an ancestor class), by setting them to their default values.
     /// </summary>
     private procedure ClearOwnFields;
+
+    /// <summary>
+    /// Copies those protobuf fields that belong to <see cref="TMessageX"/> (i.e., are not managed by an ancestor class), during a call to <see cref="TInterfacedPersistent.Assign"/>.
+    /// </summary>
+    /// <param name="aSource">Source message to copy from</param>
+    private procedure AssignOwnFields(aSource: TMessageX);
   end;
 
 implementation
@@ -223,7 +259,20 @@ begin
   inherited;
 end;
 
+procedure TMessageY.Assign(aSource: TPersistent);
+var
+  lSource: TMessageY;
+begin
+  lSource := aSource as TMessageY;
+  inherited Assign(lSource);
+  AssignOwnFields(lSource);
+end;
+
 procedure TMessageY.ClearOwnFields;
+begin
+end;
+
+procedure TMessageY.AssignOwnFields(aSource: TMessageY);
 begin
 end;
 
@@ -264,11 +313,30 @@ begin
   end;
 end;
 
+procedure TMessageX.Assign(aSource: TPersistent);
+var
+  lSource: TMessageX;
+begin
+  lSource := aSource as TMessageX;
+  inherited Assign(lSource);
+  AssignOwnFields(lSource);
+end;
+
 procedure TMessageX.ClearOwnFields;
 begin
   FFieldX := PROTOBUF_DEFAULT_VALUE_UINT32;
   FFieldY.Free;
   FFieldY := PROTOBUF_DEFAULT_VALUE_MESSAGE;
+end;
+
+procedure TMessageX.AssignOwnFields(aSource: TMessageX);
+var
+  lFieldY: TMessageY;
+begin
+  FieldX := aSource.FieldX;
+  lFieldY := TMessageY.Create;
+  lFieldY.Assign(aSource.FieldY);
+  FieldY := lFieldY;
 end;
 
 function TMessageX.GetFieldX: UInt32;

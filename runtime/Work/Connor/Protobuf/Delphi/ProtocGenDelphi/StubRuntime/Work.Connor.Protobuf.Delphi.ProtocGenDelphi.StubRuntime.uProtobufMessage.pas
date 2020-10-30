@@ -31,7 +31,7 @@ uses
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uIProtobufMessageInternal,
   // Basic protobuf definitions like TProtobufFieldNumber
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.uProtobuf,
-  // TStream for encoding and decoding of messages
+  // TStream for encoding and decoding of messages, TInterfacedPersistent as base class
   System.Classes,
   // Stub runtime helper code
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uStubRuntime;
@@ -167,7 +167,18 @@ type
 
     // TInterfacedPersistent implementation
 
-      // TODO assign
+    public
+      /// <summary>
+      /// Copies the protobuf data from another object to this one.
+      /// </summary>
+      /// <param name="aSource">Object to copy from</param>
+      /// <remarks>
+      /// The other object must be a protobuf message of the same type.
+      /// This performs a deep copy; hence, no ownership is shared.
+      /// This procedure may cause the destruction of transitively owned objects in this message instance.
+      /// Developers must ensure that no shared ownership of current field values or further nested embedded objects is held.
+      /// </remarks>
+      procedure Assign(aSource: TPersistent); override;
   end;
 
 implementation
@@ -222,6 +233,13 @@ begin
 end;
 
 procedure TProtobufMessage.DecodeAsUnknownSingularField(aContainer: IProtobufMessageInternal; aField: TProtobufFieldNumber);
+begin
+  raise NotImplementedInStub;
+end;
+
+// TInterfacedPersistent implementation
+
+procedure TProtobufMessage.Assign(aSource: TPersistent);
 begin
   raise NotImplementedInStub;
 end;
