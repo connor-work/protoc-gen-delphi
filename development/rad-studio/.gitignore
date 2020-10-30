@@ -2,16 +2,16 @@
 /xml-doc/
 
 # RAD Studio History Manager data
-/__history/
+__history/
 
 # RAD Studio AutoRecover data
-/__recovery/
+__recovery/
 
 # RAD Studio user-specific project options
-/*.dproj.local
+*.dproj.local
 
 # RAD Studio refactoring information
-/*.identcache
+*.identcache
 
 # RAD Studio build output folder
 /Win32/Debug/
