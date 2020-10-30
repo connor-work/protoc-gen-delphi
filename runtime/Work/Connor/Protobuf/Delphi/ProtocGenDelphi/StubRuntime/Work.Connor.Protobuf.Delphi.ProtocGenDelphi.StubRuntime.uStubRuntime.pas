@@ -25,15 +25,15 @@ uses
   SysUtils;
 
 /// <summary>
-/// Called by the stub runtime to signal that some functionality is not implemented.
+/// Creates an exception that signals that some functionality is not implemented in the stub runtime.
 /// </summary>
-procedure NotImplementedInStub;
+function NotImplementedInStub: Exception;
 
 implementation
 
-procedure NotImplementedInStub;
+function NotImplementedInStub: Exception;
 begin
-  raise Exception.Create('This functionality is not implemented by the stub runtime');
+  result := Exception.Create('This functionality is not implemented by the stub runtime');
 end;
 
 end.

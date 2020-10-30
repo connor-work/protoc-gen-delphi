@@ -26,9 +26,16 @@ interface
 
 uses
   // TStream for encoding and decoding of messages
-  System.Classes;
+  System.Classes,
+  // To declare custom exceptions
+  SysUtils;
 
 type
+  /// <summary>
+  /// Indicates that protobuf decoding failed since a message was not compatible with its expected schema.
+  /// </summary>
+  EDecodingSchemaError = class(Exception);
+
   /// <summary>
   /// Common interface of all generated classes that represent protobuf message types.
   /// </summary>
@@ -77,6 +84,7 @@ type
     /// Data is read until <see cref="TStream.Read"/> returns 0.
     /// </summary>
     /// <param name="aSource">The stream that the data is read from</param>
+    /// <exception cref="EDecodingSchemaError">If the message on the stream was not compatible with this message type</exception>
     /// <remarks>
     /// Protobuf fields that are not present in the read data are rendered absent by setting them to their default values.
     /// This may cause the destruction of transitively owned objects (this is also the case when a present fields overwrites a previous value).
@@ -91,6 +99,7 @@ type
     /// The data must be prefixed with message length information, as implemented by <see cref="EncodeDelimited"/>.
     /// </summary>
     /// <param name="aSource">The stream that the data is read from</param>
+    /// <exception cref="EDecodingSchemaError">If the message on the stream was not compatible with this message type</exception>
     /// <remarks>
     /// See remarks on <see cref="Decode">.
     /// </remarks>
