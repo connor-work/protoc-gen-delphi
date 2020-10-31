@@ -42,7 +42,7 @@ type
   /// </remarks>
   IProtobufMessage = Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uIProtobufMessage.IProtobufMessage;
 
-  // RUNTIME-IMPL: Replace type
+  // RUNTIME-IMPL: Replace aliased type
   /// <summary>
   /// Common ancestor of all generated classes that represent protobuf message types.
   /// </summary>

@@ -45,7 +45,7 @@ type
   /// The message instance carries transitive ownership of embedded objects in protobuf field values,
   /// and is responsible for their deallocation.
   /// </remarks>
-  TProtobufMessage = class(TInterfacedPersistent, IProtobufMessageInternal)
+  TProtobufMessage = class(TInterfacedPersistent, IProtobufMessage, IProtobufMessageInternal)
     public
       /// <summary>
       /// Constructs an empty message with all protobuf fields absent, meaning that they are set to their default values.
@@ -165,6 +165,12 @@ type
       /// </remarks>
       procedure DecodeAsUnknownSingularField(aContainer: IProtobufMessageInternal; aField: TProtobufFieldNumber);
 
+      /// <summary>
+      /// Sets the owner of the message, which is responsible for freeing it. This might be a containing message or field value collection.
+      /// </summary>
+      /// <param name="aOwner">The new owner of the message</param>
+      procedure SetOwner(aOwner: TPersistent);
+
     // TInterfacedPersistent implementation
 
     public
@@ -179,6 +185,8 @@ type
       /// Developers must ensure that no shared ownership of current field values or further nested embedded objects is held.
       /// </remarks>
       procedure Assign(aSource: TPersistent); override;
+
+      function GetOwner: TPersistent; override;
   end;
 
 implementation
@@ -237,9 +245,19 @@ begin
   raise NotImplementedInStub;
 end;
 
+procedure TProtobufMessage.SetOwner(aOwner: TPersistent);
+begin
+  raise NotImplementedInStub;
+end;
+
 // TInterfacedPersistent implementation
 
 procedure TProtobufMessage.Assign(aSource: TPersistent);
+begin
+  raise NotImplementedInStub;
+end;
+
+function TProtobufMessage.GetOwner: TPersistent;
 begin
   raise NotImplementedInStub;
 end;

@@ -14,9 +14,10 @@
 /// limitations under the License.
 
 /// <summary>
-/// Runtime library support code for the protobuf type <c>uint32</c>.
+/// Runtime library support code for encoding/decoding of
+/// protobuf fields from/to the protobuf binary wire format.
 /// </summary>
-unit Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufUint32;
+unit Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufWireCodec;
 
 {$IFDEF FPC}
   {$MODE DELPHI}
@@ -31,6 +32,8 @@ uses
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uIProtobufMessageInternal,
   // Basic protobuf definitions like TProtobufFieldNumber
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.uProtobuf,
+  // To throw EDecodingSchemaError
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uIProtobufMessage,
   // TStream for encoding and decoding of messages
   System.Classes,
   // Stub runtime helper code
@@ -38,10 +41,10 @@ uses
 
 type
   /// <summary>
-  /// Runtime library wire codec for the protobuf type <c>uint32</c>.
+  /// Generic runtime library implementation of <see cref="T:IProtobufWireCodec"/>.
   /// </summary>
-  TProtobufUint32WireCodec = class(TInterfacedObject, IProtobufWireCodec<UInt32>)
-    // IProtobufWireCodec implementation
+  TProtobufWireCodec<T> = class(TInterfacedObject, IProtobufWireCodec<T>)
+    // IProtobufWireCodec<UInt32> implementation
 
     public
       /// <summary>
@@ -55,7 +58,7 @@ type
       /// This method is not used for message fields, see <see cref="IProtobufMessageInternal.EncodeAsSingularField"/>.
       /// This should be used within an implementation of <see cref="IProtobufMessage.Encode"/>, after calling the ancestor class implementation.
       /// </remarks>
-      procedure EncodeSingularField(aValue: UInt32; aContainer: IProtobufMessageInternal; aField: TProtobufFieldNumber; aDest: TStream);
+      procedure EncodeSingularField(aValue: T; aContainer: IProtobufMessageInternal; aField: TProtobufFieldNumber; aDest: TStream);
 
       /// <summary>
       /// Decodes a previously unknown protobuf singular field of a message.
@@ -66,24 +69,25 @@ type
       /// <param name="aContainer">Protobuf message containing the field</param>
       /// <param name="aField">Protobuf field number of the field</param>
       /// <returns>The decoded field value</returns>
+      /// <exception cref="EDecodingSchemaError">If the unknown field value was not compatible with the expected type</exception>
       /// <remarks>
       /// This method is not used for message fields, see <see cref="IProtobufMessageInternal.DecodeAsUnknownSingularField"/>.
       /// This should be used within an implementation of <see cref="IProtobufMessage.Decode"/>, after calling the ancestor class implementation.
       /// This method is not idempotent. The state of the message is changed by the call, since decoding "consumes" the unknown field.
       /// </remarks>
-      function DecodeUnknownField(aContainer: IProtobufMessageInternal; aField: TProtobufFieldNumber): UInt32;
+      function DecodeUnknownField(aContainer: IProtobufMessageInternal; aField: TProtobufFieldNumber): T;
   end;
 
 implementation
 
 // IProtobufWireCodec implementation
 
-procedure TProtobufUint32WireCodec.EncodeSingularField(aValue: UInt32; aContainer: IProtobufMessageInternal; aField: TProtobufFieldNumber; aDest: TStream);
+procedure TProtobufWireCodec<T>.EncodeSingularField(aValue: T; aContainer: IProtobufMessageInternal; aField: TProtobufFieldNumber; aDest: TStream);
 begin
   raise NotImplementedInStub;
 end;
 
-function TProtobufUint32WireCodec.DecodeUnknownField(aContainer: IProtobufMessageInternal; aField: TProtobufFieldNumber): UInt32;
+function TProtobufWireCodec<T>.DecodeUnknownField(aContainer: IProtobufMessageInternal; aField: TProtobufFieldNumber): T;
 begin
   raise NotImplementedInStub;
 end;

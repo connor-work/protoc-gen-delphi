@@ -74,10 +74,16 @@ type
     /// <remarks>
     /// This should be used within an implementation of <see cref="IProtobufMessage.Decode"/>, after calling the ancestor class implementation.
     /// This method is not idempotent. The state of the containing message is changed by the call, since decoding "consumes" the unknown field.
-    /// Ownership of this message is transferred to the containing message (<i>embedded message</i>).
+    /// Ownership of this message must be held by the containing message (<i>embedded message</i>).
     /// See also remarks on destruction of transitively owned objects on <see cref="IProtobufMessage.Decode"/>.
     /// </remarks>
     procedure DecodeAsUnknownSingularField(aContainer: IProtobufMessageInternal; aField: TProtobufFieldNumber);
+
+    /// <summary>
+    /// Sets the owner of the message, which is responsible for freeing it. This might be a containing message or field value collection.
+    /// </summary>
+    /// <param name="aOwner">The new owner of the message</param>
+    procedure SetOwner(aOwner: TPersistent);
     end;
 
 implementation

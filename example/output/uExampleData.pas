@@ -11,7 +11,9 @@ interface
 
 uses
   System.Classes,
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufRepeatedUint32,
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufUint32,
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uIProtobufRepeatedFieldValues,
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uProtobufMessage,
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.uProtobuf;
 
@@ -105,6 +107,11 @@ type
     const PROTOBUF_FIELD_NUMBER_FIELD_Y = 2;
 
     /// <summary>
+    /// Protobuf field number of the protobuf field <c>fieldZ</c>.
+    /// </summary>
+    const PROTOBUF_FIELD_NUMBER_FIELD_Z = 3;
+
+    /// <summary>
     /// Holds the decoded value of the protobuf field <c>fieldX</c>.
     /// </summary>
     private var FFieldX: UInt32;
@@ -151,6 +158,7 @@ type
     /// </summary>
     /// <param name="aValue">The new value of the protobuf field <c>fieldY</c></param>
     /// <remarks>
+    /// Ownership of the inserted message is transferred to the containing message.
     /// May be overridden. Overriders shall only add side-effects and must call the ancestor implementation.
     /// </remarks>
     protected procedure SetFieldY(aValue: TMessageY); virtual;
@@ -159,6 +167,39 @@ type
     /// This property corresponds to the protobuf field <c>fieldY</c>.
     /// </remarks>
     public property FieldY: TMessageY read GetFieldY write SetFieldY;
+
+    /// <summary>
+    /// Holds the decoded values of the protobuf field <c>fieldZ</c>.
+    /// </summary>
+    private var FFieldZ: TProtobufRepeatedUint32FieldValues;
+
+    /// <summary>
+    /// Getter for <see cref="FieldZ"/>.
+    /// </summary>
+    /// <returns>The values of the protobuf field <c>fieldZ</c></returns>
+    /// <remarks>
+    /// The returned collection is still owned by the message.
+    /// Developers must ensure that a resulting shared ownership does not lead to unexpected behavior.
+    /// May be overridden. Overriders shall only add side-effects and must call the ancestor implementation.
+    /// </remarks>
+    protected function GetFieldZ: IProtobufRepeatedFieldValues<UInt32>; virtual;
+
+    /// <summary>
+    /// Setter for <see cref="FieldZ"/>.
+    /// </summary>
+    /// <param name="aValues">The new values of the protobuf field <c>fieldZ</c></param>
+    /// <remarks>
+    /// Ownership of the inserted field value collection is transferred to the containing message.
+    /// May be overridden. Overriders shall only add side-effects and must call the ancestor implementation.
+    /// </remarks>
+    protected procedure SetFieldZ(aValues: IProtobufRepeatedFieldValues<UInt32>); virtual;
+
+    /// <remarks>
+    /// This property corresponds to the protobuf field <c>fieldZ</c>.
+    /// The collection is always owned by the message.
+    /// Developers must ensure that a resulting shared ownership does not lead to unexpected behavior.
+    /// </remarks>
+    public property FieldZ: IProtobufRepeatedFieldValues<UInt32> read GetFieldZ write SetFieldZ;
 
     /// <summary>
     /// Creates an empty <see cref="TMessageX"/> that can be used as a protobuf message.
@@ -285,6 +326,7 @@ end;
 destructor TMessageX.Destroy;
 begin
   FFieldY.Free;
+  FFieldZ.Destroy;
   inherited;
 end;
 
@@ -298,7 +340,8 @@ procedure TMessageX.Encode(aDest: TStream);
 begin
   inherited;
   gProtobufWireCodecUint32.EncodeSingularField(FFieldX, self, PROTOBUF_FIELD_NUMBER_FIELD_X, aDest);
-  FFieldY.EncodeAsSingularField(self, PROTOBUF_FIELD_NUMBER_FIELD_X, aDest);
+  FFieldY.EncodeAsSingularField(self, PROTOBUF_FIELD_NUMBER_FIELD_Y, aDest);
+  FFieldZ.EncodeAsRepeatedField(self, PROTOBUF_FIELD_NUMBER_FIELD_Z, aDest);
 end;
 
 procedure TMessageX.Decode(aSource: TStream);
@@ -309,8 +352,9 @@ begin
   if HasUnknownField(PROTOBUF_FIELD_NUMBER_FIELD_X) then
   begin
     FFieldY := TMessageY.Create;
-    FFieldY.DecodeAsUnknownSingularField(self, PROTOBUF_FIELD_NUMBER_FIELD_X);
+    FFieldY.DecodeAsUnknownSingularField(self, PROTOBUF_FIELD_NUMBER_FIELD_Y);
   end;
+  FFieldZ.DecodeAsUnknownRepeatedField(self, PROTOBUF_FIELD_NUMBER_FIELD_Z);
 end;
 
 procedure TMessageX.Assign(aSource: TPersistent);
@@ -327,6 +371,7 @@ begin
   FFieldX := PROTOBUF_DEFAULT_VALUE_UINT32;
   FFieldY.Free;
   FFieldY := PROTOBUF_DEFAULT_VALUE_MESSAGE;
+  FFieldZ.Clear;
 end;
 
 procedure TMessageX.AssignOwnFields(aSource: TMessageX);
@@ -337,6 +382,7 @@ begin
   lFieldY := TMessageY.Create;
   lFieldY.Assign(aSource.FieldY);
   FieldY := lFieldY;
+  (FieldZ as TInterfacedPersistent).Assign(aSource.FieldZ as TInterfacedPersistent);
 end;
 
 function TMessageX.GetFieldX: UInt32;
@@ -358,6 +404,19 @@ procedure TMessageX.SetFieldY(aValue: TMessageY);
 begin
   FFieldY.Free;
   FFieldY := aValue;
+  FFieldY.SetOwner(self);
+end;
+
+function TMessageX.GetFieldZ: IProtobufRepeatedFieldValues<UInt32>;
+begin
+  result := FFieldZ;
+end;
+
+procedure TMessageX.SetFieldZ(aValues: IProtobufRepeatedFieldValues<UInt32>);
+begin
+  FFieldZ.Free;
+  FFieldZ := aValues as TProtobufRepeatedUint32FieldValues;
+  FFieldZ.SetOwner(self);
 end;
 
 end.

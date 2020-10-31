@@ -14,12 +14,12 @@
 /// limitations under the License.
 
 /// <summary>
-/// Runtime-internal support for the protobuf type <c>uint32</c>.
+/// Runtime-internal support for the protobuf repeated fields of the protobuf type <c>uint32</c>.
 /// </summary>
 /// <remarks>
-/// Generated code needs to reference this unit in order to operate on protobuf field values of this type.
+/// Generated code needs to reference this unit in order to operate on protobuf repeated field values of this type.
 /// </remarks>
-unit Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufUint32;
+unit Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufRepeatedUint32;
 
 {$IFDEF FPC}
   {$MODE DELPHI}
@@ -31,22 +31,13 @@ uses
   // Runtime-internal support for the protobuf binary wire format
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uIProtobufWireCodec,
   // RUNTIME-IMPL: Replace reference
-  // To provide the wire codec instance
-  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufWireCodec;
+  // To provide the concrete class for repeated field values
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufRepeatedFieldValues;
 
-var
-  /// <summary>
-  /// <i>Field codec</i> for <c>protoc-gen-delphi</c> that defines the encoding/decoding of
-  /// protobuf fields of type <c>uint32</c> from/to the protobuf binary wire format.
-  /// </summary>
-  gProtobufWireCodecUint32: IProtobufWireCodec<UInt32>;
+type
+  // RUNTIME-IMPL: Replace ancestor class
+  TProtobufRepeatedUint32FieldValues = class(TProtobufRepeatedFieldValues<UInt32>);
 
 implementation
-
-initialization
-begin
-  // RUNTIME-IMPL: Replace constructed class
-  gProtobufWireCodecUint32 := TProtobufWireCodec<UInt32>.Create;
-end;
 
 end.

@@ -17,6 +17,9 @@
 /// Basic definitions used by Delphi code generated from protobuf schema definitions using <c>protoc-gen-delphi</c>,
 /// and by compatible runtime library implementations.
 /// </summary>
+/// <remarks>
+/// Client code may need to reference this unit in order to use protobuf default values or reflection features.
+/// </remarks>
 unit Work.Connor.Protobuf.Delphi.ProtocGenDelphi.uProtobuf;
 
 {$IFDEF FPC}

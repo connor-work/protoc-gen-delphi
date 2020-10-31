@@ -6,4 +6,5 @@ message MessageY {
 message MessageX {
     uint32 fieldX = 1;
     MessageY fieldY = 2;
+    repeated uint32 fieldZ = 3;
 }
