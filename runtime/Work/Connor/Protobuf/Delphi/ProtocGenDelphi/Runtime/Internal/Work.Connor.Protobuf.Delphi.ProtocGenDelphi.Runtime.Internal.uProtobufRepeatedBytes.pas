@@ -32,7 +32,7 @@ uses
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uIProtobufWireCodec,
   // To represent values as TBytes
   System.SysUtils,
-  // RUNTIME-IMPL: Replace reference                                             s
+  // RUNTIME-IMPL: Replace reference
   // To provide the concrete class for repeated field values
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufRepeatedFieldValues;
 
