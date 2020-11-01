@@ -490,9 +490,17 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
             MessageClassSkeleton skeleton = new MessageClassSkeleton(delphiClass.Name);
             foreach (FieldDescriptorProto field in messageType.Field) CompileField(field, delphiClass, skeleton, dependencyHandler);
             skeleton.Inject(delphiClass, delphiImplementation);
-            Action<ClassDeclaration> nestedClassInjection = nestedClass => delphiClass.NestedTypeDeclarations.Add(new NestedTypeDeclaration() { ClassDeclaration = nestedClass });
+            Action<ClassDeclaration> nestedClassInjection = nestedClass => delphiClass.NestedDeclarations.Add(new ClassDeclarationNestedDeclaration()
+            {
+                Visibility = Visibility.Public,
+                NestedTypeDeclaration = new NestedTypeDeclaration() { ClassDeclaration = nestedClass }
+            });
             foreach (DescriptorProto nestedMessageType in messageType.NestedType) CompileMessage(nestedMessageType, nestedClassInjection, delphiImplementation, dependencyHandler);            
-            Action<EnumDeclaration> nestedEnumInjection = nestedEnum => delphiClass.NestedTypeDeclarations.Add(new NestedTypeDeclaration() { EnumDeclaration = nestedEnum });
+            Action<EnumDeclaration> nestedEnumInjection = nestedEnum => delphiClass.NestedDeclarations.Add(new ClassDeclarationNestedDeclaration()
+            {
+                Visibility = Visibility.Public,
+                NestedTypeDeclaration = new NestedTypeDeclaration() { EnumDeclaration = nestedEnum }
+            });
             foreach (EnumDescriptorProto nestedEnumType in messageType.EnumType) CompileEnum(nestedEnumType, nestedEnumInjection, dependencyHandler);
         }
 
@@ -612,7 +620,11 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
                     }
                 }
             };
-            delphiClass.NestedConstDeclarations.Add(new ConstDeclaration() { TrueConstDeclaration = delphiFieldNumberConst });
+            delphiClass.NestedDeclarations.Add(new ClassDeclarationNestedDeclaration()
+            {
+                Visibility = Visibility.Public,
+                NestedConstDeclaration = new ConstDeclaration() { TrueConstDeclaration = delphiFieldNumberConst }
+            });
             return delphiFieldNumberConst;
         }
 
@@ -641,10 +653,10 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
                     }
                 }
             };
-            delphiClass.MemberList.Add(new ClassMemberDeclaration()
+            delphiClass.NestedDeclarations.Add(new ClassDeclarationNestedDeclaration()
             {
                 Visibility = Visibility.Private,
-                FieldDeclaration = delphiField
+                Member = new ClassMemberDeclaration() { FieldDeclaration = delphiField }
             });
             return delphiField;
         }
@@ -678,25 +690,28 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
                 Statements = { $"result := {valueExpression};" }
             };
             skeleton.PropertyAccessors.Add(getter);
-            delphiClass.MemberList.Add(new ClassMemberDeclaration()
+            delphiClass.NestedDeclarations.Add(new ClassDeclarationNestedDeclaration()
             {
                 Visibility = Visibility.Protected,
-                MethodDeclaration = new MethodInterfaceDeclaration()
+                Member = new ClassMemberDeclaration()
                 {
-                    Prototype = getter.Prototype.Clone(),
-                    Binding = MethodInterfaceDeclaration.Types.Binding.Virtual,
-                    Comment = new AnnotationComment()
+                    MethodDeclaration = new MethodInterfaceDeclaration()
                     {
-                        CommentLines =
+                        Prototype = getter.Prototype.Clone(),
+                        Binding = MethodInterfaceDeclaration.Types.Binding.Virtual,
+                        Comment = new AnnotationComment()
                         {
-                            $"<summary>",
-                            $"Getter for <see cref=\"{delphiPropertyName}\"/>.",
-                            $"</summary>",
-                            $"<returns>The value of the protobuf field <c>{field.Name}</c></returns>",
-                            $"<remarks>",
-                            $"May be overridden. Overriders shall only add side-effects and must call the ancestor implementation.",
-                            $"</remarks>"
-                        },
+                            CommentLines =
+                            {
+                                $"<summary>",
+                                $"Getter for <see cref=\"{delphiPropertyName}\"/>.",
+                                $"</summary>",
+                                $"<returns>The value of the protobuf field <c>{field.Name}</c></returns>",
+                                $"<remarks>",
+                                $"May be overridden. Overriders shall only add side-effects and must call the ancestor implementation.",
+                                $"</remarks>"
+                            },
+                        }
                     }
                 }
             });
@@ -740,25 +755,28 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
                 Statements = { statements }
             };
             skeleton.PropertyAccessors.Add(setter);
-            delphiClass.MemberList.Add(new ClassMemberDeclaration()
+            delphiClass.NestedDeclarations.Add(new ClassDeclarationNestedDeclaration()
             {
                 Visibility = Visibility.Protected,
-                MethodDeclaration = new MethodInterfaceDeclaration()
+                Member = new ClassMemberDeclaration()
                 {
-                    Prototype = setter.Prototype.Clone(),
-                    Binding = MethodInterfaceDeclaration.Types.Binding.Virtual,
-                    Comment = new AnnotationComment()
+                    MethodDeclaration = new MethodInterfaceDeclaration()
                     {
-                        CommentLines =
+                        Prototype = setter.Prototype.Clone(),
+                        Binding = MethodInterfaceDeclaration.Types.Binding.Virtual,
+                        Comment = new AnnotationComment()
                         {
-                            $"<summary>",
-                            $"Setter for <see cref=\"{delphiPropertyName}\"/>.",
-                            $"</summary>",
-                            $"<param name=\"{setterParameter.Name}\">The new value of the protobuf field <c>{field.Name}</c></param>",
-                            $"<remarks>",
-                            $"May be overridden. Overriders shall only add side-effects and must call the ancestor implementation.",
-                            $"</remarks>"
-                        },
+                            CommentLines =
+                            {
+                                $"<summary>",
+                                $"Setter for <see cref=\"{delphiPropertyName}\"/>.",
+                                $"</summary>",
+                                $"<param name=\"{setterParameter.Name}\">The new value of the protobuf field <c>{field.Name}</c></param>",
+                                $"<remarks>",
+                                $"May be overridden. Overriders shall only add side-effects and must call the ancestor implementation.",
+                                $"</remarks>"
+                            },
+                        }
                     }
                 }
             });
@@ -801,10 +819,10 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
                 MethodDeclaration setter = GenerateAndInjectSetter(field, delphiField, delphiPropertyName, delphiType, delphiClass, skeleton);
                 delphiProperty.WriteSpecifier = setter.Prototype.Name;
             }
-            delphiClass.MemberList.Add(new ClassMemberDeclaration()
+            delphiClass.NestedDeclarations.Add(new ClassDeclarationNestedDeclaration()
             {
                 Visibility = Visibility.Public,
-                PropertyDeclaration = delphiProperty
+                Member = new ClassMemberDeclaration() { PropertyDeclaration = delphiProperty }
             });
         }
     }

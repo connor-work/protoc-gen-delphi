@@ -52,18 +52,21 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// <param name="delphiClassName">Name of the Delphi class</param>
         public MessageClassSkeleton(string delphiClassName)
         {
-            // Constructs pair of class member declaration and defining declaration for a skeleton method
+            // Constructs pair of declaration and defining declaration for a skeleton method
 #pragma warning disable S1172 // Unused method parameters should be removed -> False-positive, the parameters are used
-            static (ClassMemberDeclaration, MethodDeclaration) declareMethod(Visibility visibility, MethodInterfaceDeclaration.Types.Binding binding, MethodDeclaration definingDeclaration, AnnotationComment comment) => (
+            static (ClassDeclarationNestedDeclaration, MethodDeclaration) declareMethod(Visibility visibility, MethodInterfaceDeclaration.Types.Binding binding, MethodDeclaration definingDeclaration, AnnotationComment comment) => (
 #pragma warning restore S1172 // Unused method parameters should be removed
-                    new ClassMemberDeclaration()
+                    new ClassDeclarationNestedDeclaration()
                     {
                         Visibility = visibility,
-                        MethodDeclaration = new MethodInterfaceDeclaration
+                        Member = new ClassMemberDeclaration()
                         {
-                            Binding = binding,
-                            Prototype = definingDeclaration.Prototype.Clone(),
-                            Comment = comment.Clone()
+                            MethodDeclaration = new MethodInterfaceDeclaration
+                            {
+                                Binding = binding,
+                                Prototype = definingDeclaration.Prototype.Clone(),
+                                Comment = comment.Clone()
+                            }
                         }
                     }, definingDeclaration);
             Create = declareMethod(Visibility.Public, MethodInterfaceDeclaration.Types.Binding.Override, new MethodDeclaration()
@@ -220,37 +223,37 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// <summary>
         /// Constructor that constructs an empty message with all protobuf fields absent
         /// </summary>
-        public (ClassMemberDeclaration, MethodDeclaration) Create { get; }
+        public (ClassDeclarationNestedDeclaration, MethodDeclaration) Create { get; }
 
         /// <summary>
         /// Destructor that destroys the message and all objects and resources held by it
         /// </summary>
-        public (ClassMemberDeclaration, MethodDeclaration) Destroy { get; }
+        public (ClassDeclarationNestedDeclaration, MethodDeclaration) Destroy { get; }
 
         /// <summary>
         /// Procedure that renders all protobuf fields absent by setting them to their default values
         /// </summary>
-        public (ClassMemberDeclaration, MethodDeclaration) Clear { get; }
+        public (ClassDeclarationNestedDeclaration, MethodDeclaration) Clear { get; }
 
         /// <summary>
         /// Procedure that encodes the message using the protobuf binary wire format and writes it to a stream
         /// </summary>
-        public (ClassMemberDeclaration, MethodDeclaration) Encode { get; }
+        public (ClassDeclarationNestedDeclaration, MethodDeclaration) Encode { get; }
 
         /// <summary>
         /// Procedure that fills the message's protobuf fields by decoding the message using the protobuf binary wire format from data that is read from a stream
         /// </summary>
-        public (ClassMemberDeclaration, MethodDeclaration) Decode { get; }
+        public (ClassDeclarationNestedDeclaration, MethodDeclaration) Decode { get; }
 
         /// <summary>
         /// Procedure that renders those protobuf fields absent that belong to this specific message class sub-type, by setting them to their default values
         /// </summary>
-        public (ClassMemberDeclaration, MethodDeclaration) ClearOwnFields { get; }
+        public (ClassDeclarationNestedDeclaration, MethodDeclaration) ClearOwnFields { get; }
 
         /// <summary>
         /// Message "skeleton methods" in intended declaration order
         /// </summary>
-        public IEnumerable<(ClassMemberDeclaration, MethodDeclaration)> Methods => new (ClassMemberDeclaration, MethodDeclaration)[] { Create, Destroy, Clear, Encode, Decode, ClearOwnFields };
+        public IEnumerable<(ClassDeclarationNestedDeclaration, MethodDeclaration)> Methods => new (ClassDeclarationNestedDeclaration, MethodDeclaration)[] { Create, Destroy, Clear, Encode, Decode, ClearOwnFields };
 
         /// <summary>
         /// Mutable list of method declarations that serve as getter or setters of generated properties.
@@ -265,9 +268,9 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// <param name="delphiImplementation">The Delphi implementation section</param>
         public void Inject(ClassDeclaration delphiClass, Implementation delphiImplementation)
         {
-            foreach ((ClassMemberDeclaration methodInterface, MethodDeclaration methodImplementation) in Methods)
+            foreach ((ClassDeclarationNestedDeclaration methodInterface, MethodDeclaration methodImplementation) in Methods)
             {
-                delphiClass.MemberList.Add(methodInterface.Clone());
+                delphiClass.NestedDeclarations.Add(methodInterface.Clone());
                 delphiImplementation.Declarations.Add(new ImplementationDeclaration() { MethodDeclaration = methodImplementation.Clone() });
             }
             foreach (MethodDeclaration accessor in PropertyAccessors) delphiImplementation.Declarations.Add(new ImplementationDeclaration() { MethodDeclaration = accessor.Clone() });
