@@ -128,6 +128,12 @@
         <DCCReference Include="..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime\Internal\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufString.pas"/>
         <DCCReference Include="..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime\Internal\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufUint64.pas"/>
         <DCCReference Include="..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime\Internal\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufRepeatedMessage.pas"/>
+        <DCCReference Include="..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\bool.protoc-output\uBool.pas"/>
+        <DCCReference Include="..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\empty_schema.protoc-output\uEmptySchema.pas"/>
+        <DCCReference Include="..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\fields.protoc-output\uFields.pas"/>
+        <DCCReference Include="..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\namespace_from_path.protoc-output\SpaceX\SpaceY\SpaceX.SpaceY.uInputFileNamespaceFromPath.pas"/>
+        <DCCReference Include="..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\messages.protoc-output\uMessages.pas"/>
+        <DCCReference Include="..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\repeated_field.protoc-output\uRepeatedField.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
