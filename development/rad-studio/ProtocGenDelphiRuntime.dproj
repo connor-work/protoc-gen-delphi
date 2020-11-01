@@ -127,6 +127,7 @@
         <DCCReference Include="..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime\Internal\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufSint64.pas"/>
         <DCCReference Include="..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime\Internal\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufString.pas"/>
         <DCCReference Include="..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime\Internal\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufUint64.pas"/>
+        <DCCReference Include="..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime\Internal\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufRepeatedMessage.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

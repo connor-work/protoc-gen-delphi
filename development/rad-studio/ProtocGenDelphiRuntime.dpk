@@ -74,6 +74,7 @@ contains
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufSint32 in '..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime\Internal\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufSint32.pas',
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufSint64 in '..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime\Internal\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufSint64.pas',
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufString in '..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime\Internal\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufString.pas',
-  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufUint64 in '..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime\Internal\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufUint64.pas';
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufUint64 in '..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime\Internal\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufUint64.pas',
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufRepeatedMessage in '..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime\Internal\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufRepeatedMessage.pas';
 
 end.
