@@ -29,7 +29,10 @@ uses
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uIProtobufMessage,
   // RUNTIME-IMPL: Replace reference
   // To expose TProtobufMessage
-  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufMessage;
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufMessage,
+  // RUNTIME-IMPL: Replace reference
+  // To expose TProtobufFieldAttribute
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufFieldAttribute;
 
 type
   /// <summary>
@@ -52,6 +55,12 @@ type
   /// and is responsible for their deallocation.
   /// </remarks>
   TProtobufMessage = Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufMessage.TProtobufMessage;
+
+  // RUNTIME-IMPL: Replace aliased type
+  /// <summary>
+  /// RTTI attribute that annotates a property representing a protobuf field.
+  /// </summary>
+  ProtobufFieldAttribute = Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufFieldAttribute.TProtobufFieldAttribute;
 
 implementation
 

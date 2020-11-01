@@ -102,14 +102,9 @@ type
     const PROTOBUF_FIELD_NUMBER_FIELD_X = 1;
 
     /// <summary>
-    /// Protobuf field number of the protobuf field <c>fieldY</c>.
+    /// Protobuf field name of the protobuf field <c>fieldX</c>.
     /// </summary>
-    const PROTOBUF_FIELD_NUMBER_FIELD_Y = 2;
-
-    /// <summary>
-    /// Protobuf field number of the protobuf field <c>fieldZ</c>.
-    /// </summary>
-    const PROTOBUF_FIELD_NUMBER_FIELD_Z = 3;
+    const PROTOBUF_FIELD_NAME_FIELD_X = 'fieldX';
 
     /// <summary>
     /// Holds the decoded value of the protobuf field <c>fieldX</c>.
@@ -137,7 +132,18 @@ type
     /// <remarks>
     /// This property corresponds to the protobuf field <c>fieldX</c>.
     /// </remarks>
+    [ProtobufField(PROTOBUF_FIELD_NAME_FIELD_X, PROTOBUF_FIELD_NUMBER_FIELD_X)]
     public property FieldX: UInt32 read GetFieldX write SetFieldX;
+
+    /// <summary>
+    /// Protobuf field number of the protobuf field <c>fieldY</c>.
+    /// </summary>
+    const PROTOBUF_FIELD_NUMBER_FIELD_Y = 2;
+
+    /// <summary>
+    /// Protobuf field name of the protobuf field <c>fieldY</c>.
+    /// </summary>
+    const PROTOBUF_FIELD_NAME_FIELD_Y = 'fieldY';
 
     /// <summary>
     /// Holds the decoded value of the protobuf field <c>fieldY</c>.
@@ -166,7 +172,18 @@ type
     /// <remarks>
     /// This property corresponds to the protobuf field <c>fieldY</c>.
     /// </remarks>
+    [ProtobufField(PROTOBUF_FIELD_NAME_FIELD_Y, PROTOBUF_FIELD_NUMBER_FIELD_Y)]
     public property FieldY: TMessageY read GetFieldY write SetFieldY;
+
+    /// <summary>
+    /// Protobuf field number of the protobuf field <c>fieldZ</c>.
+    /// </summary>
+    const PROTOBUF_FIELD_NUMBER_FIELD_Z = 3;
+
+    /// <summary>
+    /// Protobuf field name of the protobuf field <c>fieldZ</c>.
+    /// </summary>
+    const PROTOBUF_FIELD_NAME_FIELD_Z = 'fieldZ';
 
     /// <summary>
     /// Holds the decoded values of the protobuf field <c>fieldZ</c>.
@@ -199,6 +216,7 @@ type
     /// The collection is always owned by the message.
     /// Developers must ensure that a resulting shared ownership does not lead to unexpected behavior.
     /// </remarks>
+    [ProtobufField(PROTOBUF_FIELD_NAME_FIELD_Z, PROTOBUF_FIELD_NUMBER_FIELD_Z)]
     public property FieldZ: IProtobufRepeatedFieldValues<UInt32> read GetFieldZ write SetFieldZ;
 
     /// <summary>

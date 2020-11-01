@@ -47,6 +47,20 @@ type
   /// Generic runtime library implementation of <see cref="T:IProtobufRepeatedFieldValuesInternal"/>.
   /// </summary>
   TProtobufRepeatedFieldValues<T> = class(TInterfacedPersistent, IProtobufRepeatedFieldValues<T>, IProtobufRepeatedFieldValuesInternal<T>)
+    public
+      /// <summary>
+      /// Constructs an empty ordered collection of protobuf field values that can be stored in a protobuf repeated field..
+      /// </summary>
+      constructor Create; virtual;
+
+      /// <summary>
+      /// Destroys the field value collection and contained protobuf field values.
+      /// </summary>
+      /// <remarks>
+      /// Developers must ensure that no shared ownership of the field values or further nested embedded objects is held.
+      /// </remarks>
+      destructor Destroy; override;
+
     // IProtobufRepeatedFieldValues<T> implementation
 
     public
@@ -204,6 +218,16 @@ type
   end;
 
 implementation
+
+constructor TProtobufRepeatedFieldValues<T>.Create;
+begin
+  raise NotImplementedInStub;
+end;
+
+destructor TProtobufRepeatedFieldValues<T>.Destroy;
+begin
+  raise NotImplementedInStub;
+end;
 
 // IProtobufRepeatedFieldValues implementation
 
