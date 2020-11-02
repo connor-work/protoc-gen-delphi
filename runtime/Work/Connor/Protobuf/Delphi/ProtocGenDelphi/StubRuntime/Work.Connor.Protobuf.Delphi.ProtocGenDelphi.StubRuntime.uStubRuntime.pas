@@ -18,6 +18,10 @@
 /// </summary>
 unit Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uStubRuntime;
 
+{$IFDEF FPC}
+  {$MODE DELPHI}
+{$ENDIF}
+
 interface
 
 uses

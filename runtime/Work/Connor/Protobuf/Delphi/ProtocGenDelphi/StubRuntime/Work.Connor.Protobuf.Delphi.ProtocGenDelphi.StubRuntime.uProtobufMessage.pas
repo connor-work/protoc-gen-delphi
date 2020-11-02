@@ -22,6 +22,10 @@
 /// </remarks>
 unit Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufMessage;
 
+{$IFDEF FPC}
+  {$MODE DELPHI}
+{$ENDIF}
+
 interface
 
 uses
