@@ -278,6 +278,8 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.RuntimeTests
                 FallbackToPath = true,
                 OutDir = CreateScratchFolder()
             };
+            plugIn.Options[ProtocGenDelphi.scopedUnitsOption] = "false";
+            plugIn.Options[ProtocGenDelphi.reflectionOption] = "false";
             ProtocOperation protoc = new ProtocOperation();
             protoc.ProtoPath.AddRange(vector.ProtoPath);
             protoc.ProtoFiles.AddRange(vector.InputProtoFileNames);

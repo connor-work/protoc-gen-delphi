@@ -175,6 +175,19 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
     public class ProtocGenDelphi
     {
         /// <summary>
+        /// Optional plug-in option whose value determines whether unit references in generated code shall use scopes (Delphi XE2+ feature).
+        /// Defaults to "true".
+        /// </summary>
+        public const string scopedUnitsOption = "scoped_units";
+
+        /// <summary>
+        /// Optional plug-in option whose value determines whether the generated code shall contain reflection information.
+        /// Not compatible with FPC versions below 3.3.1.
+        /// Defaults to "true".
+        /// </summary>
+        public const string reflectionOption = "reflection";
+
+        /// <summary>
         /// File name extension (without leading dot) for protobuf schema definitions
         /// </summary>
         public static readonly string protoFileExtension = "proto";
@@ -209,12 +222,22 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// <summary>
         /// Required unit reference for using Delphi classes
         /// </summary>
-        private static readonly UnitReference classesReference = new UnitReference() { Unit = new UnitIdentifier() { Unit = "Classes", Namespace = { "System" } } };
+        private UnitReference ClassesReference => new UnitReference() { Unit = new UnitIdentifier() { Unit = "Classes", Namespace = { Enumerable.Repeat("System", useScopedUnits ? 1 : 0) } } };
 
         /// <summary>
         /// Support definition for the targetted protobuf runtime
         /// </summary>
         private readonly IRuntimeSupport runtime = IRuntimeSupport.Default;
+
+        /// <summary>
+        /// <see langword="true"/> if scoped unit references shall be used.
+        /// </summary>
+        private bool useScopedUnits = true;
+
+        /// <summary>
+        /// <see langword="true"/> if reflection information shall be emitted.
+        /// </summary>
+        private bool useReflection = true;
 
         static void Main(string[] args)
         {
@@ -268,6 +291,16 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         {
             switch (optionKey)
             {
+                case scopedUnitsOption:
+                    if (optionValue == "true") useScopedUnits = true;
+                    else if (optionValue == "false") useScopedUnits = false;
+                    else throw new ArgumentException($"Invalid plug-in option value for key {optionKey}", optionValue);
+                    break;
+                case reflectionOption:
+                    if (optionValue == "true") useReflection = true;
+                    else if (optionValue == "false") useReflection = false;
+                    else throw new ArgumentException($"Invalid plug-in option value for key {optionKey}", optionValue);
+                    break;
                 default: throw new NotImplementedException();
             }
         }
@@ -478,7 +511,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         {
             // Add the required dependencies for handling compiled messages
             dependencyHandler.Invoke(runtime.GetDependencyForMessages());
-            dependencyHandler.Invoke(classesReference);
+            dependencyHandler.Invoke(ClassesReference);
             // Generate a corresponding message class
             ClassDeclaration delphiClass = GenerateClass(messageType);
             interfaceInjection.Invoke(delphiClass);
@@ -861,14 +894,12 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
                     }
                 }
             };
+            ClassMemberDeclaration member = new ClassMemberDeclaration() { PropertyDeclaration = delphiProperty };
+            if (useReflection) member.AttributeAnnotations.Add(new AttributeAnnotation() { Attribute = $"ProtobufField({delphiFieldNameConst.Identifier}, {delphiFieldNumberConst.Identifier})" });
             delphiClass.NestedDeclarations.Add(new ClassDeclarationNestedDeclaration()
             {
                 Visibility = Visibility.Public,
-                Member = new ClassMemberDeclaration()
-                {
-                    PropertyDeclaration = delphiProperty,
-                    AttributeAnnotations = { new AttributeAnnotation() { Attribute = $"ProtobufField({delphiFieldNameConst.Identifier}, {delphiFieldNumberConst.Identifier})" } }
-                }
+                Member = member
             });
         }
     }
