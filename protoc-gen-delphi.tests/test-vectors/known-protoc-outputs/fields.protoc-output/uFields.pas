@@ -96,7 +96,7 @@ type
     /// <remarks>
     /// This property corresponds to the protobuf field <c>fieldY</c>.
     /// </remarks>
-   [ProtobufField(PROTOBUF_FIELD_NAME_FIELD_Y, PROTOBUF_FIELD_NUMBER_FIELD_Y)]
+    [ProtobufField(PROTOBUF_FIELD_NAME_FIELD_Y, PROTOBUF_FIELD_NUMBER_FIELD_Y)]
     public property FieldY: UnicodeString read GetFieldY write SetFieldY;
 
     /// <summary>
