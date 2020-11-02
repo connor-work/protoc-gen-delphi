@@ -24,12 +24,12 @@ type
     /// <summary>
     /// Protobuf field number of the protobuf field <c>fieldX</c>.
     /// </summary>
-    const PROTOBUF_FIELD_NUMBER_FIELD_X = 1;
+    public const PROTOBUF_FIELD_NUMBER_FIELD_X = 1;
 
     /// <summary>
     /// Protobuf field name of the protobuf field <c>fieldX</c>.
     /// </summary>
-    const PROTOBUF_FIELD_NAME_FIELD_X = 'fieldX';
+    public const PROTOBUF_FIELD_NAME_FIELD_X = 'fieldX';
 
     /// <summary>
     /// Holds the decoded value of the protobuf field <c>fieldX</c>.
@@ -63,12 +63,12 @@ type
     /// <summary>
     /// Protobuf field number of the protobuf field <c>fieldY</c>.
     /// </summary>
-    const PROTOBUF_FIELD_NUMBER_FIELD_Y = 3;
+    public const PROTOBUF_FIELD_NUMBER_FIELD_Y = 3;
 
     /// <summary>
     /// Protobuf field name of the protobuf field <c>fieldY</c>.
     /// </summary>
-    const PROTOBUF_FIELD_NAME_FIELD_Y = 'fieldY';
+    public const PROTOBUF_FIELD_NAME_FIELD_Y = 'fieldY';
 
     /// <summary>
     /// Holds the decoded value of the protobuf field <c>fieldY</c>.
