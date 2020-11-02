@@ -359,6 +359,9 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
             // Compile message types
             Action<ClassDeclaration> classInjection = @class => delphiUnit.Interface.Declarations.Add(new InterfaceDeclaration() { ClassDeclaration = @class });
             foreach (DescriptorProto messageType in protoFile.MessageType) CompileMessage(messageType, classInjection, delphiUnit.Implementation, dependencyHandler);
+            // Sort uses clauses
+            delphiUnit.Interface.UsesClause.SortUsesClause();
+            delphiUnit.Implementation.UsesClause.SortUsesClause();
             return delphiUnit;
         }
 
