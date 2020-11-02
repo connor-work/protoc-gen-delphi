@@ -338,6 +338,7 @@ end;
 constructor TMessageX.Create;
 begin
   inherited;
+  FFieldZ := TProtobufRepeatedUint32FieldValues.Create;
   ClearOwnFields;
 end;
 
@@ -367,7 +368,7 @@ begin
   inherited;
   FFieldX := gProtobufWireCodecUint32.DecodeUnknownField(self, PROTOBUF_FIELD_NUMBER_FIELD_X);
   FFieldY.Free;
-  if HasUnknownField(PROTOBUF_FIELD_NUMBER_FIELD_X) then
+  if HasUnknownField(PROTOBUF_FIELD_NUMBER_FIELD_Y) then
   begin
     FFieldY := TMessageY.Create;
     FFieldY.DecodeAsUnknownSingularField(self, PROTOBUF_FIELD_NUMBER_FIELD_Y);
