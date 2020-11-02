@@ -482,9 +482,6 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
             // Generate a corresponding message class
             ClassDeclaration delphiClass = GenerateClass(messageType);
             interfaceInjection.Invoke(delphiClass);
-            MessageClassSkeleton skeleton = new MessageClassSkeleton(delphiClass.Name);
-            foreach (FieldDescriptorProto field in messageType.Field) CompileField(field, delphiClass, skeleton, dependencyHandler);
-            skeleton.Inject(delphiClass, delphiImplementation);
             Action<ClassDeclaration> nestedClassInjection = nestedClass => delphiClass.NestedDeclarations.Add(new ClassDeclarationNestedDeclaration()
             {
                 Visibility = Visibility.Public,
@@ -497,6 +494,9 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
                 NestedTypeDeclaration = new NestedTypeDeclaration() { EnumDeclaration = nestedEnum }
             });
             foreach (EnumDescriptorProto nestedEnumType in messageType.EnumType) CompileEnum(nestedEnumType, nestedEnumInjection, dependencyHandler);
+            MessageClassSkeleton skeleton = new MessageClassSkeleton(delphiClass.Name);
+            foreach (FieldDescriptorProto field in messageType.Field) CompileField(field, delphiClass, skeleton, dependencyHandler);
+            skeleton.Inject(delphiClass, delphiImplementation);
         }
 
         /// <summary>
