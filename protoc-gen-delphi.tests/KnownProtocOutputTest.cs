@@ -221,8 +221,6 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Tests
         public void ProducesExpectedOutput(TestVector vector)
         {
             if (vector.Name == "double"
-             || vector.Name == "enum_field"
-             || vector.Name == "enums"
              || vector.Name == "float"
              || vector.Name == "message_field"
              || vector.Name == "messages"

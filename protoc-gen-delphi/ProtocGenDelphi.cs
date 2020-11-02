@@ -554,7 +554,6 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
             (_, MethodDeclaration decodeDeclaration) = skeleton.Decode;
             (_, MethodDeclaration clearOwnFieldsDeclaration) = skeleton.ClearOwnFields;
             (_, MethodDeclaration assignOwnFieldsDeclaration) = skeleton.AssignOwnFields;
-            // TODO fill assignownfields
             // TODO handling of absent type (unknown if message or enum)
             string? wireCodec = null;
             if (field.Type != FieldDescriptorProto.Types.Type.Message) wireCodec = field.Type.GetDelphiWireCodec();
