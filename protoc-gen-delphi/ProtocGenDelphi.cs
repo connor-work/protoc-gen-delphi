@@ -546,13 +546,15 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
             TrueConstDeclaration delphiFieldNameConst = GenerateAndInjectFieldNameConst(field, delphiClass);
             string delphiPropertyName = field.Name.ToPascalCase();
             FieldDeclaration delphiField = GenerateAndInjectField(field, delphiPropertyName, privateDelphiType, delphiClass);
-            GenerateAndInjectProperty(field, delphiField, delphiPropertyName, publicDelphiType, delphiClass, skeleton);
+            GenerateAndInjectProperty(field, delphiField, delphiFieldNameConst, delphiFieldNumberConst, delphiPropertyName, publicDelphiType, delphiClass, skeleton);
             // Fill the message skeleton with the runtime field logic
             (_, MethodDeclaration createDeclaration) = skeleton.Create;
             (_, MethodDeclaration destroyDeclaration) = skeleton.Destroy;
             (_, MethodDeclaration encodeDeclaration) = skeleton.Encode;
             (_, MethodDeclaration decodeDeclaration) = skeleton.Decode;
             (_, MethodDeclaration clearOwnFieldsDeclaration) = skeleton.ClearOwnFields;
+            (_, MethodDeclaration assignOwnFieldsDeclaration) = skeleton.AssignOwnFields;
+            // TODO fill assignownfields
             // TODO handling of absent type (unknown if message or enum)
             string? wireCodec = null;
             if (field.Type != FieldDescriptorProto.Types.Type.Message) wireCodec = field.Type.GetDelphiWireCodec();
@@ -573,6 +575,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
                     encodeDeclaration.Statements.Add($"EncodeRepeatedField<{delphiElementType}>({delphiField.Name}, {delphiFieldNumberConst.Identifier}, {wireCodec!}, aDest);");
                     decodeDeclaration.Statements.Add($"DecodeUnknownRepeatedField<{delphiElementType}>({delphiFieldNumberConst.Identifier}, {wireCodec!}, {delphiField.Name});");
                 }
+                assignOwnFieldsDeclaration.Statements.Add($"({delphiPropertyName} as TInterfacedPersistent).Assign({MessageClassSkeleton.assignOwnFieldsSourceParamName}.{delphiPropertyName} as TInterfacedPersistent)");
             }
             else
             {
@@ -583,11 +586,17 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
                     encodeDeclaration.Statements.Add($"EncodeMessageField<{privateDelphiType}>({delphiField.Name}, {delphiFieldNumberConst.Identifier}, aDest);");
                     decodeDeclaration.Statements.Add($"{delphiField.Name} := DecodeUnknownMessageField<{privateDelphiType}>({delphiFieldNumberConst.Identifier});");
                     clearOwnFieldsDeclaration.Statements.Add($"{delphiField.Name}.Free;");
+                    string localAssignVariableName = $"l{field.Name.ToPascalCase()}";
+                    assignOwnFieldsDeclaration.LocalDeclarations.Add($"{localAssignVariableName}: {privateDelphiType}");
+                    assignOwnFieldsDeclaration.Statements.Add($"{localAssignVariableName} := {privateDelphiType}.Create;");
+                    assignOwnFieldsDeclaration.Statements.Add($"{localAssignVariableName}.Assign({MessageClassSkeleton.assignOwnFieldsSourceParamName}.{delphiPropertyName});");
+                    assignOwnFieldsDeclaration.Statements.Add($"{delphiPropertyName} := {localAssignVariableName};");
                 }
                 else
                 {
-                    encodeDeclaration.Statements.Add($"EncodeField<{privateDelphiType}>({delphiField.Name}, {delphiFieldNumberConst.Identifier}, {wireCodec!}, aDest);");
-                    decodeDeclaration.Statements.Add($"{delphiField.Name} := DecodeUnknownField<{privateDelphiType}>({delphiFieldNumberConst.Identifier}, {wireCodec!});");
+                    encodeDeclaration.Statements.Add($"{wireCodec!}.EncodeSingularField({delphiField.Name}, self, {delphiFieldNumberConst.Identifier}, aDest);");
+                    decodeDeclaration.Statements.Add($"{delphiField.Name} := {wireCodec!}.DecodeUnknownField(self, {delphiFieldNumberConst.Identifier});");
+                    assignOwnFieldsDeclaration.Statements.Add($"{delphiPropertyName} := {MessageClassSkeleton.assignOwnFieldsSourceParamName}.{delphiPropertyName};");
                 }
                 dependencyHandler.Invoke(supportCodeReference); // Required for default value constant
                 clearOwnFieldsDeclaration.Statements.Add($"{delphiField.Name} := {field.Type.GetDelphiDefaultValueConstant()};");
@@ -816,11 +825,15 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// </summary>
         /// <param name="field">The protobuf field</param>
         /// <param name="delphiField">The Delphi field holding the internal representation of the protobuf field value</param>
+        /// <param name="delphiFieldNameConst">The Delphi true constant holding the protobuf field name</param>
+        /// <param name="delphiFieldNumberConst">The Delphi true constant holding the protobuf field number</param>
         /// <param name="delphiPropertyName">Name of the Delphi property</param>
         /// <param name="delphiType">Delphi type of the property</param>
         /// <param name="delphiClass">The Delphi class representing the message type</param>
         /// <param name="skeleton">The message class skeleton for the Delphi class</param>
-        private void GenerateAndInjectProperty(FieldDescriptorProto field, FieldDeclaration delphiField, string delphiPropertyName, string delphiType, ClassDeclaration delphiClass, MessageClassSkeleton skeleton)
+        private void GenerateAndInjectProperty(FieldDescriptorProto field, FieldDeclaration delphiField,
+            TrueConstDeclaration delphiFieldNameConst, TrueConstDeclaration delphiFieldNumberConst, string delphiPropertyName, string delphiType,
+            ClassDeclaration delphiClass, MessageClassSkeleton skeleton)
         {
             MethodDeclaration getter = GenerateAndInjectGetter(field, delphiField, delphiPropertyName, delphiType, delphiClass, skeleton);
             PropertyDeclaration delphiProperty = new PropertyDeclaration()
@@ -848,7 +861,11 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
             delphiClass.NestedDeclarations.Add(new ClassDeclarationNestedDeclaration()
             {
                 Visibility = Visibility.Public,
-                Member = new ClassMemberDeclaration() { PropertyDeclaration = delphiProperty }
+                Member = new ClassMemberDeclaration()
+                {
+                    PropertyDeclaration = delphiProperty,
+                    AttributeAnnotations = { new AttributeAnnotation() { Attribute = $"ProtobufField({delphiFieldNameConst.Identifier}, {delphiFieldNumberConst.Identifier})" } }
+                }
             });
         }
     }

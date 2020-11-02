@@ -47,6 +47,20 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         };
 
         /// <summary>
+        /// Parameter declaration for <see cref="Assign"/>.
+        /// </summary>
+        private static readonly Parameter assignSourceParameter = new Parameter()
+        {
+            Name = "aSource",
+            Type = "TPersistent"
+        };
+
+        /// <summary>
+        /// Name of the source parameter for <see cref="AssignOwnFields"/>.
+        /// </summary>
+        public static readonly string assignOwnFieldsSourceParamName = "aSource";
+
+        /// <summary>
         /// Constructs a message class skeleton for injection into a Delphi class representing a protobuf message.
         /// </summary>
         /// <param name="delphiClassName">Name of the Delphi class</param>
@@ -200,6 +214,40 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
                         $"</remarks>"
                     }
             });
+            Assign = declareMethod(Visibility.Public, MethodInterfaceDeclaration.Types.Binding.Override, new MethodDeclaration()
+            {
+                Class = delphiClassName,
+                Prototype = new Prototype()
+                {
+                    Name = "Assign",
+                    Type = Prototype.Types.Type.Procedure,
+                    ParameterList = { assignSourceParameter.Clone() }
+                },
+                LocalDeclarations = { $"lSource: {delphiClassName};" },
+                Statements =
+                    {
+                        $"lSource := aSource as {delphiClassName};",
+                        $"inherited Assign(lSource);",
+                        $"AssignOwnFields(lSource);"
+                    }
+            }, new AnnotationComment()
+            {
+                CommentLines =
+                    {
+                        // SYNC partially with stub runtime annotation comment for TProtobufMessage.Assign
+                        // SYNC partially with "Assign" comment in "Messages" section of the "Delphi Generated Code" guide
+                        $"<summary>",
+                        $"Copies the protobuf data from another object to this one.",
+                        $"</summary>",
+                        $"<param name=\"aSource\">Object to copy from</param>",
+                        $"<remarks>",
+                        $"The other object must be a protobuf message of the same type.",
+                        $"This performs a deep copy; hence, no ownership is shared.",
+                        $"This procedure may cause the destruction of transitively owned objects in this message instance.",
+                        $"Developers must ensure that no shared ownership of current field values or further nested embedded objects is held.",
+                        $"</remarks>"
+                    }
+            });
             ClearOwnFields = declareMethod(Visibility.Private, MethodInterfaceDeclaration.Types.Binding.Static, new MethodDeclaration()
             {
                 Class = delphiClassName,
@@ -215,6 +263,29 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
                         $"<summary>",
                         $"Renders those protobuf fields absent that belong to <see cref=\"{delphiClassName}\"/> (i.e., are not managed by an ancestor class), by setting them to their default values.",
                         $"</summary>"
+                    }
+            });
+            AssignOwnFields = declareMethod(Visibility.Private, MethodInterfaceDeclaration.Types.Binding.Static, new MethodDeclaration()
+            {
+                Class = delphiClassName,
+                Prototype = new Prototype()
+                {
+                    Name = "AssignOwnFields",
+                    Type = Prototype.Types.Type.Procedure,
+                    ParameterList = { new Parameter()
+                    {
+                        Name = assignOwnFieldsSourceParamName,
+                        Type = delphiClassName
+                    } }
+                }
+            }, new AnnotationComment()
+            {
+                CommentLines =
+                    {
+                        $"<summary>",
+                        $"Copies those protobuf fields that belong to <see cref=\"{delphiClassName}\"/> (i.e., are not managed by an ancestor class), during a call to <see cref=\"TInterfacedPersistent.Assign\"/>.",
+                        $"</summary>",
+                        $"<param name=\"aSource\">Source message to copy from</param>"
                     }
             });
             PropertyAccessors = new List<MethodDeclaration>();
@@ -246,14 +317,24 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         public (ClassDeclarationNestedDeclaration, MethodDeclaration) Decode { get; }
 
         /// <summary>
+        /// Implementation of TInterfacedPersistent.Assign that copies the protobuf data from another object to this one
+        /// </summary>
+        public (ClassDeclarationNestedDeclaration, MethodDeclaration) Assign { get; }
+
+        /// <summary>
         /// Procedure that renders those protobuf fields absent that belong to this specific message class sub-type, by setting them to their default values
         /// </summary>
         public (ClassDeclarationNestedDeclaration, MethodDeclaration) ClearOwnFields { get; }
 
         /// <summary>
+        /// Procedure that copies those protobuf fields that belong to this specific message class sub-type, as part of the implementation of Assign
+        /// </summary>
+        public (ClassDeclarationNestedDeclaration, MethodDeclaration) AssignOwnFields { get; }
+
+        /// <summary>
         /// Message "skeleton methods" in intended declaration order
         /// </summary>
-        public IEnumerable<(ClassDeclarationNestedDeclaration, MethodDeclaration)> Methods => new (ClassDeclarationNestedDeclaration, MethodDeclaration)[] { Create, Destroy, Clear, Encode, Decode, ClearOwnFields };
+        public IEnumerable<(ClassDeclarationNestedDeclaration, MethodDeclaration)> Methods => new (ClassDeclarationNestedDeclaration, MethodDeclaration)[] { Create, Destroy, Clear, Encode, Decode, Assign, ClearOwnFields, AssignOwnFields };
 
         /// <summary>
         /// Mutable list of method declarations that serve as getter or setters of generated properties.
