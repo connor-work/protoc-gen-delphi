@@ -543,6 +543,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
             string privateDelphiType = field.GetPrivateDelphiType(name => ConstructDelphiTypeName(name));
             // Create public constants and members for the client code
             TrueConstDeclaration delphiFieldNumberConst = GenerateAndInjectFieldNumberConst(field, delphiClass);
+            TrueConstDeclaration delphiFieldNameConst = GenerateAndInjectFieldNameConst(field, delphiClass);
             string delphiPropertyName = field.Name.ToPascalCase();
             FieldDeclaration delphiField = GenerateAndInjectField(field, delphiPropertyName, privateDelphiType, delphiClass);
             GenerateAndInjectProperty(field, delphiField, delphiPropertyName, publicDelphiType, delphiClass, skeleton);
@@ -621,6 +622,36 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
                 NestedConstDeclaration = new ConstDeclaration() { TrueConstDeclaration = delphiFieldNumberConst }
             });
             return delphiFieldNumberConst;
+        }
+
+        /// <summary>
+        /// Generates a Delphi true constant to hold a protobuf field name, and injects it into the Delphi class declaration for the message class representing the containing message type.
+        /// </summary>
+        /// <param name="field">The protobuf field</param>
+        /// <param name="delphiClass">The Delphi class representing the message type</param>
+        /// <returns>The injected constant declaration</returns>
+        private TrueConstDeclaration GenerateAndInjectFieldNameConst(FieldDescriptorProto field, ClassDeclaration delphiClass)
+        {
+            TrueConstDeclaration delphiFieldNameConst = new TrueConstDeclaration()
+            {
+                Identifier = $"PROTOBUF_FIELD_NAME_{field.Name.ToScreamingSnakeCase()}",
+                Value = $"'{field.Name}'",
+                Comment = new AnnotationComment()
+                {
+                    CommentLines =
+                    {
+                        $"<summary>",
+                        $"Protobuf field name of the protobuf field <c>{field.Name}</c>.",
+                        $"</summary>"
+                    }
+                }
+            };
+            delphiClass.NestedDeclarations.Add(new ClassDeclarationNestedDeclaration()
+            {
+                Visibility = Visibility.Public,
+                NestedConstDeclaration = new ConstDeclaration() { TrueConstDeclaration = delphiFieldNameConst }
+            });
+            return delphiFieldNameConst;
         }
 
         /// <summary>
