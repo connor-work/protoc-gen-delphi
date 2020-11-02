@@ -220,11 +220,6 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Tests
         [MemberData(nameof(TestVectors))]
         public void ProducesExpectedOutput(TestVector vector)
         {
-            if (vector.Name == "double"
-             || vector.Name == "float"
-             || vector.Name == "string"
-             || vector.Name == "uint32"
-               ) return;
             // Setup file tree as input for protoc, according to the test vector
             vector.SetupInputFileTree();
 
