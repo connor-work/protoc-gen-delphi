@@ -215,7 +215,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// <summary>
         /// Required unit reference for using Delphi classes
         /// </summary>
-        private static readonly UnitReference classesReference = new UnitReference() { Unit = new UnitIdentifier() { Unit = "Classes" } };
+        private static readonly UnitReference classesReference = new UnitReference() { Unit = new UnitIdentifier() { Unit = "Classes", Namespace = { "System" } } };
 
         /// <summary>
         /// Support definition for the targetted protobuf runtime
