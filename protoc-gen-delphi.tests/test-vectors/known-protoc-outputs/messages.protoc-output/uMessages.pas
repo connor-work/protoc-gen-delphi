@@ -10,8 +10,8 @@ unit uMessages;
 interface
 
 uses
-  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufMessage,
-  Classes;
+  System.Classes,
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uProtobufMessage;
 
 type
   /// <remarks>
