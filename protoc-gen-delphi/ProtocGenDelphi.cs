@@ -571,15 +571,25 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
                 if (field.Type == FieldDescriptorProto.Types.Type.Message)
                 {
                     destroyDeclaration.Statements.Insert(destroyDeclaration.Statements.Count - 1, $"{delphiField.Name}.Free;");
-                    decodeDeclaration.Statements.Add($"{delphiField.Name}.Free;");
-                    encodeDeclaration.Statements.Add($"EncodeMessageField<{privateDelphiType}>({delphiField.Name}, {delphiFieldNumberConst.Identifier}, aDest);");
-                    decodeDeclaration.Statements.Add($"{delphiField.Name} := DecodeUnknownMessageField<{privateDelphiType}>({delphiFieldNumberConst.Identifier});");
+                    encodeDeclaration.Statements.Add($"{delphiField.Name}.EncodeAsSingularField(self, {delphiFieldNumberConst.Identifier}, aDest);");
+                    decodeDeclaration.Statements.AddRange(new[]
+                    {
+                        $"{delphiField.Name}.Free;",
+                        $"if HasUnknownField({delphiFieldNumberConst.Identifier}) then",
+                        $"begin",
+                        $"  {delphiField.Name} := {privateDelphiType}.Create;",
+                        $"  {delphiField.Name}.DecodeAsUnknownSingularField(self, {delphiFieldNumberConst.Identifier});",
+                        $"end;"
+                    });
                     clearOwnFieldsDeclaration.Statements.Add($"{delphiField.Name}.Free;");
                     string localAssignVariableName = $"l{field.Name.ToPascalCase()}";
-                    assignOwnFieldsDeclaration.LocalDeclarations.Add($"{localAssignVariableName}: {privateDelphiType}");
-                    assignOwnFieldsDeclaration.Statements.Add($"{localAssignVariableName} := {privateDelphiType}.Create;");
-                    assignOwnFieldsDeclaration.Statements.Add($"{localAssignVariableName}.Assign({MessageClassSkeleton.assignOwnFieldsSourceParamName}.{delphiPropertyName});");
-                    assignOwnFieldsDeclaration.Statements.Add($"{delphiPropertyName} := {localAssignVariableName};");
+                    assignOwnFieldsDeclaration.LocalDeclarations.Add($"{localAssignVariableName}: {privateDelphiType};");
+                    assignOwnFieldsDeclaration.Statements.AddRange(new[]
+                    {
+                        $"{localAssignVariableName} := {privateDelphiType}.Create;",
+                        $"{localAssignVariableName}.Assign({MessageClassSkeleton.assignOwnFieldsSourceParamName}.{delphiPropertyName});",
+                        $"{delphiPropertyName} := {localAssignVariableName};"
+                    });
                 }
                 else
                 {
@@ -757,8 +767,8 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         private MethodDeclaration GenerateAndInjectSetter(FieldDescriptorProto field, FieldDeclaration delphiField, string delphiPropertyName, string delphiType, ClassDeclaration delphiClass, MessageClassSkeleton skeleton)
         {
             bool isRepeated = field.Label == FieldDescriptorProto.Types.Label.Repeated;
-            bool isMessage = field.Type == FieldDescriptorProto.Types.Type.Message;
-            bool isEnum = field.Type == FieldDescriptorProto.Types.Type.Enum;
+            bool isSingularMessage = !isRepeated && (field.Type == FieldDescriptorProto.Types.Type.Message);
+            bool isSingularEnum = !isRepeated && (field.Type == FieldDescriptorProto.Types.Type.Enum);
             Parameter setterParameter = new Parameter()
             {
                 Name = isRepeated ? "aValues" : "aValue",
@@ -766,13 +776,13 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
             };
             // TODO handling of absent type (unknown if message or enum)
             List<string> statements = new List<string>();
-            if (isRepeated || isMessage) statements.Add($"{delphiField.Name}.Free;");
+            if (isRepeated || isSingularMessage) statements.Add($"{delphiField.Name}.Free;");
             string valueExpression;
             if (isRepeated) valueExpression = $"{setterParameter.Name} as {delphiField.Type}";
-            else if (isEnum) valueExpression = $"Ord({setterParameter.Name})";
+            else if (isSingularEnum) valueExpression = $"Ord({setterParameter.Name})";
             else valueExpression = setterParameter.Name;
             statements.Add($"{delphiField.Name} := {valueExpression};");
-            if (isRepeated) statements.Add($"{delphiField.Name}.SetOwner(self);");
+            if (isRepeated || isSingularMessage) statements.Add($"{delphiField.Name}.SetOwner(self);");
             MethodDeclaration setter = new MethodDeclaration()
             {
                 Class = delphiClass.Name,
@@ -803,7 +813,8 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
                                 $"</summary>",
                                 $"<param name=\"{setterParameter.Name}\">The new {(isRepeated ? "values" : "value")} of the protobuf field <c>{field.Name}</c></param>",
                                 $"<remarks>",
-                                Enumerable.Repeat("Ownership of the inserted field value collection is transferred to the containing message.", isRepeated ? 1 : 0), 
+                                Enumerable.Repeat("Ownership of the inserted field value collection is transferred to the containing message.", isRepeated ? 1 : 0),
+                                Enumerable.Repeat("Ownership of the inserted message is transferred to the containing message.", isSingularMessage ? 1 : 0),
                                 $"May be overridden. Overriders shall only add side-effects and must call the ancestor implementation.",
                                 $"</remarks>"
                             },
