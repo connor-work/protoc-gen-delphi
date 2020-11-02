@@ -223,7 +223,6 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Tests
             if (vector.Name == "double"
              || vector.Name == "float"
              || vector.Name == "message_field"
-             || vector.Name == "repeated_message_field"
              || vector.Name == "string"
              || vector.Name == "uint32"
                ) return;
