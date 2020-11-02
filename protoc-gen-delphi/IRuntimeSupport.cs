@@ -106,7 +106,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
 
             public IEnumerable<UnitReference> GetDependenciesForRepeatedFieldType(FieldDescriptorProto.Types.Type type)
             {
-                yield return GetPublicUnitReference("uProtobufRepeatedFieldValues");
+                yield return GetPublicUnitReference("uIProtobufRepeatedFieldValues");
                 yield return GetDependencyForSingularFieldType(type);
                 yield return type switch
                 {

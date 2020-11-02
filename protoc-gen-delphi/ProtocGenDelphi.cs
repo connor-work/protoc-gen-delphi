@@ -93,7 +93,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         internal static string GetPublicDelphiType(this FieldDescriptorProto field, Func<string, string> generator) => field.Label switch
         {
             FieldDescriptorProto.Types.Label.Optional => GetPublicDelphiSingleValueType(field.Type, field.TypeName, generator),
-            FieldDescriptorProto.Types.Label.Repeated => $"TProtobufRepeatedField<{GetPublicDelphiElementType(field.Type, field.TypeName, generator)}>",
+            FieldDescriptorProto.Types.Label.Repeated => $"IProtobufRepeatedFieldValues<{GetPublicDelphiElementType(field.Type, field.TypeName, generator)}>",
             _ => throw new NotImplementedException()
         };
 
@@ -132,7 +132,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         };
 
         /// <summary>
-        /// Determines the Delphi identifier of the subclass of <c>TProtobufRepeatedField<!<![CDATA[<T>]]></c> that represents repeated fields of
+        /// Determines the Delphi identifier of the subtype of <c>IProtobufRepeatedFieldValues<!<![CDATA[<T>]]></c> that represents repeated fields of
         /// a specific protobuf field type.
         /// </summary>
         /// <param name="fieldType">The protobuf field descriptor's type field value</param>
@@ -141,13 +141,13 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// <returns>Delphi identifier of class</returns>
         internal static string GetDelphiRepeatedFieldSubclass(this FieldDescriptorProto.Types.Type fieldType, string fieldTypeName, Func<string, string> generator) => fieldType switch
         {
-            FieldDescriptorProto.Types.Type.String => "TProtobufRepeatedStringField",
-            FieldDescriptorProto.Types.Type.Float => "TProtobufRepeatedFloatField",
-            FieldDescriptorProto.Types.Type.Double => "TProtobufRepeatedDoubleField",
-            FieldDescriptorProto.Types.Type.Uint32 => "TProtobufRepeatedUint32Field",
-            FieldDescriptorProto.Types.Type.Bool => "TProtobufRepeatedBoolField",
+            FieldDescriptorProto.Types.Type.String => "TProtobufRepeatedStringFieldValues",
+            FieldDescriptorProto.Types.Type.Float => "TProtobufRepeatedFloatFieldValues",
+            FieldDescriptorProto.Types.Type.Double => "TProtobufRepeatedDoubleFieldValues",
+            FieldDescriptorProto.Types.Type.Uint32 => "TProtobufRepeatedUint32FieldValues",
+            FieldDescriptorProto.Types.Type.Bool => "TProtobufRepeatedBoolFieldValues",
             FieldDescriptorProto.Types.Type.Enum => $"TProtobufRepeatedEnumField<{generator.Invoke(fieldTypeName)}>",
-            FieldDescriptorProto.Types.Type.Message => $"TProtobufRepeatedMessageField<{generator.Invoke(fieldTypeName)}>",
+            FieldDescriptorProto.Types.Type.Message => $"TProtobufRepeatedMessageFieldValues<{generator.Invoke(fieldTypeName)}>",
             _ => throw new NotImplementedException()
         };
 
@@ -560,22 +560,12 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
             if (field.Type != FieldDescriptorProto.Types.Type.Message) wireCodec = field.Type.GetDelphiWireCodec();
             if (field.Label == FieldDescriptorProto.Types.Label.Repeated)
             {
-                string delphiElementType = field.Type.GetPublicDelphiElementType(field.TypeName, name => ConstructDelphiTypeName(name));
                 createDeclaration.Statements.Insert(createDeclaration.Statements.Count - 1, $"{delphiField.Name} := {privateDelphiType}.Create;");
-                destroyDeclaration.Statements.Insert(destroyDeclaration.Statements.Count - 1, $"{delphiField.Name}.Free;");
-                decodeDeclaration.Statements.Add($"{delphiField.Name}.Clear;");
+                destroyDeclaration.Statements.Insert(destroyDeclaration.Statements.Count - 1, $"{delphiField.Name}.Destroy;");
+                encodeDeclaration.Statements.Add($"{delphiField.Name}.EncodeAsRepeatedField(self, {delphiFieldNumberConst.Identifier}, aDest);");
+                decodeDeclaration.Statements.Add($"{delphiField.Name}.DecodeAsUnknownRepeatedField(self, {delphiFieldNumberConst.Identifier});");
                 clearOwnFieldsDeclaration.Statements.Add($"{delphiField.Name}.Clear;");
-                if (field.Type == FieldDescriptorProto.Types.Type.Message)
-                {
-                    encodeDeclaration.Statements.Add($"EncodeRepeatedMessageField<{delphiElementType}>({delphiField.Name}, {delphiFieldNumberConst.Identifier}, aDest);");
-                    decodeDeclaration.Statements.Add($"DecodeUnknownRepeatedMessageField<{delphiElementType}>({delphiFieldNumberConst.Identifier}, {delphiField.Name});");
-                }
-                else
-                {
-                    encodeDeclaration.Statements.Add($"EncodeRepeatedField<{delphiElementType}>({delphiField.Name}, {delphiFieldNumberConst.Identifier}, {wireCodec!}, aDest);");
-                    decodeDeclaration.Statements.Add($"DecodeUnknownRepeatedField<{delphiElementType}>({delphiFieldNumberConst.Identifier}, {wireCodec!}, {delphiField.Name});");
-                }
-                assignOwnFieldsDeclaration.Statements.Add($"({delphiPropertyName} as TInterfacedPersistent).Assign({MessageClassSkeleton.assignOwnFieldsSourceParamName}.{delphiPropertyName} as TInterfacedPersistent)");
+                assignOwnFieldsDeclaration.Statements.Add($"({delphiPropertyName} as TInterfacedPersistent).Assign({MessageClassSkeleton.assignOwnFieldsSourceParamName}.{delphiPropertyName} as TInterfacedPersistent);");
             }
             else
             {
@@ -767,17 +757,23 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// <returns>The injected field declaration</returns>
         private MethodDeclaration GenerateAndInjectSetter(FieldDescriptorProto field, FieldDeclaration delphiField, string delphiPropertyName, string delphiType, ClassDeclaration delphiClass, MessageClassSkeleton skeleton)
         {
+            bool isRepeated = field.Label == FieldDescriptorProto.Types.Label.Repeated;
+            bool isMessage = field.Type == FieldDescriptorProto.Types.Type.Message;
+            bool isEnum = field.Type == FieldDescriptorProto.Types.Type.Enum;
             Parameter setterParameter = new Parameter()
             {
-                Name = "aValue",
+                Name = isRepeated ? "aValues" : "aValue",
                 Type = delphiType
             };
             // TODO handling of absent type (unknown if message or enum)
             List<string> statements = new List<string>();
-            if (field.Type == FieldDescriptorProto.Types.Type.Message) statements.Add($"{delphiField.Name}.Free;");
-            string valueExpression = field.Type == FieldDescriptorProto.Types.Type.Enum ? $"Ord({setterParameter.Name})"
-                                                                                        : setterParameter.Name;
+            if (isRepeated || isMessage) statements.Add($"{delphiField.Name}.Free;");
+            string valueExpression;
+            if (isRepeated) valueExpression = $"{setterParameter.Name} as {delphiField.Type}";
+            else if (isEnum) valueExpression = $"Ord({setterParameter.Name})";
+            else valueExpression = setterParameter.Name;
             statements.Add($"{delphiField.Name} := {valueExpression};");
+            if (isRepeated) statements.Add($"{delphiField.Name}.SetOwner(self);");
             MethodDeclaration setter = new MethodDeclaration()
             {
                 Class = delphiClass.Name,
@@ -806,8 +802,9 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
                                 $"<summary>",
                                 $"Setter for <see cref=\"{delphiPropertyName}\"/>.",
                                 $"</summary>",
-                                $"<param name=\"{setterParameter.Name}\">The new value of the protobuf field <c>{field.Name}</c></param>",
+                                $"<param name=\"{setterParameter.Name}\">The new {(isRepeated ? "values" : "value")} of the protobuf field <c>{field.Name}</c></param>",
                                 $"<remarks>",
+                                Enumerable.Repeat("Ownership of the inserted field value collection is transferred to the containing message.", isRepeated ? 1 : 0), 
                                 $"May be overridden. Overriders shall only add side-effects and must call the ancestor implementation.",
                                 $"</remarks>"
                             },
@@ -836,11 +833,13 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
             ClassDeclaration delphiClass, MessageClassSkeleton skeleton)
         {
             MethodDeclaration getter = GenerateAndInjectGetter(field, delphiField, delphiPropertyName, delphiType, delphiClass, skeleton);
+            MethodDeclaration setter = GenerateAndInjectSetter(field, delphiField, delphiPropertyName, delphiType, delphiClass, skeleton);
             PropertyDeclaration delphiProperty = new PropertyDeclaration()
             {
                 Name = delphiPropertyName,
                 Type = delphiType,
                 ReadSpecifier = getter.Prototype.Name,
+                WriteSpecifier = setter.Prototype.Name,
                 Comment = new AnnotationComment()
                 {
                     CommentLines =
@@ -852,12 +851,6 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
                     }
                 }
             };
-            // Do not generate a setter for repeated fields, the client code shall mutate the existing object
-            if (field.Label != FieldDescriptorProto.Types.Label.Repeated)
-            {
-                MethodDeclaration setter = GenerateAndInjectSetter(field, delphiField, delphiPropertyName, delphiType, delphiClass, skeleton);
-                delphiProperty.WriteSpecifier = setter.Prototype.Name;
-            }
             delphiClass.NestedDeclarations.Add(new ClassDeclarationNestedDeclaration()
             {
                 Visibility = Visibility.Public,
