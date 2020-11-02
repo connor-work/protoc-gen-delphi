@@ -175,12 +175,6 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
     public class ProtocGenDelphi
     {
         /// <summary>
-        /// Optional plug-in option whose value is the Delphi namespace identifier of a custom runtime library to use.
-        /// The custom runtime library needs to follow the structure of the reference stub runtime library.
-        /// </summary>
-        public const string customRuntimeOption = "runtime";
-
-        /// <summary>
         /// File name extension (without leading dot) for protobuf schema definitions
         /// </summary>
         public static readonly string protoFileExtension = "proto";
@@ -220,7 +214,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// <summary>
         /// Support definition for the targetted protobuf runtime
         /// </summary>
-        private IRuntimeSupport runtime = IRuntimeSupport.Default;
+        private readonly IRuntimeSupport runtime = IRuntimeSupport.Default;
 
         static void Main(string[] args)
         {
@@ -263,19 +257,17 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
             }
         }
 
+
         /// <summary>
         /// Applies a custom plug-in option passed through <c>protoc</c>.
         /// </summary>
         /// <param name="optionKey">Key of the option</param>
         /// <param name="optionValue">Optional value of the option</param>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S1172:Unused method parameters should be removed", Justification = "Considered internal API")]
         private void ApplyOption(string optionKey, string? optionValue)
         {
             switch (optionKey)
             {
-                case customRuntimeOption:
-                    if (string.IsNullOrWhiteSpace(optionValue)) throw new ArgumentException("Missing plug-in option value", optionKey);
-                    runtime = new IRuntimeSupport.ReferenceRuntimeSupport(optionValue);
-                    break;
                 default: throw new NotImplementedException();
             }
         }

@@ -15,7 +15,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -54,11 +53,6 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Tests
         /// Names of all known test vectors
         /// </summary>
         private static IEnumerable<string> TestVectorNames => allExpectedOutputFolderResources.GetIDs().WhereSuffixed(new Regex($"{Regex.Escape(".protoc-output")}/.*")).Distinct();
-
-        /// <summary>
-        /// Marker string in the name of of test vectors that indicates that the default runtime shall be used
-        /// </summary>
-        public static readonly string defaultRuntimeMarker = "with_default_runtime";
 
         /// <summary>
         /// Prefix to the name of .proto files in test input folders that shall be used as input files
@@ -189,11 +183,6 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Tests
                 }
             }
 
-            /// <summary>
-            /// <see langword="true"/> if the default runtime for <c>protoc-gen-delphi</c> shall be used instead of the stub runtime
-            /// </summary>
-            public bool ShallUseDefaultRuntime => name.Contains(defaultRuntimeMarker);
-
             public void Deserialize(IXunitSerializationInfo info)
             {
                 name = info.GetValue<string>(nameof(name));
@@ -231,7 +220,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Tests
         [MemberData(nameof(TestVectors))]
         public void ProducesExpectedOutput(TestVector vector)
         {
-            if (vector.Name != "uBool") return;
+            if (vector.Name != "bool") return;
             // Setup file tree as input for protoc, according to the test vector
             vector.SetupInputFileTree();
 
@@ -242,7 +231,6 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Tests
                 OutDir = CreateScratchFolder()
             };
             ProtocOperation protoc = new ProtocOperation { ProtocExecutableFolder = Path.Join("Google.Protobuf.Tools", "tools", GetProtocPlatform()) };
-            if (!vector.ShallUseDefaultRuntime) plugIn.Options[ProtocGenDelphi.customRuntimeOption] = IRuntimeSupport.Stub.DelphiNamespace;
             protoc.ProtoPath.AddRange(vector.ProtoPath);
             protoc.ProtoFiles.AddRange(vector.InputProtoFileNames);
             protoc.PlugIns.Add(plugIn);
