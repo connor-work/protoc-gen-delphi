@@ -14,8 +14,7 @@ uses
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufRepeatedUint32,
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufUint32,
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uIProtobufRepeatedFieldValues,
-  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uProtobufMessage,
-  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.uProtobuf;
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uProtobufMessage;
 
 type
   /// <remarks>
@@ -137,6 +136,7 @@ implementation
 constructor TMessageX.Create;
 begin
   inherited;
+  FFieldX := TProtobufRepeatedUint32FieldValues.Create;
   ClearOwnFields;
 end;
 
