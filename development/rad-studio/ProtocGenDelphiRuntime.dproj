@@ -134,6 +134,18 @@
         <DCCReference Include="..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\namespace_from_path.protoc-output\SpaceX\SpaceY\SpaceX.SpaceY.uInputFileNamespaceFromPath.pas"/>
         <DCCReference Include="..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\messages.protoc-output\uMessages.pas"/>
         <DCCReference Include="..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\repeated_field.protoc-output\uRepeatedField.pas"/>
+        <DCCReference Include="..\..\test-vectors\known-schemata\imports.protoc-input\uImportedA.pas"/>
+        <DCCReference Include="..\..\test-vectors\known-schemata\imports.protoc-input\uImportedB.pas"/>
+        <DCCReference Include="..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\double.protoc-output\uDouble.pas"/>
+        <DCCReference Include="..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\enum_field.protoc-output\uEnumField.pas"/>
+        <DCCReference Include="..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\enums.protoc-output\uEnums.pas"/>
+        <DCCReference Include="..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\float.protoc-output\uFloat.pas"/>
+        <DCCReference Include="..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\imports.protoc-output\uInputFileImports.pas"/>
+        <DCCReference Include="..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\message_field.protoc-output\uMessageField.pas"/>
+        <DCCReference Include="..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\nested_enums.protoc-output\uNestedEnums.pas"/>
+        <DCCReference Include="..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\repeated_message_field.protoc-output\uRepeatedMessageField.pas"/>
+        <DCCReference Include="..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\string.protoc-output\uString.pas"/>
+        <DCCReference Include="..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\uint32.protoc-output\uUint32.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

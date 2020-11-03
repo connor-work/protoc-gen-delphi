@@ -81,6 +81,18 @@ contains
   uFields in '..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\fields.protoc-output\uFields.pas',
   SpaceX.SpaceY.uInputFileNamespaceFromPath in '..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\namespace_from_path.protoc-output\SpaceX\SpaceY\SpaceX.SpaceY.uInputFileNamespaceFromPath.pas',
   uMessages in '..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\messages.protoc-output\uMessages.pas',
-  uRepeatedField in '..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\repeated_field.protoc-output\uRepeatedField.pas';
+  uRepeatedField in '..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\repeated_field.protoc-output\uRepeatedField.pas',
+  uImportedA in '..\..\test-vectors\known-schemata\imports.protoc-input\uImportedA.pas',
+  uImportedB in '..\..\test-vectors\known-schemata\imports.protoc-input\uImportedB.pas',
+  uDouble in '..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\double.protoc-output\uDouble.pas',
+  uEnumField in '..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\enum_field.protoc-output\uEnumField.pas',
+  uEnums in '..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\enums.protoc-output\uEnums.pas',
+  uFloat in '..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\float.protoc-output\uFloat.pas',
+  uInputFileImports in '..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\imports.protoc-output\uInputFileImports.pas',
+  uMessageField in '..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\message_field.protoc-output\uMessageField.pas',
+  uNestedEnums in '..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\nested_enums.protoc-output\uNestedEnums.pas',
+  uRepeatedMessageField in '..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\repeated_message_field.protoc-output\uRepeatedMessageField.pas',
+  uString in '..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\string.protoc-output\uString.pas',
+  uUint32 in '..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\uint32.protoc-output\uUint32.pas';
 
 end.

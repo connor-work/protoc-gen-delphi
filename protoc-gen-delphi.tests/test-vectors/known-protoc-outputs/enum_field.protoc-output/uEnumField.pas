@@ -11,7 +11,7 @@ interface
 
 uses
   System.Classes,
-  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uProtobufEnum,
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufEnum,
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uProtobufMessage,
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.uProtobuf;
 

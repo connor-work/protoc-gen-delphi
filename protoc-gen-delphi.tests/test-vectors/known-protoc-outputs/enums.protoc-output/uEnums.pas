@@ -10,7 +10,7 @@ unit uEnums;
 interface
 
 uses
-  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uProtobufEnum;
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufEnum;
 
 type
   /// <remarks>

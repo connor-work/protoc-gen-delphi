@@ -128,7 +128,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
                 FieldDescriptorProto.Types.Type.Double => GetInternalUnitReference("uProtobufDouble"),
                 FieldDescriptorProto.Types.Type.Uint32 => GetInternalUnitReference("uProtobufUint32"),
                 FieldDescriptorProto.Types.Type.Bool => GetInternalUnitReference("uProtobufBool"),
-                FieldDescriptorProto.Types.Type.Enum => GetPublicUnitReference("uProtobufEnum"),
+                FieldDescriptorProto.Types.Type.Enum => GetInternalUnitReference("uProtobufEnum"),
                 FieldDescriptorProto.Types.Type.Message => GetPublicUnitReference("uProtobufMessage"),
                 _ => throw new NotImplementedException()
             };
