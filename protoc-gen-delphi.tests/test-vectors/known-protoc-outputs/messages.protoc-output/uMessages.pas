@@ -3,6 +3,8 @@
 /// </remarks>
 unit uMessages;
 
+{$INCLUDE Work.Connor.Delphi.CompilerFeatures.inc}
+
 {$IFDEF FPC}
   {$MODE DELPHI}
 {$ENDIF}
@@ -10,7 +12,11 @@ unit uMessages;
 interface
 
 uses
+{$IFDEF WORK_CONNOR_DELPHI_COMPILER_UNIT_SCOPE_NAMES}
   System.Classes,
+{$ELSE}
+  Classes,
+{$ENDIF}
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uProtobufMessage;
 
 type

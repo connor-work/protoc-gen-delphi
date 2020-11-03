@@ -82,7 +82,11 @@ uses
   uProtobufRepeatedFieldValues, 
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufWireCodec, 
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uStubRuntime, 
-  uExampleData, LazarusPackageIntf;
+  uExampleData, uBool, uDouble, uEmptySchema, uEnumField, uEnums, uFields, 
+  uFloat, uInputFileImports, uMessageField, uMessages, 
+  SpaceX.SpaceY.uInputFileNamespaceFromPath, uNestedEnums, uRepeatedField, 
+  uRepeatedMessageField, uString, uUint32, uImportedA, uImportedB, 
+  LazarusPackageIntf;
 
 implementation
 

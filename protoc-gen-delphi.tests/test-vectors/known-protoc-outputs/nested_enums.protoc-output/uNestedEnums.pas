@@ -10,7 +10,11 @@ unit uNestedEnums;
 interface
 
 uses
+{$IFDEF WORK_CONNOR_DELPHI_COMPILER_UNIT_SCOPE_NAMES}
   System.Classes,
+{$ELSE}
+  Classes,
+{$ENDIF}
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufEnum,
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uProtobufMessage;
 

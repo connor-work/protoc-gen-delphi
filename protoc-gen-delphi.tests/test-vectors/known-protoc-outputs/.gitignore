@@ -3,3 +3,6 @@ __history/
 
 # RAD Studio AutoRecover data
 __recovery/
+
+# Lazarus IDE backup files
+*.pas.bak

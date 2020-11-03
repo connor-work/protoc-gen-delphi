@@ -3,6 +3,8 @@
 /// </remarks>
 unit uRepeatedField;
 
+{$INCLUDE Work.Connor.Delphi.CompilerFeatures.inc}
+
 {$IFDEF FPC}
   {$MODE DELPHI}
 {$ENDIF}
@@ -10,7 +12,11 @@ unit uRepeatedField;
 interface
 
 uses
+{$IFDEF WORK_CONNOR_DELPHI_COMPILER_UNIT_SCOPE_NAMES}
   System.Classes,
+{$ELSE}
+  Classes,
+{$ENDIF}
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufRepeatedUint32,
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufUint32,
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uIProtobufRepeatedFieldValues,
@@ -58,7 +64,9 @@ type
     /// <remarks>
     /// This property corresponds to the protobuf field <c>fieldX</c>.
     /// </remarks>
+{$IFDEF WORK_CONNOR_DELPHI_COMPILER_CUSTOM_ATTRIBUTES}
     [ProtobufField(PROTOBUF_FIELD_NAME_FIELD_X, PROTOBUF_FIELD_NUMBER_FIELD_X)]
+{$ENDIF}
     public property FieldX: IProtobufRepeatedFieldValues<UInt32> read GetFieldX write SetFieldX;
 
     /// <summary>
