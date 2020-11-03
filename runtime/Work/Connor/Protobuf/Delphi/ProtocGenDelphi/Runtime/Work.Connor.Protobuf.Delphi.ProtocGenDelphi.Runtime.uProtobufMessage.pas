@@ -22,6 +22,8 @@
 /// </remarks>
 unit Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uProtobufMessage;
 
+{$INCLUDE Work.Connor.Delphi.CompilerFeatures.inc}
+
 {$IFDEF FPC}
   {$MODE DELPHI}
 {$ENDIF}
