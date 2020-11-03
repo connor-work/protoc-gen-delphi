@@ -3,6 +3,8 @@
 /// </remarks>
 unit uExampleData;
 
+{$INCLUDE Work.Connor.Delphi.CompilerFeatures.inc}
+
 {$IFDEF FPC}
   {$MODE DELPHI}
 {$ENDIF}
@@ -10,7 +12,11 @@ unit uExampleData;
 interface
 
 uses
+{$IFDEF WORK_CONNOR_DELPHI_COMPILER_UNIT_SCOPE_NAMES}
   System.Classes,
+{$ELSE}
+  Classes,
+{$ENDIF}
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufRepeatedUint32,
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufUint32,
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uIProtobufRepeatedFieldValues,
@@ -132,7 +138,9 @@ type
     /// <remarks>
     /// This property corresponds to the protobuf field <c>fieldX</c>.
     /// </remarks>
+{$IFDEF WORK_CONNOR_DELPHI_COMPILER_CUSTOM_ATTRIBUTES}
     [ProtobufField(PROTOBUF_FIELD_NAME_FIELD_X, PROTOBUF_FIELD_NUMBER_FIELD_X)]
+{$ENDIF}
     public property FieldX: UInt32 read GetFieldX write SetFieldX;
 
     /// <summary>
@@ -172,7 +180,9 @@ type
     /// <remarks>
     /// This property corresponds to the protobuf field <c>fieldY</c>.
     /// </remarks>
+{$IFDEF WORK_CONNOR_DELPHI_COMPILER_CUSTOM_ATTRIBUTES}
     [ProtobufField(PROTOBUF_FIELD_NAME_FIELD_Y, PROTOBUF_FIELD_NUMBER_FIELD_Y)]
+{$ENDIF}
     public property FieldY: TMessageY read GetFieldY write SetFieldY;
 
     /// <summary>
@@ -216,7 +226,9 @@ type
     /// The collection is always owned by the message.
     /// Developers must ensure that a resulting shared ownership does not lead to unexpected behavior.
     /// </remarks>
+{$IFDEF WORK_CONNOR_DELPHI_COMPILER_CUSTOM_ATTRIBUTES}
     [ProtobufField(PROTOBUF_FIELD_NAME_FIELD_Z, PROTOBUF_FIELD_NUMBER_FIELD_Z)]
+{$ENDIF}
     public property FieldZ: IProtobufRepeatedFieldValues<UInt32> read GetFieldZ write SetFieldZ;
 
     /// <summary>

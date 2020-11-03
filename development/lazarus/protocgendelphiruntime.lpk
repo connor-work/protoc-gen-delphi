@@ -9,11 +9,11 @@
       <PathDelim Value="\"/>
       <SearchPaths>
         <IncludeFiles Value="..\..\runtime\Work\Connor\Delphi"/>
-        <OtherUnitFiles Value="..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi;..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime\Internal;..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime;..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\StubRuntime"/>
-        <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)\"/>
+        <OtherUnitFiles Value="..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi;..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime\Internal;..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime;..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\StubRuntime;..\..\example\output"/>
+        <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
       </SearchPaths>
     </CompilerOptions>
-    <Files Count="43">
+    <Files Count="44">
       <Item1>
         <Filename Value="..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.uProtobuf.pas"/>
         <UnitName Value="Work.Connor.Protobuf.Delphi.ProtocGenDelphi.uProtobuf"/>
@@ -186,6 +186,10 @@
         <Filename Value="..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\StubRuntime\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uStubRuntime.pas"/>
         <UnitName Value="Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uStubRuntime"/>
       </Item43>
+      <Item44>
+        <Filename Value="..\..\example\output\uExampleData.pas"/>
+        <UnitName Value="uExampleData"/>
+      </Item44>
     </Files>
     <RequiredPkgs Count="1">
       <Item1>

@@ -82,7 +82,7 @@ uses
   uProtobufRepeatedFieldValues, 
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufWireCodec, 
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uStubRuntime, 
-  LazarusPackageIntf;
+  uExampleData, LazarusPackageIntf;
 
 implementation
 
