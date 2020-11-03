@@ -93,6 +93,7 @@ contains
   uNestedEnums in '..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\nested_enums.protoc-output\uNestedEnums.pas',
   uRepeatedMessageField in '..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\repeated_message_field.protoc-output\uRepeatedMessageField.pas',
   uString in '..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\string.protoc-output\uString.pas',
-  uUint32 in '..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\uint32.protoc-output\uUint32.pas';
+  uUint32 in '..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\uint32.protoc-output\uUint32.pas',
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufEnum in '..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime\Internal\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufEnum.pas';
 
 end.
