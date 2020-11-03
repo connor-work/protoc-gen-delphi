@@ -31,12 +31,14 @@ interface
 uses
   // To expose IProtobufMessage
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uIProtobufMessage,
-  // RUNTIME-IMPL: Replace reference
-  // To expose TProtobufMessage
-  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufMessage,
+{$IFDEF WORK_CONNOR_DELPHI_COMPILER_CUSTOM_ATTRIBUTES}
   // RUNTIME-IMPL: Replace reference
   // To expose TProtobufFieldAttribute
-  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufFieldAttribute;
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufFieldAttribute,
+{$ENDIF}
+  // RUNTIME-IMPL: Replace reference
+  // To expose TProtobufMessage
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufMessage;
 
 type
   /// <summary>
@@ -60,11 +62,13 @@ type
   /// </remarks>
   TProtobufMessage = Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufMessage.TProtobufMessage;
 
+{$IFDEF WORK_CONNOR_DELPHI_COMPILER_CUSTOM_ATTRIBUTES}
   // RUNTIME-IMPL: Replace aliased type
   /// <summary>
   /// RTTI attribute that annotates a property representing a protobuf field.
   /// </summary>
   ProtobufFieldAttribute = Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufFieldAttribute.TProtobufFieldAttribute;
+{$ENDIF}
 
 implementation
 

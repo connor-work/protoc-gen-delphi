@@ -22,6 +22,8 @@
 /// </remarks>
 unit Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uIProtobufMessage;
 
+{$INCLUDE Work.Connor.Delphi.CompilerFeatures.inc}
+
 {$IFDEF FPC}
   {$MODE DELPHI}
 {$ENDIF}
@@ -30,7 +32,11 @@ interface
 
 uses
   // TStream for encoding and decoding of messages
+{$IFDEF WORK_CONNOR_DELPHI_COMPILER_UNIT_SCOPE_NAMES}
   System.Classes,
+{$ELSE}
+  Classes,
+{$ENDIF}
   // To declare custom exceptions
   SysUtils;
 

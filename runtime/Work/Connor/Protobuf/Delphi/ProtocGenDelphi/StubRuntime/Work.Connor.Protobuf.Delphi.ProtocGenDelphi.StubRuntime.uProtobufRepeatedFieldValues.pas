@@ -18,6 +18,8 @@
 /// </summary>
 unit Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufRepeatedFieldValues;
 
+{$INCLUDE Work.Connor.Delphi.CompilerFeatures.inc}
+
 {$IFDEF FPC}
   {$MODE DELPHI}
 {$ENDIF}
@@ -36,9 +38,17 @@ uses
   // To throw EDecodingSchemaError
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uIProtobufMessage,
   // To provide a TEnumerator
+{$IFDEF WORK_CONNOR_DELPHI_COMPILER_UNIT_SCOPE_NAMES}
   System.Generics.Collections,
+{$ELSE}
+  Generics.Collections,
+{$ENDIF}
   // TStream for encoding and decoding of messages
+{$IFDEF WORK_CONNOR_DELPHI_COMPILER_UNIT_SCOPE_NAMES}
   System.Classes,
+{$ELSE}
+  Classes,
+{$ENDIF}
   // Stub runtime helper code
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uStubRuntime;
 

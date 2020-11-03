@@ -21,6 +21,8 @@
 /// </remarks>
 unit Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uIProtobufRepeatedFieldValues;
 
+{$INCLUDE Work.Connor.Delphi.CompilerFeatures.inc}
+
 {$IFDEF FPC}
   {$MODE DELPHI}
 {$ENDIF}
@@ -29,7 +31,11 @@ interface
 
 uses
   // To provide a TEnumerator
+{$IFDEF WORK_CONNOR_DELPHI_COMPILER_UNIT_SCOPE_NAMES}
   System.Generics.Collections;
+{$ELSE}
+  Generics.Collections;
+{$ENDIF}
 
 type
   /// <summary>

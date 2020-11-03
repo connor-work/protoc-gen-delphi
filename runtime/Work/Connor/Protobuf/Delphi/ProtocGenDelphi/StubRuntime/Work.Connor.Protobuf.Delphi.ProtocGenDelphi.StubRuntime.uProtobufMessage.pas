@@ -22,6 +22,8 @@
 /// </remarks>
 unit Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufMessage;
 
+{$INCLUDE Work.Connor.Delphi.CompilerFeatures.inc}
+
 {$IFDEF FPC}
   {$MODE DELPHI}
 {$ENDIF}
@@ -36,7 +38,11 @@ uses
   // Basic protobuf definitions like TProtobufFieldNumber
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.uProtobuf,
   // TStream for encoding and decoding of messages, TInterfacedPersistent as base class
+{$IFDEF WORK_CONNOR_DELPHI_COMPILER_UNIT_SCOPE_NAMES}
   System.Classes,
+{$ELSE}
+  Classes,
+{$ENDIF}
   // Stub runtime helper code
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uStubRuntime;
 

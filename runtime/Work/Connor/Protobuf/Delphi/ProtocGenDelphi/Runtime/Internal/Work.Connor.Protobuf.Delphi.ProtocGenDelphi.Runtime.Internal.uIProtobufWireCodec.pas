@@ -19,6 +19,8 @@
 /// </summary>
 unit Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uIProtobufWireCodec;
 
+{$INCLUDE Work.Connor.Delphi.CompilerFeatures.inc}
+
 {$IFDEF FPC}
   {$MODE DELPHI}
 {$ENDIF}
@@ -33,7 +35,11 @@ uses
   // To throw EDecodingSchemaError
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uIProtobufMessage,
   // TStream for encoding of messages
+{$IFDEF WORK_CONNOR_DELPHI_COMPILER_UNIT_SCOPE_NAMES}
   System.Classes;
+{$ELSE}
+  Classes;
+{$ENDIF}
 
 type
   /// <summary>
