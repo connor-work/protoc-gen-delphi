@@ -26,22 +26,9 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
     public interface IRuntimeSupport
     {
         /// <summary>
-        /// Support definitions for the stub runtime library implementation.
-        /// The stub runtime library is not functional and shall only be used as a reference for runtime library implementation as well as compilation tests.
+        /// Support definitions for a runtime library implementation implementing the default runtime API.
         /// </summary>
-        public static readonly ReferenceRuntimeSupport Stub = new ReferenceRuntimeSupport("Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime");
-
-        /// <summary>
-        /// Support definitions for the default runtime library implementation.
-        /// The default runtime library is called <c>protobuf-delphi</c> and is maintained by <a href="https://github.com/pikaju">@pikaju</a> on <a href="https://github.com/pikaju/protobuf-delphi">GitHub</a>.
-        /// </summary>
-        public static readonly ReferenceRuntimeSupport Default = new ReferenceRuntimeSupport("Com.GitHub.Pikaju.Protobuf.Delphi");
-
-        /// <summary>
-        /// Provides the required unit reference for using compiled protobuf enums.
-        /// </summary>
-        /// <returns>The Delphi unit reference</returns>
-        public UnitReference GetDependencyForEnums();
+        public static readonly ReferenceRuntimeSupport Default = new ReferenceRuntimeSupport();
 
         /// <summary>
         /// Provides the required unit reference for using compiled protobuf messages.
@@ -64,67 +51,79 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         public UnitReference GetDependencyForSingularFieldType(FieldDescriptorProto.Types.Type type);
 
         /// <summary>
-        /// Provides support definitions for a runtime library implementation that follows the structure of the reference stub runtime.
+        /// Provides support definitions for a runtime library implementation that follows the structure of the reference stub runtime,
+        /// implementing the default runtime API.
         /// </summary>
         public class ReferenceRuntimeSupport : IRuntimeSupport
         {
             /// <summary>
-            /// Constructs a new support definitionfor a runtime library implementation that follows the structure of the reference stub runtime.
+            /// Delphi identifier of the runtime API's public namespace
             /// </summary>
-            /// <param name="delphiNamespace">Delphi namespace identifier of the runtime library</param>
-            public ReferenceRuntimeSupport(string delphiNamespace) => DelphiNamespace = delphiNamespace;
+            public string PublicNamespace => "Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime";
 
             /// <summary>
-            /// Delphi namespace identifier of the runtime library
+            /// Delphi identifier of the runtime API's internal namespace
             /// </summary>
-            public string DelphiNamespace { get; }
+            public string InternalNamespace => "Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal";
 
             /// <summary>
-            /// Constructs a unit reference for an unqualified unit name in the library's default namespace.
+            /// Constructs a unit reference for an unqualified unit name in the runtime API's public namespace.
             /// </summary>
             /// <param name="unit">The unqualified unit name</param>
             /// <returns>The unit reference</returns>
-            private UnitReference GetUnitReference(string unit) => new UnitReference()
+            private UnitReference GetPublicUnitReference(string unit) => new UnitReference()
             {
                 Unit = new UnitIdentifier()
                 {
                     Unit = unit,
-                    Namespace = { DelphiNamespace.Split(".") }
+                    Namespace = { PublicNamespace.Split(".") }
                 }
             };
 
-            public UnitReference GetDependencyForEnums() => GetUnitReference("uProtobufEnum");
+            /// <summary>
+            /// Constructs a unit reference for an unqualified unit name in the runtime API' internal namespace.
+            /// </summary>
+            /// <param name="unit">The unqualified unit name</param>
+            /// <returns>The unit reference</returns>
+            private UnitReference GetInternalUnitReference(string unit) => new UnitReference()
+            {
+                Unit = new UnitIdentifier()
+                {
+                    Unit = unit,
+                    Namespace = { InternalNamespace.Split(".") }
+                }
+            };
 
-            public UnitReference GetDependencyForMessages() => GetUnitReference("uProtobufMessage");
+            public UnitReference GetDependencyForMessages() => GetPublicUnitReference("uProtobufMessage");
 
             public IEnumerable<UnitReference> GetDependenciesForRepeatedFieldType(FieldDescriptorProto.Types.Type type)
             {
-                yield return GetUnitReference("uProtobufRepeatedField");
+                yield return GetPublicUnitReference("uIProtobufRepeatedFieldValues");
                 yield return GetDependencyForSingularFieldType(type);
-                yield return GetUnitReference(type switch
+                yield return type switch
                 {
-                    FieldDescriptorProto.Types.Type.String => "uProtobufRepeatedString",
-                    FieldDescriptorProto.Types.Type.Float => "uProtobufRepeatedFloat",
-                    FieldDescriptorProto.Types.Type.Double => "uProtobufRepeatedDouble",
-                    FieldDescriptorProto.Types.Type.Uint32 => "uProtobufRepeatedUint32",
-                    FieldDescriptorProto.Types.Type.Bool => "uProtobufRepeatedBool",
-                    FieldDescriptorProto.Types.Type.Enum => "uProtobufRepeatedEnum",
-                    FieldDescriptorProto.Types.Type.Message => "uProtobufRepeatedMessage",
+                    FieldDescriptorProto.Types.Type.String => GetInternalUnitReference("uProtobufRepeatedString"),
+                    FieldDescriptorProto.Types.Type.Float => GetInternalUnitReference("uProtobufRepeatedFloat"),
+                    FieldDescriptorProto.Types.Type.Double => GetInternalUnitReference("uProtobufRepeatedDouble"),
+                    FieldDescriptorProto.Types.Type.Uint32 => GetInternalUnitReference("uProtobufRepeatedUint32"),
+                    FieldDescriptorProto.Types.Type.Bool => GetInternalUnitReference("uProtobufRepeatedBool"),
+                    FieldDescriptorProto.Types.Type.Enum => GetInternalUnitReference("uProtobufRepeatedEnum"),
+                    FieldDescriptorProto.Types.Type.Message => GetInternalUnitReference("uProtobufRepeatedMessage"),
                     _ => throw new NotImplementedException()
-                });
+                };
             }
 
-            public UnitReference GetDependencyForSingularFieldType(FieldDescriptorProto.Types.Type type) => GetUnitReference(type switch
-                {
-                    FieldDescriptorProto.Types.Type.String => "uProtobufString",
-                    FieldDescriptorProto.Types.Type.Float => "uProtobufFloat",
-                    FieldDescriptorProto.Types.Type.Double => "uProtobufDouble",
-                    FieldDescriptorProto.Types.Type.Uint32 => "uProtobufUint32",
-                    FieldDescriptorProto.Types.Type.Bool => "uProtobufBool",
-                    FieldDescriptorProto.Types.Type.Enum => "uProtobufEnum",
-                    FieldDescriptorProto.Types.Type.Message => "uProtobufMessage",
-                    _ => throw new NotImplementedException()
-                });
+            public UnitReference GetDependencyForSingularFieldType(FieldDescriptorProto.Types.Type type) => type switch
+            {
+                FieldDescriptorProto.Types.Type.String => GetInternalUnitReference("uProtobufString"),
+                FieldDescriptorProto.Types.Type.Float => GetInternalUnitReference("uProtobufFloat"),
+                FieldDescriptorProto.Types.Type.Double => GetInternalUnitReference("uProtobufDouble"),
+                FieldDescriptorProto.Types.Type.Uint32 => GetInternalUnitReference("uProtobufUint32"),
+                FieldDescriptorProto.Types.Type.Bool => GetInternalUnitReference("uProtobufBool"),
+                FieldDescriptorProto.Types.Type.Enum => GetInternalUnitReference("uProtobufEnum"),
+                FieldDescriptorProto.Types.Type.Message => GetPublicUnitReference("uProtobufMessage"),
+                _ => throw new NotImplementedException()
+            };
         }
     }
 }

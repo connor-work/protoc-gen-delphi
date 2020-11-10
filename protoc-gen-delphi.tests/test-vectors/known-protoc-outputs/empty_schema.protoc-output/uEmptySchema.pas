@@ -3,6 +3,8 @@
 /// </remarks>
 unit uEmptySchema;
 
+{$INCLUDE Work.Connor.Delphi.CompilerFeatures.inc}
+
 {$IFDEF FPC}
   {$MODE DELPHI}
 {$ENDIF}

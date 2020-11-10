@@ -2,7 +2,7 @@
     "file": [
         {
             "name": "uEmptySchema.pas",
-            "content": "/// <remarks>\n/// This unit corresponds to the protobuf schema definition (.proto file) <c>empty_schema.proto</c>.\n/// </remarks>\nunit uEmptySchema;\n\n{$IFDEF FPC}\n  {$MODE DELPHI}\n{$ENDIF}\n\ninterface\n\nimplementation\n\nend.\n"
+            "content": "/// <remarks>\n/// This unit corresponds to the protobuf schema definition (.proto file) <c>empty_schema.proto</c>.\n/// </remarks>\nunit uEmptySchema;\n\n{$INCLUDE Work.Connor.Delphi.CompilerFeatures.inc}\n\n{$IFDEF FPC}\n  {$MODE DELPHI}\n{$ENDIF}\n\ninterface\n\nimplementation\n\nend.\n"
         }
     ]
 }

@@ -1,0 +1,8 @@
+# RAD Studio test units
+/*.dcu
+
+# RAD Studio build output folder
+/Win32/Debug/
+
+# Buildable RAD Studio resource file
+/ProtocGenDelphiRuntimeTests.res

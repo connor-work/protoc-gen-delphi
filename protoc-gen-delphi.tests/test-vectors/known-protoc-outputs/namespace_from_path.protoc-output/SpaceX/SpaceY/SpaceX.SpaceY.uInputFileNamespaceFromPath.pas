@@ -3,6 +3,8 @@
 /// </remarks>
 unit SpaceX.SpaceY.uInputFileNamespaceFromPath;
 
+{$INCLUDE Work.Connor.Delphi.CompilerFeatures.inc}
+
 {$IFDEF FPC}
   {$MODE DELPHI}
 {$ENDIF}
