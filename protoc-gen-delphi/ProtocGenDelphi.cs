@@ -22,6 +22,7 @@ using System.IO;
 using System.Linq;
 using Work.Connor.Delphi;
 using Work.Connor.Delphi.CodeWriter;
+using Work.Connor.Delphi.Commons.CodeWriterExtensions;
 
 namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
 {
@@ -175,19 +176,6 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
     public class ProtocGenDelphi
     {
         /// <summary>
-        /// Optional plug-in option whose value determines whether unit references in generated code shall use scopes (Delphi XE2+ feature).
-        /// Defaults to "true".
-        /// </summary>
-        public const string scopedUnitsOption = "scoped_units";
-
-        /// <summary>
-        /// Optional plug-in option whose value determines whether the generated code shall contain reflection information.
-        /// Not compatible with FPC versions below 3.3.1.
-        /// Defaults to "true".
-        /// </summary>
-        public const string reflectionOption = "reflection";
-
-        /// <summary>
         /// File name extension (without leading dot) for protobuf schema definitions
         /// </summary>
         public static readonly string protoFileExtension = "proto";
@@ -222,22 +210,12 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// <summary>
         /// Required unit reference for using Delphi classes
         /// </summary>
-        private UnitReference ClassesReference => new UnitReference() { Unit = new UnitIdentifier() { Unit = "Classes", Namespace = { Enumerable.Repeat("System", useScopedUnits ? 1 : 0) } } };
+        private UnitReference ClassesReference => new UnitReference() { Unit = new UnitIdentifier() { Unit = "Classes", Namespace = { "System" } } };
 
         /// <summary>
         /// Support definition for the targetted protobuf runtime
         /// </summary>
         private readonly IRuntimeSupport runtime = IRuntimeSupport.Default;
-
-        /// <summary>
-        /// <see langword="true"/> if scoped unit references shall be used.
-        /// </summary>
-        private bool useScopedUnits = true;
-
-        /// <summary>
-        /// <see langword="true"/> if reflection information shall be emitted.
-        /// </summary>
-        private bool useReflection = true;
 
         static void Main(string[] args)
         {
@@ -291,16 +269,6 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         {
             switch (optionKey)
             {
-                case scopedUnitsOption:
-                    if (optionValue == "true") useScopedUnits = true;
-                    else if (optionValue == "false") useScopedUnits = false;
-                    else throw new ArgumentException($"Invalid plug-in option value for key {optionKey}", optionValue);
-                    break;
-                case reflectionOption:
-                    if (optionValue == "true") useReflection = true;
-                    else if (optionValue == "false") useReflection = false;
-                    else throw new ArgumentException($"Invalid plug-in option value for key {optionKey}", optionValue);
-                    break;
                 default: throw new NotImplementedException();
             }
         }
@@ -380,13 +348,14 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
             foreach (FileDescriptorProto dependency in dependencies) CompileDependency(dependency, dependencyHandler);
             // Compile enums
             Action<EnumDeclaration> enumInjection = @enum => delphiUnit.Interface.Declarations.Add(new InterfaceDeclaration() { EnumDeclaration = @enum });
-            foreach (EnumDescriptorProto @enum in protoFile.EnumType) CompileEnum(@enum, enumInjection, dependencyHandler);
+            foreach (EnumDescriptorProto @enum in protoFile.EnumType) CompileEnum(@enum, enumInjection);
             // Compile message types
             Action<ClassDeclaration> classInjection = @class => delphiUnit.Interface.Declarations.Add(new InterfaceDeclaration() { ClassDeclaration = @class });
             foreach (DescriptorProto messageType in protoFile.MessageType) CompileMessage(messageType, classInjection, delphiUnit.Implementation, dependencyHandler);
             // Sort uses clauses
             delphiUnit.Interface.UsesClause.SortUsesClause();
             delphiUnit.Implementation.UsesClause.SortUsesClause();
+            delphiUnit.AdaptForDelphiCommons();
             return delphiUnit;
         }
 
@@ -424,7 +393,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// <param name="delphiInterface">The Delphi interface section</param>
         private void InjectInterfaceDependency(UnitReference delphiUnitReference, Interface delphiInterface)
         {
-            if (delphiInterface.UsesClause.Any(existingReference => existingReference.Unit.Equals(delphiUnitReference.Unit))) return;
+            if (delphiInterface.UsesClause.Any(existingReference => existingReference.Element.Unit.Equals(delphiUnitReference.Unit))) return;
             delphiInterface.UsesClause.Add(delphiUnitReference);
         }
 
@@ -443,11 +412,8 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// </summary>
         /// <param name="enum">The enum</param>
         /// <param name="interfaceInjection">Action that injects the interface part of the enum into an interface section or surrounding class</param>
-        /// <param name="dependencyHandler"> Action to perform when a new Delphi interface dependency has been detected</param>
-        private void CompileEnum(EnumDescriptorProto @enum, Action<EnumDeclaration> interfaceInjection, Action<UnitReference> dependencyHandler)
+        private void CompileEnum(EnumDescriptorProto @enum, Action<EnumDeclaration> interfaceInjection)
         {
-            // Add the required runtime dependency for handling compiled enums
-            dependencyHandler.Invoke(runtime.GetDependencyForEnums());
             // Generate a corresponding enumerated type
             EnumDeclaration delphiEnum = GenerateEnum(@enum);
             interfaceInjection.Invoke(delphiEnum);
@@ -526,7 +492,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
                 Visibility = Visibility.Public,
                 NestedTypeDeclaration = new NestedTypeDeclaration() { EnumDeclaration = nestedEnum }
             });
-            foreach (EnumDescriptorProto nestedEnumType in messageType.EnumType) CompileEnum(nestedEnumType, nestedEnumInjection, dependencyHandler);
+            foreach (EnumDescriptorProto nestedEnumType in messageType.EnumType) CompileEnum(nestedEnumType, nestedEnumInjection);
             MessageClassSkeleton skeleton = new MessageClassSkeleton(delphiClass.Name);
             foreach (FieldDescriptorProto field in messageType.Field) CompileField(field, delphiClass, skeleton, dependencyHandler);
             skeleton.Inject(delphiClass, delphiImplementation);
@@ -895,7 +861,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
                 }
             };
             ClassMemberDeclaration member = new ClassMemberDeclaration() { PropertyDeclaration = delphiProperty };
-            if (useReflection) member.AttributeAnnotations.Add(new AttributeAnnotation() { Attribute = $"ProtobufField({delphiFieldNameConst.Identifier}, {delphiFieldNumberConst.Identifier})" });
+            member.AttributeAnnotations.Add(new AttributeAnnotation() { Attribute = $"ProtobufField({delphiFieldNameConst.Identifier}, {delphiFieldNumberConst.Identifier})" });
             delphiClass.NestedDeclarations.Add(new ClassDeclarationNestedDeclaration()
             {
                 Visibility = Visibility.Public,

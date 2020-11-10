@@ -47,6 +47,21 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.RuntimeTests
         private static readonly IResourceSet supportCodeUnitResources = IResourceSet.Root.Nest("[support code unit]");
 
         /// <summary>
+        /// Resource set of all Delphi include files that contain support source code for testing
+        /// </summary>
+        private static readonly IResourceSet testSupportCodeIncludeFileResources = IResourceSet.Root.Nest("[Delphi test support code include file]");
+
+        /// <summary>
+        /// Resource set of all Delphi units that make up the public runtime API
+        /// </summary>
+        private static readonly IResourceSet runtimePublicApiUnitResources = IResourceSet.Root.Nest("[runtime public API unit]");
+
+        /// <summary>
+        /// Resource set of all Delphi units that make up the internal runtime API
+        /// </summary>
+        private static readonly IResourceSet runtimeInternalApiUnitResources = IResourceSet.Root.Nest("[runtime internal API unit]");
+
+        /// <summary>
         /// Resource set of all Delphi units that form the stub runtime library implementation
         /// </summary>
         private static readonly IResourceSet stubRuntimeUnitResources = IResourceSet.Root.Nest("[stub runtime unit]");
@@ -227,8 +242,6 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.RuntimeTests
                 FallbackToPath = true,
                 OutDir = CreateScratchFolder()
             };
-            plugIn.Options[ProtocGenDelphi.scopedUnitsOption] = "false";
-            plugIn.Options[ProtocGenDelphi.reflectionOption] = "false";
             ProtocOperation protoc = new ProtocOperation();
             protoc.ProtoPath.AddRange(vector.ProtoPath);
             protoc.ProtoFiles.AddRange(vector.InputProtoFileNames);
@@ -260,8 +273,25 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.RuntimeTests
                     if (!fpc.UnitPath.Contains(folder)) fpc.UnitPath.Add(folder);
                 }
             }
+            // Adds include files from a resource set to FPC
+            void addIncludeFiles(IEnumerable<(string name, string content)> resources, string rootFolder)
+            {
+                foreach ((string name, string content) in resources)
+                {
+                    string path = Path.Join(rootFolder, name);
+                    string folder = Directory.GetParent(path).FullName;
+                    Directory.CreateDirectory(folder);
+                    File.WriteAllText(path, content);
+                    if (!fpc.IncludePath.Contains(folder)) fpc.IncludePath.Add(folder);
+                }
+            }
             // Create a scratch folder to hold the runtime-independent support source code
             addUnits(supportCodeUnitResources.ReadAllResources(), CreateScratchFolder());
+            addIncludeFiles(testSupportCodeIncludeFileResources.ReadAllResources(), CreateScratchFolder());
+            // Create a scratch folder to hold the public runtime API source code
+            addUnits(runtimePublicApiUnitResources.ReadAllResources(), CreateScratchFolder());
+            // Create a scratch folder to hold the internal runtime API source code
+            addUnits(runtimeInternalApiUnitResources.ReadAllResources(), CreateScratchFolder());
             // Create a scratch folder to hold the runtime source code
             addUnits(runtimeUnitResources.ReadAllResources(), CreateScratchFolder());
             // Add support files (may contain required source code)

@@ -18,6 +18,8 @@
 /// </summary>
 unit Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uStubRuntime;
 
+{$INCLUDE Work.Connor.Delphi.CompilerFeatures.inc}
+
 {$IFDEF FPC}
   {$MODE DELPHI}
 {$ENDIF}
@@ -26,7 +28,11 @@ interface
 
 uses
   // To raise exceptions
+{$IFDEF WORK_CONNOR_DELPHI_COMPILER_UNIT_SCOPE_NAMES}
+  System.SysUtils;
+{$ELSE}
   SysUtils;
+{$ENDIF}
 
 /// <summary>
 /// Creates an exception that signals that some functionality is not implemented in the stub runtime.

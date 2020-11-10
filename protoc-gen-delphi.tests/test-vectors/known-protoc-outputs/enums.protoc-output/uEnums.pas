@@ -3,14 +3,13 @@
 /// </remarks>
 unit uEnums;
 
+{$INCLUDE Work.Connor.Delphi.CompilerFeatures.inc}
+
 {$IFDEF FPC}
   {$MODE DELPHI}
 {$ENDIF}
 
 interface
-
-uses
-  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufEnum;
 
 type
   /// <remarks>

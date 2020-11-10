@@ -3,6 +3,8 @@
 /// </remarks>
 unit uNestedEnums;
 
+{$INCLUDE Work.Connor.Delphi.CompilerFeatures.inc}
+
 {$IFDEF FPC}
   {$MODE DELPHI}
 {$ENDIF}
@@ -15,7 +17,6 @@ uses
 {$ELSE}
   Classes,
 {$ENDIF}
-  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufEnum,
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uProtobufMessage;
 
 type
