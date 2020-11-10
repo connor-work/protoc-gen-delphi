@@ -53,7 +53,7 @@
     <Version Condition=" '$(PrereleaseVersionSuffix)' != '' ">$(CoreVersion)-$(PrereleaseVersionSuffix).$(ComputedVersionOwnerTag).$(ComputedVersionStabilityTag)</Version>
     <Version Condition=" '$(PrereleaseVersionSuffix)' == '' ">$(CoreVersion)-zz-release.$(ComputedVersionOwnerTag).$(ComputedVersionStabilityTag)</Version>
   </PropertyGroup>
-    <PropertyGroup Condition=" '$(IsStablePublicVersion)' == 'true' ">
+  <PropertyGroup Condition=" '$(IsStablePublicVersion)' == 'true' ">
     <Version Condition=" '$(PrereleaseVersionSuffix)' != '' ">$(CoreVersion)-$(PrereleaseVersionSuffix).official</Version>
     <Version Condition=" '$(PrereleaseVersionSuffix)' == '' ">$(CoreVersion)</Version>
   </PropertyGroup>
@@ -69,6 +69,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Protobuf Include="../proto/google/protobuf/compiler\plugin.proto" GrpcServices="None" Link="Protos\plugin.proto" />
+    <Protobuf Include="../proto/google/protobuf/compiler/plugin.proto" GrpcServices="None" Link="Protos/plugin.proto" />
   </ItemGroup>
 </Project>
