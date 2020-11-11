@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <!-- TODO: Version should be always same as protoc-gen-delphi -->
-    <CoreVersion>0.5.0</CoreVersion>
+    <CoreVersion>0.6.0</CoreVersion>
     <PrereleaseVersionSuffix></PrereleaseVersionSuffix>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <RootNamespace>Work.Connor.Protobuf.Delphi.ProtocGenDelphi.RuntimeTests</RootNamespace>
