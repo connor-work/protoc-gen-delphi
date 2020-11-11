@@ -67,11 +67,16 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.RuntimeTests
         private static readonly IResourceSet stubRuntimeUnitResources = IResourceSet.Root.Nest("[stub runtime unit]");
 
         /// <summary>
-        /// Names of all known test vectors
+        /// Names of all known test schemata
         /// </summary>
-        private static IEnumerable<string> TestVectorNames => allInputFolderResources.GetIDs().WhereSuffixed(new Regex($"{Regex.Escape(".protoc-input")}/.*"))
+        private static IEnumerable<string> TestSchemaNames => allInputFolderResources.GetIDs().WhereSuffixed(new Regex($"{Regex.Escape(".protoc-input")}/.*"))
                                                       .Concat(allInputFileResources.GetIDs().WhereSuffixed(new Regex(Regex.Escape(".proto"))))
-                                                      .Distinct();
+                                                              .Distinct();
+
+        /// <summary>
+        /// Delphi compilers used for testing
+        /// </summary>
+        private static IEnumerable<DelphiCompiler> TestCompilers => (DelphiCompiler[])  Enum.GetValues(typeof(DelphiCompiler));
 
         /// <summary>
         /// Prefix to the name of .proto files in test input folders that shall be used as input files
@@ -96,9 +101,24 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.RuntimeTests
         public class TestVector : IXunitSerializable
         {
             /// <summary>
+            /// Name of the test schema
+            /// </summary>
+            private string schemaName;
+
+            /// <summary>
+            /// Compiler used for testing
+            /// </summary>
+            private DelphiCompiler compiler;
+
+            /// <summary>
             /// Name of the test vector
             /// </summary>
-            private string name;
+            public string Name => $"{schemaName}-{compiler}";
+
+            /// <summary>
+            /// Compiler used for testing
+            /// </summary>
+            public DelphiCompiler Compiler => compiler;
 
             /// <summary>
             /// Resource set of all test resource files that are used as <c>protoc</c> input or support files for this test
@@ -119,23 +139,26 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.RuntimeTests
             /// <summary>
             /// Constructs a new test vector.
             /// </summary>
-            /// <param name="name">Name of the test vector</param>
-            public TestVector(string name) 
+            /// <param name="schemaName">Name of the test schema</param>
+            /// <param name="compiler">Compiler used for testing</param>
+            public TestVector(string schemaName, DelphiCompiler compiler)
             {
-                this.name = name;
+                this.schemaName = schemaName;
+                this.compiler = compiler;
                 InitializeResourceSets();
             }
+
 #pragma warning restore CS8618
 
             /// <summary>
             /// Helper function that sets up the test vector's resource sets.
             /// </summary>
-            private void InitializeResourceSets() => inputFolderResources = allInputFolderResources.Nest($"{name}.protoc-input/");
+            private void InitializeResourceSets() => inputFolderResources = allInputFolderResources.Nest($"{schemaName}.protoc-input/");
 
             /// <summary>
             /// Name of the optional test resource file that is used as a single input protobuf schema definition file for <c>protoc</c> for this test
             /// </summary>
-            private string InputSchemaFileName => $"{name}.proto";
+            private string InputSchemaFileName => $"{schemaName}.proto";
 
             /// <summary>
             /// Name and contents of all .proto files that are used as <c>protoc</c> input for this test
@@ -207,19 +230,24 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.RuntimeTests
 
             public void Deserialize(IXunitSerializationInfo info)
             {
-                name = info.GetValue<string>(nameof(name));
+                schemaName = info.GetValue<string>(nameof(schemaName));
+                compiler = info.GetValue<DelphiCompiler>(nameof(compiler));
                 InitializeResourceSets();
             }
 
-            public void Serialize(IXunitSerializationInfo info) => info.AddValue(nameof(name), name);
+            public void Serialize(IXunitSerializationInfo info)
+            {
+                info.AddValue(nameof(schemaName), schemaName);
+                info.AddValue(nameof(compiler), compiler);
+            }
 
-            public override string? ToString() => name;
+            public override string? ToString() => Name;
         }
 
         /// <summary>
         /// All known test vectors
         /// </summary>
-        public static IEnumerable<object[]> TestVectors => TestVectorNames.Select(name => new object[] { new TestVector(name) });
+        public static IEnumerable<object[]> TestVectors => TestSchemaNames.SelectMany(schemaName => TestCompilers, (schemaName, compiler) => new object[] { new TestVector(schemaName, compiler) });
 
         /// <summary>
         /// <see cref="ProtocGenDelphi"/> produces Delphi code when used as a <c>protoc</c> plug-in, that can be compiled using FPC, together with runtime library sources.
@@ -229,6 +257,10 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.RuntimeTests
         [MemberData(nameof(TestVectors))]
         public void ProducesOutputThatCanBeCompiled(TestVector vector)
         {
+            // TODO these tests should actually be skipped, waiting for xUnit support https://github.com/xunit/xunit/issues/2073#issuecomment-673632823
+            if (vector.Compiler == DelphiCompiler.DCC64
+             && RuntimeTestOptions.DisableDCC64) return;
+            
             // Determine whether to test with embedded stub runtime library or external functional runtime library
             IResourceSet runtimeUnitResources = RuntimeTestOptions.UseStubRuntimeLibrary ? stubRuntimeUnitResources
                                                                                          : IResourceSet.External(RuntimeTestOptions.RuntimeLibrarySourcePath!);
