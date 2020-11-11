@@ -131,6 +131,8 @@ const
   /// </summary>
   PROTOBUF_DEFAULT_VALUE_STRING = System.UnicodeString('');
 
+  // No PROTOBUF_DEFAULT_VALUE_BYTES, since the language does not provide a way to define an empty array constant
+
   /// <summary>
   /// Default value for a protobuf field of an enum type
   /// </summary>
