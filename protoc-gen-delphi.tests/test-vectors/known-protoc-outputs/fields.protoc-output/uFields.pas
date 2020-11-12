@@ -150,7 +150,7 @@ type
     /// <param name="aSource">The stream that the data is read from</param>
     /// <remarks>
     /// Protobuf fields that are not present in the read data are rendered absent by setting them to their default values.
-    /// This may cause the destruction of transitively owned objects (this is also the case when a present fields overwrites a previous value)
+    /// This may cause the destruction of transitively owned objects (this is also the case when a present fields overwrites a previous value).
     /// Developers must ensure that no shared ownership of current field values or further nested embedded objects is held.
     /// </remarks>
     public procedure Decode(aSource: TStream); override;
