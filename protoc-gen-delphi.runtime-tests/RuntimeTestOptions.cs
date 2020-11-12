@@ -31,5 +31,10 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.RuntimeTests
         /// <see langword="true"/> if the embedded stub runtime library shall be used for testing and all tests requiring runtime functionality will be skipped.
         /// </summary>
         public static bool UseStubRuntimeLibrary => RuntimeLibrarySourcePath == null;
+
+        /// <summary>
+        /// <see langword="true"/> if tests using <see cref="DelphiCompiler.DCC64"/> shall be skipped.
+        /// </summary>
+        public static bool DisableDCC64 => Environment.GetEnvironmentVariable("Work_Connor_Delphi_ProtocGenDelphi_RuntimeTests_SkipDcc64") == "1";
     }
 }
