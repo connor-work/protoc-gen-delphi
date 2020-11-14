@@ -38,7 +38,11 @@ uses
   Classes,
 {$ENDIF}
   // To declare custom exceptions
+{$IFDEF WORK_CONNOR_DELPHI_COMPILER_UNIT_SCOPE_NAMES}
+  System.SysUtils;
+{$ELSE}
   SysUtils;
+{$ENDIF}
 
 type
   /// <summary>
