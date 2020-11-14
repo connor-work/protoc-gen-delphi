@@ -250,7 +250,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.RuntimeTests
         public static IEnumerable<object[]> TestVectors => TestSchemaNames.SelectMany(schemaName => TestCompilers, (schemaName, compiler) => new object[] { new TestVector(schemaName, compiler) });
 
         /// <summary>
-        /// <see cref="ProtocGenDelphi"/> produces Delphi code when used as a <c>protoc</c> plug-in, that can be compiled using FPC, together with runtime library sources.
+        /// <see cref="ProtocGenDelphi"/> produces Delphi code when used as a <c>protoc</c> plug-in, that can be compiled using a Delphi compiler, together with runtime library sources.
         /// </summary>
         /// <param name="vector">Test vector</param>
         [Theory]
@@ -290,10 +290,11 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.RuntimeTests
             };
             File.WriteAllText(programFile, program.ToSourceCode());
 
-            // Run FPC
-            FpcOperation fpc = new FpcOperation(programFile) { OutputPath = CreateScratchFolder() };
-            fpc.UnitPath.AddRange(vector.GetUnitPathFolders(plugIn.OutDir));
-            // Adds units from a resource set to FPC
+            // Run the Delphi compiler
+            DelphiCompilerOperation compilation = DelphiCompilerOperation.Plan(vector.Compiler, programFile);
+            compilation.OutputPath = CreateScratchFolder();
+            compilation.UnitPath.AddRange(vector.GetUnitPathFolders(plugIn.OutDir));
+            // Adds units from a resource set to the compilation
             void addUnits(IEnumerable<(string name, string content)> resources, string rootFolder)
             {
                 foreach ((string name, string content) in resources)
@@ -302,10 +303,10 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.RuntimeTests
                     string folder = Directory.GetParent(path).FullName;
                     Directory.CreateDirectory(folder);
                     File.WriteAllText(path, content);
-                    if (!fpc.UnitPath.Contains(folder)) fpc.UnitPath.Add(folder);
+                    if (!compilation.UnitPath.Contains(folder)) compilation.UnitPath.Add(folder);
                 }
             }
-            // Adds include files from a resource set to FPC
+            // Adds include files from a resource set to the compilation
             void addIncludeFiles(IEnumerable<(string name, string content)> resources, string rootFolder)
             {
                 foreach ((string name, string content) in resources)
@@ -314,7 +315,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.RuntimeTests
                     string folder = Directory.GetParent(path).FullName;
                     Directory.CreateDirectory(folder);
                     File.WriteAllText(path, content);
-                    if (!fpc.IncludePath.Contains(folder)) fpc.IncludePath.Add(folder);
+                    if (!compilation.IncludePath.Contains(folder)) compilation.IncludePath.Add(folder);
                 }
             }
             // Create a scratch folder to hold the runtime-independent support source code
@@ -328,8 +329,8 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.RuntimeTests
             addUnits(runtimeUnitResources.ReadAllResources(), CreateScratchFolder());
             // Add support files (may contain required source code)
             addUnits(vector.SupportFiles, CreateScratchFolder());
-            (bool fpcSuccess, _, string? fpcError) = fpc.Perform();
-            Assert.True(fpcSuccess, fpcError!);
+            (bool compilationSuccess, _, string? compilationError) = compilation.Perform();
+            Assert.True(compilationSuccess, compilationError!);
         }
     }
 }

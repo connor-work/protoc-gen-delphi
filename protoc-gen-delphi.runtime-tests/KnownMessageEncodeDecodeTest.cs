@@ -319,14 +319,15 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.RuntimeTests
             (bool protocSuccess, _, string? protocError) = protoc.Perform();
             Assert.True(protocSuccess, protocError!);
 
-            // Compiles a program using FPC
+            // Compiles a program using the Delphi compiler
             string compile(string programFile)
             {
-                // Run FPC
-                FpcOperation fpc = new FpcOperation(programFile) { OutputPath = CreateScratchFolder() };
-                if (Debugger.IsAttached) fpc.GenerateDebugInfo = true;
-                fpc.UnitPath.AddRange(vector.GetUnitPathFolders(plugIn.OutDir));
-                // Adds units from a resource set to FPC
+                // Run the Delphi compiler
+                DelphiCompilerOperation compilation = DelphiCompilerOperation.Plan(vector.Compiler, programFile);
+                compilation.OutputPath = CreateScratchFolder();
+                if (Debugger.IsAttached) compilation.GenerateDebugInfo = true;
+                compilation.UnitPath.AddRange(vector.GetUnitPathFolders(plugIn.OutDir));
+                // Adds units from a resource set to the compilation
                 void addUnits(IEnumerable<(string name, string content)> resources, string rootFolder)
                 {
                     foreach ((string name, string content) in resources)
@@ -335,10 +336,10 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.RuntimeTests
                         string folder = Directory.GetParent(path).FullName;
                         Directory.CreateDirectory(folder);
                         File.WriteAllText(path, content);
-                        if (!fpc.UnitPath.Contains(folder)) fpc.UnitPath.Add(folder);
+                        if (!compilation.UnitPath.Contains(folder)) compilation.UnitPath.Add(folder);
                     }
                 }
-                // Adds include files from a resource set to FPC
+                // Adds include files from a resource set to the compilation
                 void addIncludeFiles(IEnumerable<(string name, string content)> resources, string rootFolder)
                 {
                     foreach ((string name, string content) in resources)
@@ -347,7 +348,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.RuntimeTests
                         string folder = Directory.GetParent(path).FullName;
                         Directory.CreateDirectory(folder);
                         File.WriteAllText(path, content);
-                        if (!fpc.IncludePath.Contains(folder)) fpc.IncludePath.Add(folder);
+                        if (!compilation.IncludePath.Contains(folder)) compilation.IncludePath.Add(folder);
                     }
                 }
                 // Create a scratch folder to hold the runtime-independent support source code
@@ -357,9 +358,9 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.RuntimeTests
                 addUnits(runtimeUnitResources.ReadAllResources(), CreateScratchFolder());
                 // Add support files (may contain required source code)
                 addUnits(vector.SupportFiles, CreateScratchFolder());
-                (bool fpcSuccess, _, string? fpcError) = fpc.Perform();
-                Assert.True(fpcSuccess, fpcError!);
-                return Path.Join(fpc.OutputPath, GetExecutableName(Regex.Replace(Path.GetFileName(programFile), $"{Regex.Escape($".dpr")}$", "")));
+                (bool compilationSuccess, _, string? compilationError) = compilation.Perform();
+                Assert.True(compilationSuccess, compilationError!);
+                return Path.Join(compilation.OutputPath, GetExecutableName(Regex.Replace(Path.GetFileName(programFile), $"{Regex.Escape($".dpr")}$", "")));
             }
 
             // Create message encode/decode test program
