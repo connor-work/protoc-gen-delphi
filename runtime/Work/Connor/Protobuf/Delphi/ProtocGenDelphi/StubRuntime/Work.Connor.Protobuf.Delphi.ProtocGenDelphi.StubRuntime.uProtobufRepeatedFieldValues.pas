@@ -121,7 +121,7 @@ type
       /// </summary>
       /// <remarks>
       /// When a field value is read, it is still owned by the repeated field and must not be destroyed.
-      /// When a field value is written, the previous value is destroyed.
+      /// When a field value is written, the previous value is destroyed and ownership of the new field value is transferred to the repeated field.
       /// Developers must ensure that no shared ownership of the destroyed field value or further nested embedded objects is held.
       /// </remarks>
       /// <param name="aIndex">The index to access</param>
