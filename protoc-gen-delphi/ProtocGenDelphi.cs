@@ -42,6 +42,11 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         public static readonly string unitSourceFileExtension = "pas";
 
         /// <summary>
+        /// File name extension (without leading dot) for Delphi include files
+        /// </summary>
+        public static readonly string includeFileExtension = "inc";
+
+        /// <summary>
         /// Path separator used in protobuf file names
         /// </summary>
         public static readonly string protoFileNamePathSeparator = "/";
