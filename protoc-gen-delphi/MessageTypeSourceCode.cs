@@ -36,9 +36,14 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         private static UnitReference ClassesReference => new UnitReference() { Unit = new UnitIdentifier() { Unit = "Classes", Namespace = { "System" } } };
 
         /// <summary>
-        /// Name of the root base class of all generated Delphi classes for protobuf messages
+        /// Name of the Delphi root base class of all generated Delphi classes for protobuf messages
         /// </summary>
         private static readonly string messageRootClass = "TProtobufMessage";
+
+        /// <summary>
+        /// Name of the Delphi interface of all generated Delphi classes for protobuf messages that contains the public API
+        /// </summary>
+        private static readonly string messagePublicInterface = "IProtobufMessage";
 
         /// <summary>
         /// Protobuf message type to generate code for
@@ -152,12 +157,22 @@ This class corresponds to the protobuf message type <c>{messageType.Name}</c>.
                 yield return new ClassDeclarationNestedDeclaration()
                 {
                     Visibility = Visibility.Public,
+                    Member = new ClassMemberDeclaration() { MethodDeclaration = MergeFromInterface }
+                };
+                yield return new ClassDeclarationNestedDeclaration()
+                {
+                    Visibility = Visibility.Public,
                     Member = new ClassMemberDeclaration() { MethodDeclaration = AssignInterface }
                 };
                 yield return new ClassDeclarationNestedDeclaration()
                 {
                     Visibility = Visibility.Private,
                     Member = new ClassMemberDeclaration() { MethodDeclaration = ClearOwnFieldsInterface }
+                };
+                yield return new ClassDeclarationNestedDeclaration()
+                {
+                    Visibility = Visibility.Private,
+                    Member = new ClassMemberDeclaration() { MethodDeclaration = MergeFromOwnFieldsInterface }
                 };
                 yield return new ClassDeclarationNestedDeclaration()
                 {
@@ -179,8 +194,10 @@ This class corresponds to the protobuf message type <c>{messageType.Name}</c>.
                 yield return Clear;
                 yield return Encode;
                 yield return Decode;
+                yield return MergeFrom;
                 yield return Assign;
                 yield return ClearOwnFields;
+                yield return MergeFromOwnFields;
                 yield return AssignOwnFields;
                 foreach (MethodDeclaration method in Fields.SelectMany(field => field.MethodDeclarations))
                 {
@@ -473,6 +490,76 @@ Developers must ensure that no shared ownership of current field values or furth
         }
 
         /// <summary>
+        /// Interface declaration of the generated <c>MergeFrom</c> method
+        /// </summary>
+        private MethodInterfaceDeclaration MergeFromInterface => new MethodInterfaceDeclaration()
+        {
+            Binding = Binding.Override,
+            Prototype = MergeFromPrototype,
+            Comment = new AnnotationComment { CommentLines = { MergeFromComment } }
+        };
+
+        /// <summary>
+        /// Prototype of the generated <c>MergeFrom</c> method
+        /// </summary>
+        private Prototype MergeFromPrototype => new Prototype()
+        {
+            Name = "MergeFrom",
+            Type = Prototype.Types.Type.Procedure,
+            ParameterList = { MergeFromSourceParameter }
+        };
+
+        /// <summary>
+        /// Source object parameter of the generated <c>MergeFrom</c> method
+        /// </summary>
+        private Parameter MergeFromSourceParameter => new Parameter()
+        {
+            Name = "aSource",
+            Type = messagePublicInterface
+        };
+
+        /// <summary>
+        /// XML documentation comment for the generated <c>MergeFrom</c> method
+        /// </summary>
+        private IEnumerable<string> MergeFromComment =>
+$@"<summary>
+Merges the given message (source) into this one (destination).
+All singular present (non-default) scalar fields in the source replace those in the destination.
+All singular embedded messages are merged recursively.
+All repeated fields are concatenated, with the source field values being appended to the destination field.
+If this causes a new message object to be added, a copy is created to preserve ownership.
+</summary>
+<param name=""{MergeFromSourceParameter.Name}"">Message to merge into this one</param>
+<remarks>
+The source message must be a protobuf message of the same type.
+This procedure does not cause the destruction of any transitively owned objects in this message instance (append-only).
+</remarks>".Lines();
+
+        /// <summary>
+        /// Method declaration of the generated <c>MergeFrom</c> method
+        /// </summary>
+        private MethodDeclaration MergeFrom => new MethodDeclaration()
+        {
+            Class = DelphiClassName,
+            Prototype = MergeFromPrototype,
+            LocalDeclarations = { $"{MergeFromScratchVariableName}: {DelphiClassName};" },
+            Statements = { MergeFromStatements }
+        };
+
+        /// <summary>
+        /// Name of the local variable of the <c>MergeFrom</c> method, that is used for casting to the message class's type
+        /// </summary>
+        private string MergeFromScratchVariableName => "lSource";
+
+        /// <summary>
+        /// Source code lines within the generated <c>MergeFrom</c> method's statement block
+        /// </summary>
+        private IEnumerable<string> MergeFromStatements =>
+$@"{MergeFromScratchVariableName} := {MergeFromSourceParameter.Name} as {DelphiClassName};
+inherited MergeFrom({MergeFromScratchVariableName});
+MergeFromOwnFields({MergeFromScratchVariableName});".Lines();
+
+        /// <summary>
         /// Interface declaration of the generated <c>Assign</c> method
         /// </summary>
         private MethodInterfaceDeclaration AssignInterface => new MethodInterfaceDeclaration()
@@ -585,6 +672,82 @@ Renders those protobuf fields absent that belong to <see cref=""{DelphiClassName
             get
             {
                 foreach (string statement in Fields.SelectMany(field => field.ClearOwnFieldsStatements)) yield return statement;
+            }
+        }
+
+        /// <summary>
+        /// Interface declaration of the generated <c>MergeFromOwnFields</c> method
+        /// </summary>
+        private MethodInterfaceDeclaration MergeFromOwnFieldsInterface => new MethodInterfaceDeclaration()
+        {
+            Binding = Binding.Static,
+            Prototype = MergeFromOwnFieldsPrototype,
+            Comment = new AnnotationComment { CommentLines = { MergeFromOwnFieldsComment } }
+        };
+
+        /// <summary>
+        /// Prototype of the generated <c>MergeFromOwnFields</c> method
+        /// </summary>
+        private Prototype MergeFromOwnFieldsPrototype => new Prototype()
+        {
+            Name = "MergeFromOwnFields",
+            Type = Prototype.Types.Type.Procedure,
+            ParameterList = { MergeFromOwnFieldsSourceParameter }
+        };
+
+        /// <summary>
+        /// Name of the source object parameter of the generated <c>MergeFromOwnFields</c> method
+        /// </summary>
+        public static string MergeFromOwnFieldsSourceParameterName => "aSource";
+
+        /// <summary>
+        /// Source object parameter of the generated <c>MergeFromOwnFields</c> method
+        /// </summary>
+        private Parameter MergeFromOwnFieldsSourceParameter => new Parameter()
+        {
+            Name = MergeFromOwnFieldsSourceParameterName,
+            Type = DelphiClassName
+        };
+
+        /// <summary>
+        /// XML documentation comment for the generated <c>MergeFromOwnFields</c> method
+        /// </summary>
+        private IEnumerable<string> MergeFromOwnFieldsComment =>
+$@"<summary>
+Merges those protobuf fields that belong to <see cref=""{DelphiClassName}""/> (i.e., are not managed by an ancestor class), during a call to <see cref=""MergeFrom""/>.
+</summary>
+<param name=""{MergeFromOwnFieldsSourceParameter.Name}"">Message to merge into this one</param>".Lines();
+
+        /// <summary>
+        /// Method declaration of the generated <c>MergeFromOwnFields</c> method
+        /// </summary>
+        private MethodDeclaration MergeFromOwnFields => new MethodDeclaration()
+        {
+            Class = DelphiClassName,
+            Prototype = MergeFromOwnFieldsPrototype,
+            LocalDeclarations = { MergeFromOwnFieldsLocalDeclarations },
+            Statements = { MergeFromOwnFieldsStatements }
+        };
+
+        /// <summary>
+        /// Source code lines within the generated <c>MergeFromOwnFields</c> method's local declaration section
+        /// </summary>
+        private IEnumerable<string> MergeFromOwnFieldsLocalDeclarations
+        {
+            get
+            {
+                foreach (string declaration in Fields.SelectMany(field => field.MergeFromOwnFieldsLocalDeclarations)) yield return declaration;
+            }
+        }
+
+        /// <summary>
+        /// Source code lines within the generated <c>MergeFromOwnFields</c> method's statement block
+        /// </summary>
+        private IEnumerable<string> MergeFromOwnFieldsStatements
+        {
+            get
+            {
+                foreach (string statement in Fields.SelectMany(field => field.MergeFromOwnFieldsStatements)) yield return statement;
             }
         }
 

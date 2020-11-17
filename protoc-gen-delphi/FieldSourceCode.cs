@@ -481,6 +481,48 @@ end;".Lines();
         }
 
         /// <summary>
+        /// Source code lines to be added to the <c>MergeFromOwnFields</c> method's local declaration section in the containing message class
+        /// </summary>
+        public IEnumerable<string> MergeFromOwnFieldsLocalDeclarations
+        {
+            get
+            {
+                if (IsSingular && IsMessage) yield return $"{MergeFromOwnFieldsScratchVariableName}: {PrivateDelphiType};";
+            }
+        }
+
+        /// <summary>
+        /// Name of the local variable of the <c>MergeFromOwnFields</c> method in the containing class, that is used for the field
+        /// </summary>
+        private string MergeFromOwnFieldsScratchVariableName => $"l{field.Name.ToPascalCase()}";
+
+        /// <summary>
+        /// Source code lines to be added to the <c>MergeFromOwnFields</c> method's statement block in the containing message class
+        /// </summary>
+        public IEnumerable<string> MergeFromOwnFieldsStatements
+        {
+            get
+            {
+                string parameter = MessageTypeSourceCode.MergeFromOwnFieldsSourceParameterName;
+                if (IsRepeated) yield return $"{DelphiPropertyName}.MergeFrom({parameter}.{DelphiPropertyName});";
+                else if (IsMessage)
+                {
+                    IEnumerable<string> lines =
+$@"if (Assigned({DelphiPropertyName})) then {DelphiPropertyName}.MergeFrom({parameter}.{DelphiPropertyName})
+else
+begin
+  {MergeFromOwnFieldsScratchVariableName} := {PrivateDelphiType}.Create;
+  {MergeFromOwnFieldsScratchVariableName}.Assign({parameter}.{DelphiPropertyName});
+  {DelphiPropertyName} := {MergeFromOwnFieldsScratchVariableName};
+end;".Lines();
+                    foreach (string line in lines) yield return line;
+                }
+                else yield return $"if ({parameter}.{DelphiPropertyName} <> {field.Type.GetDelphiDefaultValueExpression()}) then {DelphiPropertyName} := {parameter}.{DelphiPropertyName};";
+
+            }
+        }
+
+        /// <summary>
         /// Source code lines to be added to the <c>AssignOwnFields</c> method's local declaration section in the containing message class
         /// </summary>
         public IEnumerable<string> AssignOwnFieldsLocalDeclarations
@@ -503,16 +545,17 @@ end;".Lines();
         {
             get
             {
-                if (IsRepeated) yield return $"({DelphiPropertyName} as TInterfacedPersistent).Assign({MessageTypeSourceCode.AssignOwnFieldsSourceParameterName}.{DelphiPropertyName} as TInterfacedPersistent);";
+                string parameter = MessageTypeSourceCode.AssignOwnFieldsSourceParameterName;
+                if (IsRepeated) yield return $"({DelphiPropertyName} as TInterfacedPersistent).Assign({parameter}.{DelphiPropertyName} as TInterfacedPersistent);";
                 else if (IsMessage)
                 {
                     IEnumerable<string> lines =
 $@"{AssignOwnFieldsScratchVariableName} := {PrivateDelphiType}.Create;
-{AssignOwnFieldsScratchVariableName}.Assign({MessageTypeSourceCode.AssignOwnFieldsSourceParameterName}.{DelphiPropertyName});
+{AssignOwnFieldsScratchVariableName}.Assign({parameter}.{DelphiPropertyName});
 {DelphiPropertyName} := {AssignOwnFieldsScratchVariableName};".Lines();
                     foreach (string line in lines) yield return line;
                 }
-                else yield return $"{DelphiPropertyName} := {MessageTypeSourceCode.AssignOwnFieldsSourceParameterName}.{DelphiPropertyName};";
+                else yield return $"{DelphiPropertyName} := {parameter}.{DelphiPropertyName};";
             }
         }
     }
