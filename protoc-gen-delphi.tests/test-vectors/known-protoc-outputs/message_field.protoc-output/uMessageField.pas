@@ -286,6 +286,7 @@ procedure TMessageY.Decode(aSource: TStream);
 begin
   inherited;
   FFieldX.Free;
+  FFieldX := PROTOBUF_DEFAULT_VALUE_MESSAGE;
   if HasUnknownField(PROTOBUF_FIELD_NUMBER_FIELD_X) then
   begin
     FFieldX := TMessageX.Create;
