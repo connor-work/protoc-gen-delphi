@@ -147,7 +147,7 @@ type
       /// The source message must be a protobuf message of the same type.
       /// This procedure does not cause the destruction of any transitively owned objects in this message instance (append-only).
       /// </remarks>
-      procedure MergeFrom(aSource: IProtobufMessage);
+      procedure MergeFrom(aSource: IProtobufMessage); virtual;
 
     // IProtobufMessageInternal implementation
 
