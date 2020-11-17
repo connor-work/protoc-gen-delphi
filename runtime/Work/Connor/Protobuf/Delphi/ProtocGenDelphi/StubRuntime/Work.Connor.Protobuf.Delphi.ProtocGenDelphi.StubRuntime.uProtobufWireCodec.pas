@@ -50,7 +50,7 @@ type
   /// Generic runtime library implementation of <see cref="T:IProtobufWireCodec"/>.
   /// </summary>
   TProtobufWireCodec<T> = class(TInterfacedObject, IProtobufWireCodec<T>)
-    // IProtobufWireCodec<UInt32> implementation
+    // IProtobufWireCodec<T> implementation
 
     public
       /// <summary>
