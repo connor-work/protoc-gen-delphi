@@ -156,6 +156,20 @@ type
     public procedure Decode(aSource: TStream); override;
 
     /// <summary>
+    /// Merges the given message (source) into this one (destination).
+    /// All singular present (non-default) scalar fields in the source replace those in the destination.
+    /// All singular embedded messages are merged recursively.
+    /// All repeated fields are concatenated, with the source field values being appended to the destination field.
+    /// If this causes a new message object to be added, a copy is created to preserve ownership.
+    /// </summary>
+    /// <param name="aSource">Message to merge into this one</param>
+    /// <remarks>
+    /// The source message must be a protobuf message of the same type.
+    /// This procedure does not cause the destruction of any transitively owned objects in this message instance (append-only).
+    /// </remarks>
+    public procedure MergeFrom(aSource: IProtobufMessage); override;
+
+    /// <summary>
     /// Copies the protobuf data from another object to this one.
     /// </summary>
     /// <param name="aSource">Object to copy from</param>
@@ -171,6 +185,12 @@ type
     /// Renders those protobuf fields absent that belong to <see cref="TMessageX"/> (i.e., are not managed by an ancestor class), by setting them to their default values.
     /// </summary>
     private procedure ClearOwnFields;
+
+    /// <summary>
+    /// Merges those protobuf fields that belong to <see cref="TMessageX"/> (i.e., are not managed by an ancestor class), during a call to <see cref="MergeFrom"/>.
+    /// </summary>
+    /// <param name="aSource">Message to merge into this one</param>
+    private procedure MergeFromOwnFields(aSource: TMessageX);
 
     /// <summary>
     /// Copies those protobuf fields that belong to <see cref="TMessageX"/> (i.e., are not managed by an ancestor class), during a call to <see cref="TInterfacedPersistent.Assign"/>.
@@ -212,6 +232,15 @@ begin
   FFieldY := gProtobufWireCodecString.DecodeUnknownField(self, PROTOBUF_FIELD_NUMBER_FIELD_Y);
 end;
 
+procedure TMessageX.MergeFrom(aSource: IProtobufMessage);
+var
+  lSource: TMessageX;
+begin
+  lSource := aSource as TMessageX;
+  inherited MergeFrom(lSource);
+  MergeFromOwnFields(lSource);
+end;
+
 procedure TMessageX.Assign(aSource: TPersistent);
 var
   lSource: TMessageX;
@@ -225,6 +254,12 @@ procedure TMessageX.ClearOwnFields;
 begin
   FFieldX := PROTOBUF_DEFAULT_VALUE_UINT32;
   FFieldY := PROTOBUF_DEFAULT_VALUE_STRING;
+end;
+
+procedure TMessageX.MergeFromOwnFields(aSource: TMessageX);
+begin
+  if (aSource.FieldX <> PROTOBUF_DEFAULT_VALUE_UINT32) then FieldX := aSource.FieldX;
+  if (aSource.FieldY <> PROTOBUF_DEFAULT_VALUE_STRING) then FieldY := aSource.FieldY;
 end;
 
 procedure TMessageX.AssignOwnFields(aSource: TMessageX);
