@@ -455,6 +455,7 @@ This property corresponds to the protobuf field <c>{field.Name}</c>.
                 {
                     IEnumerable<string> lines =
 $@"{DelphiField.Name}.Free;
+{DelphiField.Name} := {Type.Message.GetDelphiDefaultValueExpression()};
 if HasUnknownField({FieldNumberConstant.Identifier}) then
 begin
   {DelphiField.Name} := {PrivateDelphiType}.Create;
