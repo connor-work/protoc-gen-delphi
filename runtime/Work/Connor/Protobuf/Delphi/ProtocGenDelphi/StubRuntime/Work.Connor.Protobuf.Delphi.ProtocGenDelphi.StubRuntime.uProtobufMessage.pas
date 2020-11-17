@@ -135,6 +135,20 @@ type
       /// </remarks>
       procedure DecodeDelimited(aSource: TStream);
 
+      /// <summary>
+      /// Merges the given message (source) into this one (destination).
+      /// All singular present (non-default) scalar fields in the source replace those in the destination.
+      /// All singular embedded messages are merged recursively.
+      /// All repeated fields are concatenated, with the source field values being appended to the destination field.
+      /// If this causes a new message object to be added, a copy is created to preserve ownership.
+      /// </summary>
+      /// <param name="aSource">Message to merge into this one</param>
+      /// <remarks>
+      /// The source message must be a protobuf message of the same type.
+      /// This procedure does not cause the destruction of any transitively owned objects in this message instance (append-only).
+      /// </remarks>
+      procedure MergeFrom(aSource: IProtobufMessage);
+
     // IProtobufMessageInternal implementation
 
     protected
@@ -234,6 +248,11 @@ begin
 end;
 
 procedure TProtobufMessage.DecodeDelimited(aSource: TStream);
+begin
+  raise NotImplementedInStub;
+end;
+
+procedure TProtobufMessage.MergeFrom(aSource: IProtobufMessage);
 begin
   raise NotImplementedInStub;
 end;

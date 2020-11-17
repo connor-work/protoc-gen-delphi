@@ -174,6 +174,17 @@ type
       /// </remarks>
       function ExtractAt(aIndex: Integer): T;
 
+      /// <summary>
+      /// Merges the given field value collection (source) into this one (destination).
+      /// The source field values are appended to the destination collection.
+      /// If this causes a new message object to be added, a copy is created to preserve ownership.
+      /// </summary>
+      /// <param name="aSource">Field value collection to merge into this one</param>
+      /// <remarks>
+      /// The source collection must be a collection of protobuf field values of the same type.
+      /// </remarks>
+      procedure MergeFrom(aSource: IProtobufRepeatedFieldValues<T>);
+
     // IProtobufRepeatedFieldValuesInternal<T> implementation
 
     public
@@ -287,6 +298,11 @@ begin
 end;
 
 function TProtobufRepeatedFieldValues<T>.ExtractAt(aIndex: Integer): T;
+begin
+  raise NotImplementedInStub;
+end;
+
+procedure TProtobufRepeatedFieldValues<T>.MergeFrom(aSource: IProtobufRepeatedFieldValues<T>);
 begin
   raise NotImplementedInStub;
 end;
