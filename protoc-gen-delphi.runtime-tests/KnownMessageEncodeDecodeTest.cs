@@ -26,6 +26,7 @@ using Work.Connor.Delphi.CodeWriter;
 using Work.Connor.Delphi.Tools;
 using Xunit;
 using Xunit.Abstractions;
+using static Work.Connor.Delphi.CodeWriter.StringExtensions;
 
 namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.RuntimeTests
 {
@@ -223,7 +224,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.RuntimeTests
             /// </summary>
             /// <param name="name">Name of the .proto file</param>
             /// <returns>Segments of the namespace identifier</returns>
-            private static IEnumerable<string> GetNamespaceSegmentsForProtoFile(string name) => name.Split(ProtocGenDelphi.protoFileNamePathSeparator)[0..^1].Select(segment => segment.ToPascalCase());
+            private static IEnumerable<string> GetNamespaceSegmentsForProtoFile(string name) => name.Split(ProtocGenDelphi.protoFileNamePathSeparator)[0..^1].Select(segment => segment.ToCase(IdentifierCase.Pascal));
 
             /// <summary>
             /// All Delphi unit references that are required for test compilation.
@@ -233,7 +234,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.RuntimeTests
                 Unit = new UnitIdentifier()
                 {
                     Namespace = { GetNamespaceSegmentsForProtoFile(name) },
-                    Unit = $"u{Path.GetFileName(name).Split(".")[0].ToPascalCase()}"
+                    Unit = $"u{Path.GetFileName(name).Split(".")[0].ToCase(IdentifierCase.Pascal)}"
                 }
             });
 

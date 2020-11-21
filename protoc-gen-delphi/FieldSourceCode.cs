@@ -21,6 +21,7 @@ using Work.Connor.Delphi;
 using Work.Connor.Delphi.CodeWriter;
 using Label = Google.Protobuf.Reflection.FieldDescriptorProto.Types.Label;
 using Type = Google.Protobuf.Reflection.FieldDescriptorProto.Types.Type;
+using static Work.Connor.Delphi.CodeWriter.StringExtensions;
 
 namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
 {
@@ -33,6 +34,41 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
     /// </remarks>
     internal class FieldSourceCode
     {
+        /// <summary>
+        /// Mapping of protobuf fields to identifiers for Delphi fields
+        /// </summary>
+        private static IdentifierGenerator<FieldDescriptorProto> FieldIdentifier => new IdentifierTemplate<FieldDescriptorProto>("field", x => x.Name, "_ProtobufField", IdentifierCase.Pascal, "F");
+
+        /// <summary>
+        /// Mapping of protobuf fields to identifiers for Delphi getters
+        /// </summary>
+        private static IdentifierGenerator<FieldDescriptorProto> GetterIdentifier => new IdentifierTemplate<FieldDescriptorProto>("field getter", x => x.Name, "_ProtobufField", IdentifierCase.Pascal, "Get");
+
+        /// <summary>
+        /// Mapping of protobuf fields to identifiers for Delphi setters
+        /// </summary>
+        private static IdentifierGenerator<FieldDescriptorProto> SetterIdentifier => new IdentifierTemplate<FieldDescriptorProto>("field setter", x => x.Name, "_ProtobufField", IdentifierCase.Pascal, "Set");
+
+        /// <summary>
+        /// Mapping of protobuf fields to identifiers for Delphi properties
+        /// </summary>
+        private static IdentifierGenerator<FieldDescriptorProto> PropertyIdentifier => new IdentifierTemplate<FieldDescriptorProto>("property", x => x.Name, "_ProtobufField", IdentifierCase.Pascal);
+
+        /// <summary>
+        /// Mapping of protobuf fields to identifiers for Delphi constants for their field number
+        /// </summary>
+        private static IdentifierGenerator<FieldDescriptorProto> FieldNumberConstantIdentifier => new IdentifierTemplate<FieldDescriptorProto>("field number constant", x => x.Name, "", IdentifierCase.ScreamingSnake, "PROTOBUF_FIELD_NUMBER_");
+
+        /// <summary>
+        /// Mapping of protobuf fields to identifiers for Delphi constants for their field name
+        /// </summary>
+        private static IdentifierGenerator<FieldDescriptorProto> FieldNameConstantIdentifier => new IdentifierTemplate<FieldDescriptorProto>("field name constant", x => x.Name, "", IdentifierCase.ScreamingSnake, "PROTOBUF_FIELD_NAME_");
+
+        /// <summary>
+        /// Mapping of protobuf fields to identifiers for Delphi scratch variables
+        /// </summary>
+        private static IdentifierGenerator<FieldDescriptorProto> ScratchVariableIdentifier => new IdentifierTemplate<FieldDescriptorProto>("scratch variable", x => x.Name, "_ProtobufField", IdentifierCase.Pascal, "l");
+
         /// <summary>
         /// Unit reference for the Delphi <c>SysUtils</c> unit
         /// </summary>
@@ -64,7 +100,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// <summary>
         /// Name of the Delphi property
         /// </summary>
-        private string DelphiPropertyName => field.Name.ToPascalCase();
+        private string DelphiPropertyName => PropertyIdentifier.Generate(field);
 
         /// <summary>
         /// Delphi type identifier of the Delphi type that is used to represent the protobuf field value(s) when communicating with internal (runtime) code
@@ -199,7 +235,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// </summary>
         private TrueConstDeclaration FieldNumberConstant => new TrueConstDeclaration()
         {
-            Identifier = $"PROTOBUF_FIELD_NUMBER_{field.Name.ToScreamingSnakeCase()}",
+            Identifier = FieldNumberConstantIdentifier.Generate(field),
             Value = field.Number.ToString(),
             Comment = new AnnotationComment() { CommentLines = { FieldNumberConstantComment } }
         };
@@ -217,7 +253,7 @@ Protobuf field number of the protobuf field <c>{field.Name}</c>.
         /// </summary>
         private TrueConstDeclaration FieldNameConstant => new TrueConstDeclaration()
         {
-            Identifier = $"PROTOBUF_FIELD_NAME_{field.Name.ToScreamingSnakeCase()}",
+            Identifier = FieldNameConstantIdentifier.Generate(field),
             Value = $"'{field.Name}'",
             Comment = new AnnotationComment() { CommentLines = { FieldNameConstantComment } }
         };
@@ -235,7 +271,7 @@ Protobuf field name of the protobuf field <c>{field.Name}</c>.
         /// </summary>
         private FieldDeclaration DelphiField => new FieldDeclaration()
         {
-            Name = $"F{DelphiPropertyName}",
+            Name = FieldIdentifier.Generate(field),
             Type = PrivateDelphiType,
             Comment = new AnnotationComment()
             {
@@ -266,7 +302,7 @@ Holds the decoded value of the protobuf field <c>{field.Name}</c>.
         /// </summary>
         private Prototype GetterPrototype => new Prototype()
         {
-            Name = $"Get{DelphiPropertyName}",
+            Name = GetterIdentifier.Generate(field),
             Type = Prototype.Types.Type.Function,
             ReturnType = PublicDelphiType
         };
@@ -321,7 +357,7 @@ May be overridden. Overriders shall only add side-effects and must call the ance
         /// </summary>
         private Prototype SetterPrototype => new Prototype()
         {
-            Name = $"Set{DelphiPropertyName}",
+            Name = SetterIdentifier.Generate(field),
             Type = Prototype.Types.Type.Procedure,
             ParameterList = { SetterParameter }
         };
@@ -494,7 +530,7 @@ end;".Lines();
         /// <summary>
         /// Name of the local variable of the <c>MergeFromOwnFields</c> method in the containing class, that is used for the field
         /// </summary>
-        private string MergeFromOwnFieldsScratchVariableName => $"l{field.Name.ToPascalCase()}";
+        private string MergeFromOwnFieldsScratchVariableName => ScratchVariableIdentifier.Generate(field);
 
         /// <summary>
         /// Source code lines to be added to the <c>MergeFromOwnFields</c> method's statement block in the containing message class
@@ -536,7 +572,7 @@ end;".Lines();
         /// <summary>
         /// Name of the local variable of the <c>AssignOwnFields</c> method in the containing class, that is used for the field
         /// </summary>
-        private string AssignOwnFieldsScratchVariableName => $"l{field.Name.ToPascalCase()}";
+        private string AssignOwnFieldsScratchVariableName => ScratchVariableIdentifier.Generate(field);
 
         /// <summary>
         /// Source code lines to be added to the <c>AssignOwnFields</c> method's statement block in the containing message class

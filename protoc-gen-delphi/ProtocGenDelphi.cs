@@ -23,6 +23,7 @@ using System.Linq;
 using Work.Connor.Delphi;
 using Work.Connor.Delphi.CodeWriter;
 using Work.Connor.Delphi.Commons.CodeWriterExtensions;
+using static Work.Connor.Delphi.CodeWriter.StringExtensions;
 
 namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
 {
@@ -31,6 +32,16 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
     /// </summary>
     public class ProtocGenDelphi
     {
+        /// <summary>
+        /// Mapping of protobuf type names to identifiers for Delphi types
+        /// </summary>
+        private static IdentifierGenerator<string> TypeIdentifier => new IdentifierTemplate<string>("type", x => x, "_ProtobufType", IdentifierCase.Pascal, "T");
+
+        /// <summary>
+        /// Mapping of protobuf schema names to identifiers for Delphi units
+        /// </summary>
+        private static IdentifierGenerator<string> UnitIdentifier => new IdentifierTemplate<string>("unit", x => x, "_ProtobufSchema", IdentifierCase.Pascal, "u");
+
         /// <summary>
         /// File name extension (without leading dot) for protobuf schema definitions
         /// </summary>
@@ -137,24 +148,23 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// <returns>The Delphi type name</returns>
         public static string ConstructDelphiTypeName(string typeName)
         {
-            if (!typeName.StartsWith(".")) return $"T{typeName.ToPascalCase()}";
-            string[] delphiTypeNameSegments = typeName.Split(".", StringSplitOptions.RemoveEmptyEntries).Select(segment => segment.ToPascalCase()).ToArray();
-            string unqualifiedName = ConstructDelphiTypeName(delphiTypeNameSegments[^1]);
-            if (delphiTypeNameSegments.Length < 2) return unqualifiedName;
-            return $"{ConstructUnitIdentifier(delphiTypeNameSegments[0..^2], delphiTypeNameSegments[^2]).ToSourceCode()}.{unqualifiedName}";
+            if (!typeName.StartsWith(".")) return TypeIdentifier.Generate(typeName);
+            string[] typeNameSegments = typeName.Split(".", StringSplitOptions.RemoveEmptyEntries).ToArray();
+            string unqualifiedName = ConstructDelphiTypeName(typeNameSegments[^1]);
+            if (typeNameSegments.Length < 2) return unqualifiedName;
+            return $"{ConstructUnitIdentifier(typeNameSegments[0..^2], typeNameSegments[^2]).ToSourceCode()}.{unqualifiedName}";
         }
 
         /// <summary>
         /// Constructs a Delphi unit identifier that corresponds to a protobuf qualified schema name.
         /// </summary>
         /// <param name="nameSpaceSegments">Segments in the protobuf namespace string</param>
-        /// <param name="fileName">Unqualified schema name (should be .proto file name without extension)</param>
+        /// <param name="schemaName">Unqualified schema name (should be .proto file name without extension)</param>
         /// <returns>The unit identifier</returns>
-        public static UnitIdentifier ConstructUnitIdentifier(string[] nameSpaceSegments, string fileName) => new UnitIdentifier()
+        public static UnitIdentifier ConstructUnitIdentifier(string[] nameSpaceSegments, string schemaName) => new UnitIdentifier()
         {
-            // Use .proto file filename without extensions as identifier
-            Unit = $"u{fileName.Split(".")[0].ToPascalCase()}",
-            Namespace = { nameSpaceSegments.Select(segment => segment.ToPascalCase()) }
+            Unit = UnitIdentifier.Generate(schemaName),
+            Namespace = { nameSpaceSegments.Select(segment => segment.ToCase(IdentifierCase.Pascal)) }
         };
     }
 }

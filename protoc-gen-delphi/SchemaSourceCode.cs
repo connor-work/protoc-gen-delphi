@@ -91,7 +91,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
             string[] nameSpaceSegments = protoFile.HasPackage ? protoFile.Package.Split(".")
                                                               : fileNameSegments[0..^1];
             // Split off extension from file name
-            return ProtocGenDelphi.ConstructUnitIdentifier(nameSpaceSegments, fileNameSegments[^1].Split(".")[0].ToPascalCase());
+            return ProtocGenDelphi.ConstructUnitIdentifier(nameSpaceSegments, fileNameSegments[^1].Split(".")[0]);
         }
 
         /// <summary>

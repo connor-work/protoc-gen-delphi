@@ -16,7 +16,7 @@
 using System.Collections.Generic;
 using Google.Protobuf.Reflection;
 using Work.Connor.Delphi;
-using Work.Connor.Delphi.CodeWriter;
+using static Work.Connor.Delphi.CodeWriter.StringExtensions;
 
 namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
 {
@@ -32,6 +32,11 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// Optional prefix to the generated identifier
         /// </summary>
         private readonly string? prefix;
+
+        /// <summary>
+        /// Mapping of protobuf enum values to identifiers for Delphi enumerated values
+        /// </summary>
+        private IdentifierGenerator<EnumValueDescriptorProto> EnumValueIdentifier => new IdentifierTemplate<EnumValueDescriptorProto>("enumerated value", x => x.Name, "_ProtobufEnumValue", IdentifierCase.Pascal, prefix ?? "");
 
         /// <summary>
         /// Protobuf enum value to generate code for
@@ -52,7 +57,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// <summary>
         /// Name of the Delphi enumerated value
         /// </summary>
-        private string DelphiEnumValueName => $"{prefix ?? ""}{enumValue.Name.ToPascalCase()}";
+        private string DelphiEnumValueName => EnumValueIdentifier.Generate(enumValue);
 
         /// <summary>
         /// Generated Delphi enumerated value

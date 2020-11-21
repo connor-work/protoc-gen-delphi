@@ -19,7 +19,7 @@ using Google.Protobuf.Reflection;
 using Work.Connor.Delphi;
 using static Work.Connor.Delphi.Visibility;
 using static Work.Connor.Delphi.MethodInterfaceDeclaration.Types.Binding;
-using Work.Connor.Delphi.CodeWriter;
+using static Work.Connor.Delphi.CodeWriter.StringExtensions;
 
 namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
 {
@@ -50,7 +50,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// <summary>
         /// Delphi source code representations of the protobuf enum values
         /// </summary>
-        private IEnumerable<EnumValueSourceCode> EnumValues => @enum.Value.Select(enumValue => new EnumValueSourceCode(@enum.Name.ToPascalCase(), enumValue));
+        private IEnumerable<EnumValueSourceCode> EnumValues => @enum.Value.Select(enumValue => new EnumValueSourceCode(@enum.Name.ToCase(IdentifierCase.Pascal), enumValue));
 
         /// <summary>
         /// Generated Delphi enumerated type
