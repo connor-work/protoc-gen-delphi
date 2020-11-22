@@ -17,6 +17,7 @@ using Google.Protobuf.Reflection;
 using System;
 using System.Collections.Generic;
 using Work.Connor.Delphi;
+using Type = Google.Protobuf.Reflection.FieldDescriptorProto.Types.Type;
 
 namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
 {
@@ -41,14 +42,14 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// </summary>
         /// <param name="type">The protobuf field type</param>
         /// <returns>The Delphi unit references</returns>
-        public IEnumerable<UnitReference> GetDependenciesForSingularFieldType(FieldDescriptorProto.Types.Type type);
+        public IEnumerable<UnitReference> GetDependenciesForSingularFieldType(Type type);
 
         /// <summary>
         /// Provides the required runtime-specific unit references for handling protobuf repeated fields of a specific field type.
         /// </summary>
         /// <param name="type">The protobuf field type</param>
         /// <returns>The Delphi unit reference</returns>
-        public IEnumerable<UnitReference> GetDependenciesForRepeatedFieldType(FieldDescriptorProto.Types.Type type);
+        public IEnumerable<UnitReference> GetDependenciesForRepeatedFieldType(Type type);
 
         /// <summary>
         /// Provides support definitions for a runtime library implementation that follows the structure of the reference stub runtime,
@@ -96,54 +97,54 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
 
             public UnitReference GetDependencyForMessages() => GetPublicUnitReference("uProtobufMessage");
 
-            public IEnumerable<UnitReference> GetDependenciesForSingularFieldType(FieldDescriptorProto.Types.Type type)
+            public IEnumerable<UnitReference> GetDependenciesForSingularFieldType(Type type)
             {
                 yield return type switch
                 {
-                    FieldDescriptorProto.Types.Type.Double   => GetInternalUnitReference("uProtobufDouble"),
-                    FieldDescriptorProto.Types.Type.Float    => GetInternalUnitReference("uProtobufFloat"),
-                    FieldDescriptorProto.Types.Type.Int32    => GetInternalUnitReference("uProtobufInt32"),
-                    FieldDescriptorProto.Types.Type.Int64    => GetInternalUnitReference("uProtobufInt64"),
-                    FieldDescriptorProto.Types.Type.Uint32   => GetInternalUnitReference("uProtobufUint32"),
-                    FieldDescriptorProto.Types.Type.Uint64   => GetInternalUnitReference("uProtobufUint64"),
-                    FieldDescriptorProto.Types.Type.Sint32   => GetInternalUnitReference("uProtobufSint32"),
-                    FieldDescriptorProto.Types.Type.Sint64   => GetInternalUnitReference("uProtobufSint64"),
-                    FieldDescriptorProto.Types.Type.Fixed32  => GetInternalUnitReference("uProtobufFixed32"),
-                    FieldDescriptorProto.Types.Type.Fixed64  => GetInternalUnitReference("uProtobufFixed64"),
-                    FieldDescriptorProto.Types.Type.Sfixed32 => GetInternalUnitReference("uProtobufSfixed32"),
-                    FieldDescriptorProto.Types.Type.Sfixed64 => GetInternalUnitReference("uProtobufSfixed64"),
-                    FieldDescriptorProto.Types.Type.Bool     => GetInternalUnitReference("uProtobufBool"),
-                    FieldDescriptorProto.Types.Type.String   => GetInternalUnitReference("uProtobufString"),
-                    FieldDescriptorProto.Types.Type.Bytes    => GetInternalUnitReference("uProtobufBytes"),
-                    FieldDescriptorProto.Types.Type.Enum     => GetInternalUnitReference("uProtobufEnum"),
-                    FieldDescriptorProto.Types.Type.Message  => GetPublicUnitReference("uProtobufMessage"),
+                    Type.Double   => GetInternalUnitReference("uProtobufDouble"),
+                    Type.Float    => GetInternalUnitReference("uProtobufFloat"),
+                    Type.Int32    => GetInternalUnitReference("uProtobufInt32"),
+                    Type.Int64    => GetInternalUnitReference("uProtobufInt64"),
+                    Type.Uint32   => GetInternalUnitReference("uProtobufUint32"),
+                    Type.Uint64   => GetInternalUnitReference("uProtobufUint64"),
+                    Type.Sint32   => GetInternalUnitReference("uProtobufSint32"),
+                    Type.Sint64   => GetInternalUnitReference("uProtobufSint64"),
+                    Type.Fixed32  => GetInternalUnitReference("uProtobufFixed32"),
+                    Type.Fixed64  => GetInternalUnitReference("uProtobufFixed64"),
+                    Type.Sfixed32 => GetInternalUnitReference("uProtobufSfixed32"),
+                    Type.Sfixed64 => GetInternalUnitReference("uProtobufSfixed64"),
+                    Type.Bool     => GetInternalUnitReference("uProtobufBool"),
+                    Type.String   => GetInternalUnitReference("uProtobufString"),
+                    Type.Bytes    => GetInternalUnitReference("uProtobufBytes"),
+                    Type.Enum     => GetInternalUnitReference("uProtobufEnum"),
+                    Type.Message  => GetPublicUnitReference("uProtobufMessage"),
                     _ => throw new NotImplementedException()
                 };
             }
 
-            public IEnumerable<UnitReference> GetDependenciesForRepeatedFieldType(FieldDescriptorProto.Types.Type type)
+            public IEnumerable<UnitReference> GetDependenciesForRepeatedFieldType(Type type)
             {
                 yield return GetPublicUnitReference("uIProtobufRepeatedFieldValues");
                 foreach (UnitReference dependency in GetDependenciesForSingularFieldType(type)) yield return dependency;
                 yield return type switch
                 {
-                    FieldDescriptorProto.Types.Type.Double   => GetInternalUnitReference("uProtobufRepeatedDouble"),
-                    FieldDescriptorProto.Types.Type.Float    => GetInternalUnitReference("uProtobufRepeatedFloat"),
-                    FieldDescriptorProto.Types.Type.Int32    => GetInternalUnitReference("uProtobufRepeatedInt32"),
-                    FieldDescriptorProto.Types.Type.Int64    => GetInternalUnitReference("uProtobufRepeatedInt64"),
-                    FieldDescriptorProto.Types.Type.Uint32   => GetInternalUnitReference("uProtobufRepeatedUint32"),
-                    FieldDescriptorProto.Types.Type.Uint64   => GetInternalUnitReference("uProtobufRepeatedUint64"),
-                    FieldDescriptorProto.Types.Type.Sint32   => GetInternalUnitReference("uProtobufRepeatedSint32"),
-                    FieldDescriptorProto.Types.Type.Sint64   => GetInternalUnitReference("uProtobufRepeatedSint64"),
-                    FieldDescriptorProto.Types.Type.Fixed32  => GetInternalUnitReference("uProtobufRepeatedFixed32"),
-                    FieldDescriptorProto.Types.Type.Fixed64  => GetInternalUnitReference("uProtobufRepeatedFixed64"),
-                    FieldDescriptorProto.Types.Type.Sfixed32 => GetInternalUnitReference("uProtobufRepeatedSfixed32"),
-                    FieldDescriptorProto.Types.Type.Sfixed64 => GetInternalUnitReference("uProtobufRepeatedSfixed64"),
-                    FieldDescriptorProto.Types.Type.Bool     => GetInternalUnitReference("uProtobufRepeatedBool"),
-                    FieldDescriptorProto.Types.Type.String   => GetInternalUnitReference("uProtobufRepeatedString"),
-                    FieldDescriptorProto.Types.Type.Bytes    => GetInternalUnitReference("uProtobufRepeatedBytes"),
-                    FieldDescriptorProto.Types.Type.Enum     => GetInternalUnitReference("uProtobufRepeatedEnum"),
-                    FieldDescriptorProto.Types.Type.Message  => GetInternalUnitReference("uProtobufRepeatedMessage"),
+                    Type.Double   => GetInternalUnitReference("uProtobufRepeatedDouble"),
+                    Type.Float    => GetInternalUnitReference("uProtobufRepeatedFloat"),
+                    Type.Int32    => GetInternalUnitReference("uProtobufRepeatedInt32"),
+                    Type.Int64    => GetInternalUnitReference("uProtobufRepeatedInt64"),
+                    Type.Uint32   => GetInternalUnitReference("uProtobufRepeatedUint32"),
+                    Type.Uint64   => GetInternalUnitReference("uProtobufRepeatedUint64"),
+                    Type.Sint32   => GetInternalUnitReference("uProtobufRepeatedSint32"),
+                    Type.Sint64   => GetInternalUnitReference("uProtobufRepeatedSint64"),
+                    Type.Fixed32  => GetInternalUnitReference("uProtobufRepeatedFixed32"),
+                    Type.Fixed64  => GetInternalUnitReference("uProtobufRepeatedFixed64"),
+                    Type.Sfixed32 => GetInternalUnitReference("uProtobufRepeatedSfixed32"),
+                    Type.Sfixed64 => GetInternalUnitReference("uProtobufRepeatedSfixed64"),
+                    Type.Bool     => GetInternalUnitReference("uProtobufRepeatedBool"),
+                    Type.String   => GetInternalUnitReference("uProtobufRepeatedString"),
+                    Type.Bytes    => GetInternalUnitReference("uProtobufRepeatedBytes"),
+                    Type.Enum     => GetInternalUnitReference("uProtobufRepeatedEnum"),
+                    Type.Message  => GetInternalUnitReference("uProtobufRepeatedMessage"),
                     _ => throw new NotImplementedException()
                 };
             }

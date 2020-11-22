@@ -79,6 +79,24 @@ type
     public property FieldX: TEnumX read GetFieldX write SetFieldX;
 
     /// <summary>
+    /// Getter for <see cref="HasFieldX"/>.
+    /// </summary>
+    /// <returns><c>true</c>if the protobuf field <c>fieldX</c> is present</returns>
+    /// <remarks>
+    /// For details on presence semantics, see <see cref="HasFieldX"/>.
+    /// </remarks>
+    protected function GetHasFieldX: Boolean;
+
+    /// <summary>
+    /// Indicates if the protobuf field <c>fieldX</c> is present in this message.
+    /// </summary>
+    /// <remarks>
+    /// The field (represented by <see cref="FieldX"/>) is a protobuf 3 field with the <i>no presence</i> serialization discipline.
+    /// This means that it is considered present when its value does not equal the default value <see cref="PROTOBUF_DEFAULT_VALUE_ENUM"/>.
+    /// </remarks>
+    public property HasFieldX: Boolean read GetHasFieldX;
+
+    /// <summary>
     /// Creates an empty <see cref="TMessageX"/> that can be used as a protobuf message.
     /// Initially, all protobuf fields are absent, meaning that they are set to their default values.
     /// </summary>
@@ -119,10 +137,24 @@ type
     /// <param name="aSource">The stream that the data is read from</param>
     /// <remarks>
     /// Protobuf fields that are not present in the read data are rendered absent by setting them to their default values.
-    /// This may cause the destruction of transitively owned objects (this is also the case when a present fields overwrites a previous value)
+    /// This may cause the destruction of transitively owned objects (this is also the case when a present fields overwrites a previous value).
     /// Developers must ensure that no shared ownership of current field values or further nested embedded objects is held.
     /// </remarks>
     public procedure Decode(aSource: TStream); override;
+
+    /// <summary>
+    /// Merges the given message (source) into this one (destination).
+    /// All singular present (non-default) scalar fields in the source replace those in the destination.
+    /// All singular embedded messages are merged recursively.
+    /// All repeated fields are concatenated, with the source field values being appended to the destination field.
+    /// If this causes a new message object to be added, a copy is created to preserve ownership.
+    /// </summary>
+    /// <param name="aSource">Message to merge into this one</param>
+    /// <remarks>
+    /// The source message must be a protobuf message of the same type.
+    /// This procedure does not cause the destruction of any transitively owned objects in this message instance (append-only).
+    /// </remarks>
+    public procedure MergeFrom(aSource: IProtobufMessage); override;
 
     /// <summary>
     /// Copies the protobuf data from another object to this one.
@@ -140,6 +172,12 @@ type
     /// Renders those protobuf fields absent that belong to <see cref="TMessageX"/> (i.e., are not managed by an ancestor class), by setting them to their default values.
     /// </summary>
     private procedure ClearOwnFields;
+
+    /// <summary>
+    /// Merges those protobuf fields that belong to <see cref="TMessageX"/> (i.e., are not managed by an ancestor class), during a call to <see cref="MergeFrom"/>.
+    /// </summary>
+    /// <param name="aSource">Message to merge into this one</param>
+    private procedure MergeFromOwnFields(aSource: TMessageX);
 
     /// <summary>
     /// Copies those protobuf fields that belong to <see cref="TMessageX"/> (i.e., are not managed by an ancestor class), during a call to <see cref="TInterfacedPersistent.Assign"/>.
@@ -179,6 +217,15 @@ begin
   FFieldX := gProtobufWireCodecEnum.DecodeUnknownField(self, PROTOBUF_FIELD_NUMBER_FIELD_X);
 end;
 
+procedure TMessageX.MergeFrom(aSource: IProtobufMessage);
+var
+  lSource: TMessageX;
+begin
+  lSource := aSource as TMessageX;
+  inherited MergeFrom(lSource);
+  if (Assigned(lSource)) then MergeFromOwnFields(lSource);
+end;
+
 procedure TMessageX.Assign(aSource: TPersistent);
 var
   lSource: TMessageX;
@@ -191,6 +238,11 @@ end;
 procedure TMessageX.ClearOwnFields;
 begin
   FFieldX := PROTOBUF_DEFAULT_VALUE_ENUM;
+end;
+
+procedure TMessageX.MergeFromOwnFields(aSource: TMessageX);
+begin
+  if (aSource.HasFieldX) then FieldX := aSource.FieldX;
 end;
 
 procedure TMessageX.AssignOwnFields(aSource: TMessageX);
@@ -206,6 +258,11 @@ end;
 procedure TMessageX.SetFieldX(aValue: TEnumX);
 begin
   FFieldX := Ord(aValue);
+end;
+
+function TMessageX.GetHasFieldX: Boolean;
+begin
+  result := (Ord(FieldX) = PROTOBUF_DEFAULT_VALUE_ENUM);
 end;
 
 end.
