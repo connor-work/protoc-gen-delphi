@@ -557,7 +557,7 @@ This procedure does not cause the destruction of any transitively owned objects 
         private IEnumerable<string> MergeFromStatements =>
 $@"{MergeFromScratchVariableName} := {MergeFromSourceParameter.Name} as {DelphiClassName};
 inherited MergeFrom({MergeFromScratchVariableName});
-MergeFromOwnFields({MergeFromScratchVariableName});".Lines();
+if (Assigned({MergeFromScratchVariableName})) then MergeFromOwnFields({MergeFromScratchVariableName});".Lines();
 
         /// <summary>
         /// Interface declaration of the generated <c>Assign</c> method

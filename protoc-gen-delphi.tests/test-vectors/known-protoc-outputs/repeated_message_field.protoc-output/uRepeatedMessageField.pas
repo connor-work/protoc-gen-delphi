@@ -288,7 +288,7 @@ var
 begin
   lSource := aSource as TMessageX;
   inherited MergeFrom(lSource);
-  MergeFromOwnFields(lSource);
+  if (Assigned(lSource)) then MergeFromOwnFields(lSource);
 end;
 
 procedure TMessageX.Assign(aSource: TPersistent);
@@ -349,7 +349,7 @@ var
 begin
   lSource := aSource as TMessageY;
   inherited MergeFrom(lSource);
-  MergeFromOwnFields(lSource);
+  if (Assigned(lSource)) then MergeFromOwnFields(lSource);
 end;
 
 procedure TMessageY.Assign(aSource: TPersistent);

@@ -223,7 +223,7 @@ var
 begin
   lSource := aSource as TMessageX;
   inherited MergeFrom(lSource);
-  MergeFromOwnFields(lSource);
+  if (Assigned(lSource)) then MergeFromOwnFields(lSource);
 end;
 
 procedure TMessageX.Assign(aSource: TPersistent);
