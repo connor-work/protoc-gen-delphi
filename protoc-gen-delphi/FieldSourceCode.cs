@@ -523,7 +523,9 @@ For details on presence semantics, see <see cref=""{DelphiPresencePropertyName}"
         {
             get
             {
-                yield return $"result := ({DelphiPropertyName} = {field.Type.GetDelphiDefaultValueExpression()});";
+                string checkedExpression = IsEnum ? $"Ord({DelphiPropertyName})"
+                                                  : DelphiPropertyName;
+                yield return $"result := ({checkedExpression} = {field.Type.GetDelphiDefaultValueExpression()});";
             }
         }
 

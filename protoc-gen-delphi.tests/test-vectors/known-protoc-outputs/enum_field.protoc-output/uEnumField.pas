@@ -262,7 +262,7 @@ end;
 
 function TMessageX.GetHasFieldX: Boolean;
 begin
-  result := (FieldX = PROTOBUF_DEFAULT_VALUE_ENUM);
+  result := (Ord(FieldX) = PROTOBUF_DEFAULT_VALUE_ENUM);
 end;
 
 end.
