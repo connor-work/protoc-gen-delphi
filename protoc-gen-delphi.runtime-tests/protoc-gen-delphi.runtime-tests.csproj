@@ -3,7 +3,6 @@
     <!-- TODO: Version should be always same as protoc-gen-delphi -->
     <CoreVersion>0.7.0</CoreVersion>
     <PrereleaseVersionSuffix></PrereleaseVersionSuffix>
-    <SnapshotVersion>true</SnapshotVersion>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <RootNamespace>Work.Connor.Protobuf.Delphi.ProtocGenDelphi.RuntimeTests</RootNamespace>
     <IsPackable>true</IsPackable>

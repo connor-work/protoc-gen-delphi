@@ -2,7 +2,6 @@
   <PropertyGroup>
     <CoreVersion>0.7.0</CoreVersion>
     <PrereleaseVersionSuffix></PrereleaseVersionSuffix>
-    <SnapshotVersion>true</SnapshotVersion>
     <OutputType>exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <RootNamespace>Work.Connor.Protobuf.Delphi.ProtocGenDelphi</RootNamespace>
