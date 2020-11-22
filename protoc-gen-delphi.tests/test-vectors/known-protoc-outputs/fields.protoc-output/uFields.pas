@@ -69,6 +69,24 @@ type
     public property FieldX: UInt32 read GetFieldX write SetFieldX;
 
     /// <summary>
+    /// Getter for <see cref="HasFieldX"/>.
+    /// </summary>
+    /// <returns><c>true</c>if the protobuf field <c>fieldX</c> is present</returns>
+    /// <remarks>
+    /// For details on presence semantics, see <see cref="HasFieldX"/>.
+    /// </remarks>
+    protected function GetHasFieldX: Boolean;
+
+    /// <summary>
+    /// Indicates if the protobuf field <c>fieldX</c> is present in this message.
+    /// </summary>
+    /// <remarks>
+    /// The field (represented by <see cref="FieldX"/>) is a protobuf 3 field with the <i>no presence</i> serialization discipline.
+    /// This means that it is considered present when its value does not equal the default value <see cref="PROTOBUF_DEFAULT_VALUE_UINT32"/>.
+    /// </remarks>
+    public property HasFieldX: Boolean read GetHasFieldX;
+
+    /// <summary>
     /// Protobuf field number of the protobuf field <c>fieldY</c>.
     /// </summary>
     public const PROTOBUF_FIELD_NUMBER_FIELD_Y = 3;
@@ -108,6 +126,24 @@ type
     [ProtobufField(PROTOBUF_FIELD_NAME_FIELD_Y, PROTOBUF_FIELD_NUMBER_FIELD_Y)]
 {$ENDIF}
     public property FieldY: UnicodeString read GetFieldY write SetFieldY;
+
+    /// <summary>
+    /// Getter for <see cref="HasFieldY"/>.
+    /// </summary>
+    /// <returns><c>true</c>if the protobuf field <c>fieldY</c> is present</returns>
+    /// <remarks>
+    /// For details on presence semantics, see <see cref="HasFieldY"/>.
+    /// </remarks>
+    protected function GetHasFieldY: Boolean;
+
+    /// <summary>
+    /// Indicates if the protobuf field <c>fieldY</c> is present in this message.
+    /// </summary>
+    /// <remarks>
+    /// The field (represented by <see cref="FieldY"/>) is a protobuf 3 field with the <i>no presence</i> serialization discipline.
+    /// This means that it is considered present when its value does not equal the default value <see cref="PROTOBUF_DEFAULT_VALUE_STRING"/>.
+    /// </remarks>
+    public property HasFieldY: Boolean read GetHasFieldY;
 
     /// <summary>
     /// Creates an empty <see cref="TMessageX"/> that can be used as a protobuf message.
@@ -278,6 +314,11 @@ begin
   FFieldX := aValue;
 end;
 
+function TMessageX.GetHasFieldX: Boolean;
+begin
+  result := (FieldX = PROTOBUF_DEFAULT_VALUE_UINT32);
+end;
+
 function TMessageX.GetFieldY: UnicodeString;
 begin
   result := FFieldY;
@@ -286,6 +327,11 @@ end;
 procedure TMessageX.SetFieldY(aValue: UnicodeString);
 begin
   FFieldY := aValue;
+end;
+
+function TMessageX.GetHasFieldY: Boolean;
+begin
+  result := (FieldY = PROTOBUF_DEFAULT_VALUE_STRING);
 end;
 
 end.

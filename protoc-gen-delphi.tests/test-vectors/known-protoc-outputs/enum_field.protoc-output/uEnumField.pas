@@ -79,6 +79,24 @@ type
     public property FieldX: TEnumX read GetFieldX write SetFieldX;
 
     /// <summary>
+    /// Getter for <see cref="HasFieldX"/>.
+    /// </summary>
+    /// <returns><c>true</c>if the protobuf field <c>fieldX</c> is present</returns>
+    /// <remarks>
+    /// For details on presence semantics, see <see cref="HasFieldX"/>.
+    /// </remarks>
+    protected function GetHasFieldX: Boolean;
+
+    /// <summary>
+    /// Indicates if the protobuf field <c>fieldX</c> is present in this message.
+    /// </summary>
+    /// <remarks>
+    /// The field (represented by <see cref="FieldX"/>) is a protobuf 3 field with the <i>no presence</i> serialization discipline.
+    /// This means that it is considered present when its value does not equal the default value <see cref="PROTOBUF_DEFAULT_VALUE_ENUM"/>.
+    /// </remarks>
+    public property HasFieldX: Boolean read GetHasFieldX;
+
+    /// <summary>
     /// Creates an empty <see cref="TMessageX"/> that can be used as a protobuf message.
     /// Initially, all protobuf fields are absent, meaning that they are set to their default values.
     /// </summary>
@@ -240,6 +258,11 @@ end;
 procedure TMessageX.SetFieldX(aValue: TEnumX);
 begin
   FFieldX := Ord(aValue);
+end;
+
+function TMessageX.GetHasFieldX: Boolean;
+begin
+  result := (FieldX = PROTOBUF_DEFAULT_VALUE_ENUM);
 end;
 
 end.
