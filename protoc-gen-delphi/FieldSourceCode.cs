@@ -662,7 +662,7 @@ begin
 end;".Lines();
                     foreach (string line in lines) yield return line;
                 }
-                else yield return $"if ({parameter}.{DelphiPropertyName} <> {field.Type.GetDelphiDefaultValueExpression()}) then {DelphiPropertyName} := {parameter}.{DelphiPropertyName};";
+                else yield return $"if ({parameter}.{DelphiPresencePropertyName}) then {DelphiPropertyName} := {parameter}.{DelphiPropertyName};";
 
             }
         }

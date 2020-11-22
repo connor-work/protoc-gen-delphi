@@ -294,8 +294,8 @@ end;
 
 procedure TMessageX.MergeFromOwnFields(aSource: TMessageX);
 begin
-  if (aSource.FieldX <> PROTOBUF_DEFAULT_VALUE_UINT32) then FieldX := aSource.FieldX;
-  if (aSource.FieldY <> PROTOBUF_DEFAULT_VALUE_STRING) then FieldY := aSource.FieldY;
+  if (aSource.HasFieldX) then FieldX := aSource.FieldX;
+  if (aSource.HasFieldY) then FieldY := aSource.FieldY;
 end;
 
 procedure TMessageX.AssignOwnFields(aSource: TMessageX);
