@@ -55,6 +55,16 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         private static IdentifierGenerator<FieldDescriptorProto> PropertyIdentifier => new IdentifierTemplate<FieldDescriptorProto>("property", x => x.Name, "_ProtobufField", IdentifierCase.Pascal, caseSensitive: false);
 
         /// <summary>
+        /// Mapping of protobuf fields to identifiers for Delphi getters for field presence
+        /// </summary>
+        private static IdentifierGenerator<FieldDescriptorProto> PresenceGetterIdentifier => new IdentifierTemplate<FieldDescriptorProto>("presence getter", x => x.Name, "_ProtobufField", IdentifierCase.Pascal, "GetHas", caseSensitive: false);
+
+        /// <summary>
+        /// Mapping of protobuf fields to identifiers for Delphi properties indicating field presence
+        /// </summary>
+        private static IdentifierGenerator<FieldDescriptorProto> PresencePropertyIdentifier => new IdentifierTemplate<FieldDescriptorProto>("presence property", x => x.Name, "_ProtobufField", IdentifierCase.Pascal, "Has", caseSensitive: false);
+
+        /// <summary>
         /// Mapping of protobuf fields to identifiers for Delphi constants for their field number
         /// </summary>
         private static IdentifierGenerator<FieldDescriptorProto> FieldNumberConstantIdentifier => new IdentifierTemplate<FieldDescriptorProto>("field number constant", x => x.Name, "", IdentifierCase.ScreamingSnake, "PROTOBUF_FIELD_NUMBER_", caseSensitive: false);
@@ -101,6 +111,11 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// Name of the Delphi property
         /// </summary>
         private string DelphiPropertyName => PropertyIdentifier.Generate(field);
+
+        /// <summary>
+        /// Name of the Delphi property indicating field presence
+        /// </summary>
+        private string DelphiPresencePropertyName => PresencePropertyIdentifier.Generate(field);
 
         /// <summary>
         /// Delphi type identifier of the Delphi type that is used to represent the protobuf field value(s) when communicating with internal (runtime) code
@@ -183,52 +198,69 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// <summary>
         /// Nested declarations in the containing message class that are added to represent the field
         /// </summary>
-        public IEnumerable<ClassDeclarationNestedDeclaration> ClassNestedDeclarations => new ClassDeclarationNestedDeclaration[]
+        public IEnumerable<ClassDeclarationNestedDeclaration> ClassNestedDeclarations
         {
-            new ClassDeclarationNestedDeclaration()
+            get
             {
-                Visibility = Visibility.Public,
-                NestedConstDeclaration = new ConstDeclaration() { TrueConstDeclaration = FieldNumberConstant }
-            },
-            new ClassDeclarationNestedDeclaration()
-            {
-                Visibility = Visibility.Public,
-                NestedConstDeclaration = new ConstDeclaration() { TrueConstDeclaration = FieldNameConstant }
-            },
-            new ClassDeclarationNestedDeclaration()
-            {
-                Visibility = Visibility.Private,
-                Member = new ClassMemberDeclaration() { FieldDeclaration = DelphiField }
-            },
-            new ClassDeclarationNestedDeclaration()
-            {
-                Visibility = Visibility.Protected,
-                Member = new ClassMemberDeclaration() { MethodDeclaration = GetterInterface }
-            },
-            new ClassDeclarationNestedDeclaration()
-            {
-                Visibility = Visibility.Protected,
-                Member = new ClassMemberDeclaration() { MethodDeclaration = SetterInterface }
-            },
-            new ClassDeclarationNestedDeclaration()
-            {
-                Visibility = Visibility.Public,
-                Member = new ClassMemberDeclaration()
+                yield return new ClassDeclarationNestedDeclaration()
                 {
-                    PropertyDeclaration = DelphiProperty,
-                    AttributeAnnotations = { DelphiPropertyAttribute }
-                }
+                    Visibility = Visibility.Public,
+                    NestedConstDeclaration = new ConstDeclaration() { TrueConstDeclaration = FieldNumberConstant }
+                };
+                yield return new ClassDeclarationNestedDeclaration()
+                {
+                    Visibility = Visibility.Public,
+                    NestedConstDeclaration = new ConstDeclaration() { TrueConstDeclaration = FieldNameConstant }
+                };
+                yield return new ClassDeclarationNestedDeclaration()
+                {
+                    Visibility = Visibility.Private,
+                    Member = new ClassMemberDeclaration() { FieldDeclaration = DelphiField }
+                };
+                yield return new ClassDeclarationNestedDeclaration()
+                {
+                    Visibility = Visibility.Protected,
+                    Member = new ClassMemberDeclaration() { MethodDeclaration = GetterInterface }
+                };
+                yield return new ClassDeclarationNestedDeclaration()
+                {
+                    Visibility = Visibility.Protected,
+                    Member = new ClassMemberDeclaration() { MethodDeclaration = SetterInterface }
+                };
+                yield return new ClassDeclarationNestedDeclaration()
+                {
+                    Visibility = Visibility.Public,
+                    Member = new ClassMemberDeclaration()
+                    {
+                        PropertyDeclaration = DelphiProperty,
+                        AttributeAnnotations = { DelphiPropertyAttribute }
+                    }
+                };
+                if (IsSingular) yield return new ClassDeclarationNestedDeclaration()
+                {
+                    Visibility = Visibility.Protected,
+                    Member = new ClassMemberDeclaration() { MethodDeclaration = PresenceGetterInterface }
+                };
+                if (IsSingular) yield return new ClassDeclarationNestedDeclaration()
+                {
+                    Visibility = Visibility.Public,
+                    Member = new ClassMemberDeclaration() { PropertyDeclaration = DelphiPresenceProperty }
+                };
             }
-        };
+        }
 
         /// <summary>
         /// Method declarations of the surrounding Delphi class that are added to represent the field
         /// </summary>
-        public IEnumerable<MethodDeclaration> MethodDeclarations => new MethodDeclaration[]
+        public IEnumerable<MethodDeclaration> MethodDeclarations
         {
-            Getter,
-            Setter
-        };
+            get
+            {
+                yield return Getter;
+                yield return Setter;
+                if (IsSingular) yield return PresenceGetter;
+            }
+        }
 
         /// <summary>
         /// Delphi true constant to hold the protobuf field number of the field
@@ -442,6 +474,81 @@ This property corresponds to the protobuf field <c>{field.Name}</c>.
         /// RTTI attribute annotation for the generated Delphi property
         /// </summary>
         private AttributeAnnotation DelphiPropertyAttribute => new AttributeAnnotation() { Attribute = $"ProtobufField({FieldNameConstant.Identifier}, {FieldNumberConstant.Identifier})" };
+
+        /// <summary>
+        /// Interface declaration of the generated Delphi getter method for field presence
+        /// </summary>
+        private MethodInterfaceDeclaration PresenceGetterInterface => new MethodInterfaceDeclaration()
+        {
+            Prototype = PresenceGetterPrototype,
+            Comment = new AnnotationComment() { CommentLines = { PresenceGetterComment } }
+        };
+
+        /// <summary>
+        /// Prototype of the generated Delphi getter method for field presence
+        /// </summary>
+        private Prototype PresenceGetterPrototype => new Prototype()
+        {
+            Name = PresenceGetterIdentifier.Generate(field),
+            Type = Prototype.Types.Type.Function,
+            ReturnType = "Boolean"
+        };
+
+        /// <summary>
+        /// XML documentation comment for the generated Delphi getter method for field presence
+        /// </summary>
+        private IEnumerable<string> PresenceGetterComment =>
+$@"<summary>
+Getter for <see cref=""{DelphiPresencePropertyName}""/>.
+</summary>
+<returns><c>true</c>if the protobuf field <c>{field.Name}</c> is present</returns>
+<remarks>
+For details on presence semantics, see <see cref=""{DelphiPresencePropertyName}""/>.
+</remarks>".Lines();
+
+        /// <summary>
+        /// Method declaration of the generated Delphi getter method for field presence
+        /// </summary>
+        private MethodDeclaration PresenceGetter => new MethodDeclaration()
+        {
+            // Class not assigned, caller shall assign
+            Prototype = PresenceGetterPrototype,
+            Statements = { PresenceGetterStatements }
+        };
+
+        /// <summary>
+        /// Statement block of the generated Delphi getter method for field presence
+        /// </summary>
+        private IEnumerable<string> PresenceGetterStatements
+        {
+            get
+            {
+                yield return $"result := ({DelphiPropertyName} = {field.Type.GetDelphiDefaultValueExpression()});";
+            }
+        }
+
+        /// <summary>
+        /// Generated Delphi property indicating field presence
+        /// </summary>
+        private PropertyDeclaration DelphiPresenceProperty => new PropertyDeclaration()
+        {
+            Name = DelphiPresencePropertyName,
+            Type = "Boolean",
+            ReadSpecifier = PresenceGetterPrototype.Name,
+            Comment = new AnnotationComment() { CommentLines = { DelphiPresencePropertyComment } }
+        };
+
+        /// <summary>
+        /// XML documentation comment for the generated Delphi property indicating field presence
+        /// </summary>
+        private IEnumerable<string> DelphiPresencePropertyComment =>
+$@"<summary>
+Indicates if the protobuf field <c>{field.Name}</c> is present in this message.
+</summary>
+<remarks>
+The field (represented by <see cref=""{DelphiPropertyName}""/>) is a protobuf 3 field with the <i>no presence</i> serialization discipline.
+This means that it is considered present when its value does not equal the default value <see cref=""{field.Type.GetDelphiDefaultValueExpression()}""/>.
+</remarks>".Lines();
 
         /// <summary>
         /// Source code lines to be added to the <c>Create</c> method's statement block in the containing message class
