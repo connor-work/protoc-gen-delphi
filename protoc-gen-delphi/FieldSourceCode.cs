@@ -37,37 +37,37 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// <summary>
         /// Mapping of protobuf fields to identifiers for Delphi fields
         /// </summary>
-        private static IdentifierGenerator<FieldDescriptorProto> FieldIdentifier => new IdentifierTemplate<FieldDescriptorProto>("field", x => x.Name, "_ProtobufField", IdentifierCase.Pascal, "F");
+        private static IdentifierGenerator<FieldDescriptorProto> FieldIdentifier => new IdentifierTemplate<FieldDescriptorProto>("field", x => x.Name, "_ProtobufField", IdentifierCase.Pascal, "F", caseSensitive: false);
 
         /// <summary>
         /// Mapping of protobuf fields to identifiers for Delphi getters
         /// </summary>
-        private static IdentifierGenerator<FieldDescriptorProto> GetterIdentifier => new IdentifierTemplate<FieldDescriptorProto>("field getter", x => x.Name, "_ProtobufField", IdentifierCase.Pascal, "Get");
+        private static IdentifierGenerator<FieldDescriptorProto> GetterIdentifier => new IdentifierTemplate<FieldDescriptorProto>("field getter", x => x.Name, "_ProtobufField", IdentifierCase.Pascal, "Get", caseSensitive: false);
 
         /// <summary>
         /// Mapping of protobuf fields to identifiers for Delphi setters
         /// </summary>
-        private static IdentifierGenerator<FieldDescriptorProto> SetterIdentifier => new IdentifierTemplate<FieldDescriptorProto>("field setter", x => x.Name, "_ProtobufField", IdentifierCase.Pascal, "Set");
+        private static IdentifierGenerator<FieldDescriptorProto> SetterIdentifier => new IdentifierTemplate<FieldDescriptorProto>("field setter", x => x.Name, "_ProtobufField", IdentifierCase.Pascal, "Set", caseSensitive: false);
 
         /// <summary>
         /// Mapping of protobuf fields to identifiers for Delphi properties
         /// </summary>
-        private static IdentifierGenerator<FieldDescriptorProto> PropertyIdentifier => new IdentifierTemplate<FieldDescriptorProto>("property", x => x.Name, "_ProtobufField", IdentifierCase.Pascal);
+        private static IdentifierGenerator<FieldDescriptorProto> PropertyIdentifier => new IdentifierTemplate<FieldDescriptorProto>("property", x => x.Name, "_ProtobufField", IdentifierCase.Pascal, caseSensitive: false);
 
         /// <summary>
         /// Mapping of protobuf fields to identifiers for Delphi constants for their field number
         /// </summary>
-        private static IdentifierGenerator<FieldDescriptorProto> FieldNumberConstantIdentifier => new IdentifierTemplate<FieldDescriptorProto>("field number constant", x => x.Name, "", IdentifierCase.ScreamingSnake, "PROTOBUF_FIELD_NUMBER_");
+        private static IdentifierGenerator<FieldDescriptorProto> FieldNumberConstantIdentifier => new IdentifierTemplate<FieldDescriptorProto>("field number constant", x => x.Name, "", IdentifierCase.ScreamingSnake, "PROTOBUF_FIELD_NUMBER_", caseSensitive: false);
 
         /// <summary>
         /// Mapping of protobuf fields to identifiers for Delphi constants for their field name
         /// </summary>
-        private static IdentifierGenerator<FieldDescriptorProto> FieldNameConstantIdentifier => new IdentifierTemplate<FieldDescriptorProto>("field name constant", x => x.Name, "", IdentifierCase.ScreamingSnake, "PROTOBUF_FIELD_NAME_");
+        private static IdentifierGenerator<FieldDescriptorProto> FieldNameConstantIdentifier => new IdentifierTemplate<FieldDescriptorProto>("field name constant", x => x.Name, "", IdentifierCase.ScreamingSnake, "PROTOBUF_FIELD_NAME_", caseSensitive: false);
 
         /// <summary>
         /// Mapping of protobuf fields to identifiers for Delphi scratch variables
         /// </summary>
-        private static IdentifierGenerator<FieldDescriptorProto> ScratchVariableIdentifier => new IdentifierTemplate<FieldDescriptorProto>("scratch variable", x => x.Name, "_ProtobufField", IdentifierCase.Pascal, "l");
+        private static IdentifierGenerator<FieldDescriptorProto> ScratchVariableIdentifier => new IdentifierTemplate<FieldDescriptorProto>("scratch variable", x => x.Name, "_ProtobufField", IdentifierCase.Pascal, "l", caseSensitive: false);
 
         /// <summary>
         /// Unit reference for the Delphi <c>SysUtils</c> unit

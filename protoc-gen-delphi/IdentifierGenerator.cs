@@ -111,9 +111,19 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         private string Suffix { get; }
 
         /// <summary>
-        /// Regular expression matching a potential output of the generation scheme
+        /// <see langword="true"/> if collision avoidance checks shall be case-sensitive
+        /// </summary>
+        private bool CaseSensitive { get; }
+
+        /// <summary>
+        /// Regular expression matching a potential output of the generation scheme (case-sensitive)
         /// </summary>
         private Regex IdentifierRegex => new Regex($@"^{Regex.Escape(Prefix)}{Case.IdentifierRegex()}{Regex.Escape(Suffix)}$");
+
+        /// <summary>
+        /// Regular expression matching a potential output of the generation scheme (case-insensitive version)
+        /// </summary>
+        private Regex IdentifierCaseInsensitiveRegex => new Regex($@"(?i){IdentifierRegex}(?-i)");
 
         protected override string IdentifierType => Type;
 
@@ -126,8 +136,9 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// <param name="case">Identifier case style for the generated identifier</param>
         /// <param name="prefix">Prefix prepended to the case-styled identifier core</param>
         /// <param name="suffix">Suffix appended to the case-styled identifier core</param>
+        /// <param name="caseSensitive"><see langword="true"/> if collision avoidance checks shall be case-sensitive</param>
         public IdentifierTemplate(string type, Func<T, string> converter, string collisionAvoidanceSuffix,
-            IdentifierCase @case = IdentifierCase.None, string prefix = "", string suffix = "")
+            IdentifierCase @case = IdentifierCase.None, string prefix = "", string suffix = "", bool caseSensitive = true)
         {
             Type = type;
             Converter = converter;
@@ -135,9 +146,10 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
             Case = @case;
             Prefix = prefix;
             Suffix = suffix;
+            CaseSensitive = caseSensitive;
         }
 
-        protected override bool CouldGenerate(string identifier) => IdentifierRegex.IsMatch(identifier);
+        protected override bool CouldGenerate(string identifier) => (CaseSensitive ? IdentifierRegex : IdentifierCaseInsensitiveRegex).IsMatch(identifier);
 
         protected override string GenerateOwn(T entity, bool avoidCollision) => $"{Prefix}{(Converter.Invoke(entity) + (avoidCollision ? CollisionAvoidanceSuffix : "")).ToCase(Case)}{Suffix}";
     }

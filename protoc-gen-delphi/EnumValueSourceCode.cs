@@ -36,7 +36,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// <summary>
         /// Mapping of protobuf enum values to identifiers for Delphi enumerated values
         /// </summary>
-        private IdentifierGenerator<EnumValueDescriptorProto> EnumValueIdentifier => new IdentifierTemplate<EnumValueDescriptorProto>("enumerated value", x => x.Name, "_ProtobufEnumValue", IdentifierCase.Pascal, prefix ?? "");
+        private IdentifierGenerator<EnumValueDescriptorProto> EnumValueIdentifier => new IdentifierTemplate<EnumValueDescriptorProto>("enumerated value", x => x.Name, "_ProtobufEnumValue", IdentifierCase.Pascal, prefix ?? "", caseSensitive: false);
 
         /// <summary>
         /// Protobuf enum value to generate code for

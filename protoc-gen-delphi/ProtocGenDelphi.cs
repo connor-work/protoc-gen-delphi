@@ -35,12 +35,12 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// <summary>
         /// Mapping of protobuf type names to identifiers for Delphi types
         /// </summary>
-        private static IdentifierGenerator<string> TypeIdentifier => new IdentifierTemplate<string>("type", x => x, "_ProtobufType", IdentifierCase.Pascal, "T");
+        private static IdentifierGenerator<string> TypeIdentifier => new IdentifierTemplate<string>("type", x => x, "_ProtobufType", IdentifierCase.Pascal, "T", caseSensitive: false);
 
         /// <summary>
         /// Mapping of protobuf schema names to identifiers for Delphi units
         /// </summary>
-        private static IdentifierGenerator<string> UnitIdentifier => new IdentifierTemplate<string>("unit", x => x, "_ProtobufSchema", IdentifierCase.Pascal, "u");
+        private static IdentifierGenerator<string> UnitIdentifier => new IdentifierTemplate<string>("unit", x => x, "_ProtobufSchema", IdentifierCase.Pascal, "u", caseSensitive: false);
 
         /// <summary>
         /// File name extension (without leading dot) for protobuf schema definitions
