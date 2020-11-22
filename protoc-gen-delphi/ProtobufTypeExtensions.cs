@@ -73,7 +73,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
             Type.Sfixed64 => "PROTOBUF_DEFAULT_VALUE_SFIXED64",
             Type.Bool     => "PROTOBUF_DEFAULT_VALUE_BOOL",
             Type.String   => "PROTOBUF_DEFAULT_VALUE_STRING",
-            Type.Bytes    => "[]",
+            Type.Bytes    => "PROTOBUF_DEFAULT_VALUE_BYTES",
             Type.Enum     => "PROTOBUF_DEFAULT_VALUE_ENUM",
             Type.Message  => "PROTOBUF_DEFAULT_VALUE_MESSAGE",
             _ => throw new NotImplementedException()
