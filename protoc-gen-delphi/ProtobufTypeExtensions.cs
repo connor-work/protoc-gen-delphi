@@ -13,7 +13,6 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
-using Google.Protobuf.Reflection;
 using System;
 using Type = Google.Protobuf.Reflection.FieldDescriptorProto.Types.Type;
 

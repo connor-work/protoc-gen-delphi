@@ -65,7 +65,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Work.Connor.Delphi.CodeWriter" Version="0.14.0" />
+    <PackageReference Include="Work.Connor.Delphi.CodeWriter" Version="0.15.0" />
     <PackageReference Include="Work.Connor.Delphi.Commons.CodeWriterExtensions" Version="0.1.0" />
   </ItemGroup>
 

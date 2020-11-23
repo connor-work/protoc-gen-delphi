@@ -57,7 +57,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// <summary>
         /// Name of the Delphi enumerated value
         /// </summary>
-        private string DelphiEnumValueName => EnumValueIdentifier.Generate(enumValue);
+        private string DelphiEnumValueName => EnumValueIdentifier.Generate(enumValue, reservedIdentifiers: ProtocGenDelphi.ReservedIdentifiers);
 
         /// <summary>
         /// Generated Delphi enumerated value

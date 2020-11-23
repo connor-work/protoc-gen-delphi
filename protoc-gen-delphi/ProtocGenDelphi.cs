@@ -43,6 +43,11 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         private static IdentifierGenerator<string> UnitIdentifier => new IdentifierTemplate<string>("unit", x => x, "_ProtobufSchema", IdentifierCase.Pascal, "u", caseSensitive: false);
 
         /// <summary>
+        /// Reserved identifiers that shall not be used by generated source code
+        /// </summary>
+        internal static IEnumerable<string> ReservedIdentifiers => ((ReservedWord[]) Enum.GetValues(typeof(ReservedWord))).Select(word => word.ToSourceCode());
+
+        /// <summary>
         /// File name extension (without leading dot) for protobuf schema definitions
         /// </summary>
         public static readonly string protoFileExtension = "proto";
@@ -67,7 +72,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// </summary>
         private readonly IRuntimeSupport runtime = IRuntimeSupport.Default;
 
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
             if (args.Length != 0) throw new ArgumentException("protoc-gen-delphi does not expect program arguments");
             // protoc communicates with the plug-in through stdin and stdout
@@ -146,9 +151,9 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// </summary>
         /// <param name="typeName">The protobuf type's name</param>
         /// <returns>The Delphi type name</returns>
-        public static string ConstructDelphiTypeName(string typeName)
+        internal static string ConstructDelphiTypeName(string typeName)
         {
-            if (!typeName.StartsWith(".")) return TypeIdentifier.Generate(typeName);
+            if (!typeName.StartsWith(".")) return TypeIdentifier.Generate(typeName, reservedIdentifiers: ReservedIdentifiers);
             string[] typeNameSegments = typeName.Split(".", StringSplitOptions.RemoveEmptyEntries).ToArray();
             string unqualifiedName = ConstructDelphiTypeName(typeNameSegments[^1]);
             if (typeNameSegments.Length < 2) return unqualifiedName;
@@ -161,9 +166,9 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// <param name="nameSpaceSegments">Segments in the protobuf namespace string</param>
         /// <param name="schemaName">Unqualified schema name (should be .proto file name without extension)</param>
         /// <returns>The unit identifier</returns>
-        public static UnitIdentifier ConstructUnitIdentifier(string[] nameSpaceSegments, string schemaName) => new UnitIdentifier()
+        internal static UnitIdentifier ConstructUnitIdentifier(string[] nameSpaceSegments, string schemaName) => new UnitIdentifier()
         {
-            Unit = UnitIdentifier.Generate(schemaName),
+            Unit = UnitIdentifier.Generate(schemaName, reservedIdentifiers: ReservedIdentifiers),
             Namespace = { nameSpaceSegments.Select(segment => segment.ToCase(IdentifierCase.Pascal)) }
         };
     }

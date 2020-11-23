@@ -45,8 +45,16 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// Tests whether an identifier is potential output of the mapping scheme.
         /// </summary>
         /// <param name="identifier">The identifier</param>
-        /// <returns> <see langword="true"/> if the identifier is a potential output</returns>
+        /// <returns><see langword="true"/> if the identifier is a potential output</returns>
         protected abstract bool CouldGenerate(string identifier);
+
+        /// <summary>
+        /// Tests whether two identifiers are considered two collide.
+        /// </summary>
+        /// <param name="identifier1">The first identifier</param>
+        /// <param name="identifier2">The second identifier</param>
+        /// <returns><see langword="true"/> if the identifiers are considered two collide</returns>
+        protected abstract bool IdentifiersCollide(string identifier1, string identifier2);
 
         public override string? ToString() => $"[{IdentifierType} generator]";
 
@@ -64,7 +72,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
             string identifier = GenerateOwn(entity, false);
             IdentifierGenerator<T>? avoidedCollider = colliders.FirstOrDefault(generator => generator.CouldGenerate(identifier));
             string? avoidedReservedIdentifier = null;
-            if (avoidedCollider is null && reservedIdentifiers.Contains(identifier)) avoidedReservedIdentifier = identifier;
+            if (avoidedCollider is null) avoidedReservedIdentifier = reservedIdentifiers.FirstOrDefault(reservedIdentifier => IdentifiersCollide(identifier, reservedIdentifier));
             if (avoidedReservedIdentifier is null) return identifier;
             identifier = GenerateOwn(entity, true);
             IdentifierGenerator<T>? unavoidableCollider = colliders.FirstOrDefault(generator => generator.CouldGenerate(identifier));
@@ -152,5 +160,8 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         protected override bool CouldGenerate(string identifier) => (CaseSensitive ? IdentifierRegex : IdentifierCaseInsensitiveRegex).IsMatch(identifier);
 
         protected override string GenerateOwn(T entity, bool avoidCollision) => $"{Prefix}{(Converter.Invoke(entity) + (avoidCollision ? CollisionAvoidanceSuffix : "")).ToCase(Case)}{Suffix}";
+
+        protected override bool IdentifiersCollide(string identifier1, string identifier2) => CaseSensitive ? identifier1 == identifier2
+                                                                                                            : identifier1.Equals(identifier2, StringComparison.InvariantCultureIgnoreCase);
     }
 }

@@ -110,12 +110,12 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// <summary>
         /// Name of the Delphi property
         /// </summary>
-        private string DelphiPropertyName => PropertyIdentifier.Generate(field);
+        private string DelphiPropertyName => PropertyIdentifier.Generate(field, reservedIdentifiers: ProtocGenDelphi.ReservedIdentifiers);
 
         /// <summary>
         /// Name of the Delphi property indicating field presence
         /// </summary>
-        private string DelphiPresencePropertyName => PresencePropertyIdentifier.Generate(field);
+        private string DelphiPresencePropertyName => PresencePropertyIdentifier.Generate(field, reservedIdentifiers: ProtocGenDelphi.ReservedIdentifiers);
 
         /// <summary>
         /// Delphi type identifier of the Delphi type that is used to represent the protobuf field value(s) when communicating with internal (runtime) code
@@ -267,7 +267,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// </summary>
         private TrueConstDeclaration FieldNumberConstant => new TrueConstDeclaration()
         {
-            Identifier = FieldNumberConstantIdentifier.Generate(field),
+            Identifier = FieldNumberConstantIdentifier.Generate(field, reservedIdentifiers: ProtocGenDelphi.ReservedIdentifiers),
             Value = field.Number.ToString(),
             Comment = new AnnotationComment() { CommentLines = { FieldNumberConstantComment } }
         };
@@ -285,7 +285,7 @@ Protobuf field number of the protobuf field <c>{field.Name}</c>.
         /// </summary>
         private TrueConstDeclaration FieldNameConstant => new TrueConstDeclaration()
         {
-            Identifier = FieldNameConstantIdentifier.Generate(field),
+            Identifier = FieldNameConstantIdentifier.Generate(field, reservedIdentifiers: ProtocGenDelphi.ReservedIdentifiers),
             Value = $"'{field.Name}'",
             Comment = new AnnotationComment() { CommentLines = { FieldNameConstantComment } }
         };
@@ -303,7 +303,7 @@ Protobuf field name of the protobuf field <c>{field.Name}</c>.
         /// </summary>
         private FieldDeclaration DelphiField => new FieldDeclaration()
         {
-            Name = FieldIdentifier.Generate(field),
+            Name = FieldIdentifier.Generate(field, reservedIdentifiers: ProtocGenDelphi.ReservedIdentifiers),
             Type = PrivateDelphiType,
             Comment = new AnnotationComment()
             {
@@ -334,7 +334,7 @@ Holds the decoded value of the protobuf field <c>{field.Name}</c>.
         /// </summary>
         private Prototype GetterPrototype => new Prototype()
         {
-            Name = GetterIdentifier.Generate(field),
+            Name = GetterIdentifier.Generate(field, reservedIdentifiers: ProtocGenDelphi.ReservedIdentifiers),
             Type = Prototype.Types.Type.Function,
             ReturnType = PublicDelphiType
         };
@@ -389,7 +389,7 @@ May be overridden. Overriders shall only add side-effects and must call the ance
         /// </summary>
         private Prototype SetterPrototype => new Prototype()
         {
-            Name = SetterIdentifier.Generate(field),
+            Name = SetterIdentifier.Generate(field, reservedIdentifiers: ProtocGenDelphi.ReservedIdentifiers),
             Type = Prototype.Types.Type.Procedure,
             ParameterList = { SetterParameter }
         };
@@ -489,7 +489,7 @@ This property corresponds to the protobuf field <c>{field.Name}</c>.
         /// </summary>
         private Prototype PresenceGetterPrototype => new Prototype()
         {
-            Name = PresenceGetterIdentifier.Generate(field),
+            Name = PresenceGetterIdentifier.Generate(field, reservedIdentifiers: ProtocGenDelphi.ReservedIdentifiers),
             Type = Prototype.Types.Type.Function,
             ReturnType = "Boolean"
         };
@@ -639,7 +639,7 @@ end;".Lines();
         /// <summary>
         /// Name of the local variable of the <c>MergeFromOwnFields</c> method in the containing class, that is used for the field
         /// </summary>
-        private string MergeFromOwnFieldsScratchVariableName => ScratchVariableIdentifier.Generate(field);
+        private string MergeFromOwnFieldsScratchVariableName => ScratchVariableIdentifier.Generate(field, reservedIdentifiers: ProtocGenDelphi.ReservedIdentifiers);
 
         /// <summary>
         /// Source code lines to be added to the <c>MergeFromOwnFields</c> method's statement block in the containing message class
@@ -681,7 +681,7 @@ end;".Lines();
         /// <summary>
         /// Name of the local variable of the <c>AssignOwnFields</c> method in the containing class, that is used for the field
         /// </summary>
-        private string AssignOwnFieldsScratchVariableName => ScratchVariableIdentifier.Generate(field);
+        private string AssignOwnFieldsScratchVariableName => ScratchVariableIdentifier.Generate(field, reservedIdentifiers: ProtocGenDelphi.ReservedIdentifiers);
 
         /// <summary>
         /// Source code lines to be added to the <c>AssignOwnFields</c> method's statement block in the containing message class
