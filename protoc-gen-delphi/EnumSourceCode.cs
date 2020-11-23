@@ -17,8 +17,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Google.Protobuf.Reflection;
 using Work.Connor.Delphi;
-using static Work.Connor.Delphi.Visibility;
-using static Work.Connor.Delphi.MethodInterfaceDeclaration.Types.Binding;
 using static Work.Connor.Delphi.CodeWriter.StringExtensions;
 
 namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
