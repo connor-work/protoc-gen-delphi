@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+message ntil {
+    uint32 unit = 1;
+}
+
+enum hen {
+    NONE = 0;
+}
+
+enum h {
+    readvar = 0;
+}
