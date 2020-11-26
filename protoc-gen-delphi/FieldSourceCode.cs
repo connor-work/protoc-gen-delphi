@@ -593,20 +593,12 @@ For details on presence semantics, see <see cref=""{DelphiPresencePropertyName}"
         /// <summary>
         /// Statement block of the generated Delphi setter method for field presence
         /// </summary>
-        private IEnumerable<string> PresenceSetterStatements
-        {
-            get
-            {
-                string setAbsentStatement = IsRepeated ? $"{DelphiPropertyName}.Clear;"
-                                                       : $"{DelphiPropertyName} := {field.Type.GetDelphiDefaultValueExpression()};";
-                return
+        private IEnumerable<string> PresenceSetterStatements =>
 $@"if ({PresenceSetterParameter.Name}) then
 begin
   if (not {DelphiPresencePropertyName}) then raise EProtobufInvalidOperation.Create('Attempted to set a protobuf field to present without defining a value');
 end
-else {setAbsentStatement}".Lines();
-            }
-        }
+else {DelphiPropertyName} := {field.Type.GetDelphiDefaultValueExpression()};".Lines();
 
         /// <summary>
         /// Generated Delphi property indicating field presence
