@@ -678,7 +678,7 @@ begin
   {DelphiPropertyName} := {PrivateDelphiType}.Create;
   {DelphiPropertyName}.DecodeAsUnknownSingularField(self, {FieldNumberConstant.Identifier});
 end
-else {DelphiPropertyName} := {Type.Message.GetDelphiDefaultValueExpression()};".Lines();
+else {DelphiPresencePropertyName} := False;".Lines();
                     foreach (string line in lines) yield return line;
                 }
                 else yield return $"{DelphiPropertyName} := {field.Type.GetDelphiWireCodec()}.DecodeUnknownField(self, {FieldNumberConstant.Identifier});";
@@ -693,7 +693,7 @@ else {DelphiPropertyName} := {Type.Message.GetDelphiDefaultValueExpression()};".
             get
             {
                 yield return IsRepeated ? $"{DelphiPropertyName}.Clear;"
-                                        : $"{DelphiPropertyName} := {field.Type.GetDelphiDefaultValueExpression()};";
+                                        : $"{DelphiPresencePropertyName} := False;";
             }
         }
 
