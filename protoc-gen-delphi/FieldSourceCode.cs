@@ -575,7 +575,7 @@ $@"<summary>
 Setter for <see cref=""{DelphiPresencePropertyName}""/>.
 </summary>
 <param name=""{PresenceSetterParameter.Name}""><c>true</c> if the protobuf field <c>{field.Name}</c> shall be present, <c>false</c> if absent</param>
-<exception cref=""EDecodingSchemaError"">If the field was absent and set to present</exception>
+<exception cref=""EProtobufInvalidOperation"">If the field was absent and set to present</exception>
 <remarks>
 For details on presence semantics, see <see cref=""{DelphiPresencePropertyName}""/>.
 </remarks>".Lines();
