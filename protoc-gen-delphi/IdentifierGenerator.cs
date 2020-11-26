@@ -159,7 +159,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
 
         protected override bool CouldGenerate(string identifier) => (CaseSensitive ? IdentifierRegex : IdentifierCaseInsensitiveRegex).IsMatch(identifier);
 
-        protected override string GenerateOwn(T entity, bool avoidCollision) => $"{Prefix}{(Converter.Invoke(entity) + (avoidCollision ? CollisionAvoidanceSuffix : "")).ToCase(Case)}{Suffix}";
+        protected override string GenerateOwn(T entity, bool avoidCollision) => $"{Prefix}{Converter.Invoke(entity).ToCase(Case) + (avoidCollision ? CollisionAvoidanceSuffix : "")}{Suffix}";
 
         protected override bool IdentifiersCollide(string identifier1, string identifier2) => CaseSensitive ? identifier1 == identifier2
                                                                                                             : identifier1.Equals(identifier2, StringComparison.InvariantCultureIgnoreCase);
