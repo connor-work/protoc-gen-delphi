@@ -51,6 +51,11 @@ type
   EDecodingSchemaError = class(Exception);
 
   /// <summary>
+  /// Indicates an invalid operation on a value representing a protobuf entity.
+  /// </summary>
+  EProtobufInvalidOperation = class(Exception);
+
+  /// <summary>
   /// Common interface of all generated classes that represent protobuf message types.
   /// </summary>
   /// <remarks>

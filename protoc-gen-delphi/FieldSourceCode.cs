@@ -60,6 +60,11 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         private static IdentifierGenerator<FieldDescriptorProto> PresenceGetterIdentifier => new IdentifierTemplate<FieldDescriptorProto>("presence getter", x => x.Name, "_ProtobufField", IdentifierCase.Pascal, "GetHas", caseSensitive: false);
 
         /// <summary>
+        /// Mapping of protobuf fields to identifiers for Delphi setters for field presence
+        /// </summary>
+        private static IdentifierGenerator<FieldDescriptorProto> PresenceSetterIdentifier => new IdentifierTemplate<FieldDescriptorProto>("presence setter", x => x.Name, "_ProtobufField", IdentifierCase.Pascal, "SetHas", caseSensitive: false);
+
+        /// <summary>
         /// Mapping of protobuf fields to identifiers for Delphi properties indicating field presence
         /// </summary>
         private static IdentifierGenerator<FieldDescriptorProto> PresencePropertyIdentifier => new IdentifierTemplate<FieldDescriptorProto>("presence property", x => x.Name, "_ProtobufField", IdentifierCase.Pascal, "Has", caseSensitive: false);
@@ -243,6 +248,11 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
                 };
                 if (IsSingular) yield return new ClassDeclarationNestedDeclaration()
                 {
+                    Visibility = Visibility.Protected,
+                    Member = new ClassMemberDeclaration() { MethodDeclaration = PresenceSetterInterface }
+                };
+                if (IsSingular) yield return new ClassDeclarationNestedDeclaration()
+                {
                     Visibility = Visibility.Public,
                     Member = new ClassMemberDeclaration() { PropertyDeclaration = DelphiPresenceProperty }
                 };
@@ -259,6 +269,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
                 yield return Getter;
                 yield return Setter;
                 if (IsSingular) yield return PresenceGetter;
+                if (IsSingular) yield return PresenceSetter;
             }
         }
 
@@ -530,6 +541,75 @@ For details on presence semantics, see <see cref=""{DelphiPresencePropertyName}"
         }
 
         /// <summary>
+        /// Interface declaration of the generated Delphi setter method for field presence
+        /// </summary>
+        private MethodInterfaceDeclaration PresenceSetterInterface => new MethodInterfaceDeclaration()
+        {
+            Prototype = PresenceSetterPrototype,
+            Comment = new AnnotationComment() { CommentLines = { PresenceSetterComment } }
+        };
+
+        /// <summary>
+        /// Prototype of the generated Delphi setter method for field presence
+        /// </summary>
+        private Prototype PresenceSetterPrototype => new Prototype()
+        {
+            Name = PresenceSetterIdentifier.Generate(field, reservedIdentifiers: ProtocGenDelphi.ReservedIdentifiers),
+            Type = Prototype.Types.Type.Procedure,
+            ParameterList = { PresenceSetterParameter }
+        };
+
+        /// <summary>
+        /// Input parameter of the generated Delphi setter method for field presence
+        /// </summary>
+        private Parameter PresenceSetterParameter => new Parameter()
+        {
+            Name = "aPresent",
+            Type = "Boolean"
+        };
+
+        /// <summary>
+        /// XML documentation comment for the generated Delphi setter method for field presence
+        /// </summary>
+        private IEnumerable<string> PresenceSetterComment =>
+$@"<summary>
+Setter for <see cref=""{DelphiPresencePropertyName}""/>.
+</summary>
+<param name=""{PresenceSetterParameter.Name}""><c>true</c> if the protobuf field <c>{field.Name}</c> shall be present, <c>false</c> if absent</param>
+<exception cref=""EDecodingSchemaError"">If the field was absent and set to present</exception>
+<remarks>
+For details on presence semantics, see <see cref=""{DelphiPresencePropertyName}""/>.
+</remarks>".Lines();
+
+        /// <summary>
+        /// Method declaration of the generated Delphi setter method for field presence
+        /// </summary>
+        private MethodDeclaration PresenceSetter => new MethodDeclaration()
+        {
+            // Class not assigned, caller shall assign
+            Prototype = PresenceSetterPrototype,
+            Statements = { PresenceSetterStatements }
+        };
+
+        /// <summary>
+        /// Statement block of the generated Delphi setter method for field presence
+        /// </summary>
+        private IEnumerable<string> PresenceSetterStatements
+        {
+            get
+            {
+                string setAbsentStatement = IsRepeated ? $"{DelphiPropertyName}.Clear;"
+                                                       : $"{DelphiPropertyName} := {field.Type.GetDelphiDefaultValueExpression()};";
+                return
+$@"if ({PresenceSetterParameter.Name}) then
+begin
+  if (not {DelphiPresencePropertyName}) then raise EProtobufInvalidOperation.Create('Attempted to set a protobuf field to present without defining a value');
+end
+else {setAbsentStatement}".Lines();
+            }
+        }
+
+        /// <summary>
         /// Generated Delphi property indicating field presence
         /// </summary>
         private PropertyDeclaration DelphiPresenceProperty => new PropertyDeclaration()
@@ -537,6 +617,7 @@ For details on presence semantics, see <see cref=""{DelphiPresencePropertyName}"
             Name = DelphiPresencePropertyName,
             Type = "Boolean",
             ReadSpecifier = PresenceGetterPrototype.Name,
+            WriteSpecifier = PresenceSetterPrototype.Name,
             Comment = new AnnotationComment() { CommentLines = { DelphiPresencePropertyComment } }
         };
 
@@ -546,6 +627,8 @@ For details on presence semantics, see <see cref=""{DelphiPresencePropertyName}"
         private IEnumerable<string> DelphiPresencePropertyComment =>
 $@"<summary>
 Indicates if the protobuf field <c>{field.Name}</c> is present in this message.
+If present, setting it to absent sets it to its default value <see cref=""{field.Type.GetDelphiDefaultValueExpression()}""/>.
+If absent, it cannot be set to present using this property, attempting to do so will raise an exception.
 </summary>
 <remarks>
 The field (represented by <see cref=""{DelphiPropertyName}""/>) is a protobuf 3 field with the <i>no presence</i> serialization discipline.
