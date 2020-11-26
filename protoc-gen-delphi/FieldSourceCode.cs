@@ -452,8 +452,10 @@ May be overridden. Overriders shall only add side-effects and must call the ance
                 if (IsRepeated) valueExpression = $"{SetterParameter.Name} as {PrivateDelphiType}";
                 else if (IsSingular && IsEnum) valueExpression = $"Ord({SetterParameter.Name})";
                 else valueExpression = SetterParameter.Name;
+                // TODO do not allow nil for repeated
                 if (IsRepeated || IsMessage) yield return $"{DelphiField.Name}.Free;";
                 yield return $"{DelphiField.Name} := {valueExpression};";
+                // TODO only if assigned
                 if (IsRepeated || IsMessage) yield return $"{DelphiField.Name}.SetOwner(self);";
             }
         }
