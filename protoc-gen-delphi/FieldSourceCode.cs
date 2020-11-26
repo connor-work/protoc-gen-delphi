@@ -664,9 +664,9 @@ This means that it is considered present when its value does not equal the defau
         {
             get
             {
-                if (IsRepeated) yield return $"{DelphiField.Name}.EncodeAsRepeatedField(self, {FieldNumberConstant.Identifier}, {MessageTypeSourceCode.EncodeDestinationParameter.Name});";
-                else if (IsMessage) yield return $"{DelphiField.Name}.EncodeAsSingularField(self, {FieldNumberConstant.Identifier}, {MessageTypeSourceCode.EncodeDestinationParameter.Name});";
-                else yield return $"{field.Type.GetDelphiWireCodec()}.EncodeSingularField({DelphiField.Name}, self, {FieldNumberConstant.Identifier}, {MessageTypeSourceCode.EncodeDestinationParameter.Name});";
+                if (IsRepeated) yield return $"{DelphiPropertyName}.EncodeAsRepeatedField(self, {FieldNumberConstant.Identifier}, {MessageTypeSourceCode.EncodeDestinationParameter.Name});";
+                else if (IsMessage) yield return $"{DelphiPropertyName}.EncodeAsSingularField(self, {FieldNumberConstant.Identifier}, {MessageTypeSourceCode.EncodeDestinationParameter.Name});";
+                else yield return $"{field.Type.GetDelphiWireCodec()}.EncodeSingularField({DelphiPropertyName}, self, {FieldNumberConstant.Identifier}, {MessageTypeSourceCode.EncodeDestinationParameter.Name});";
             }
         }
 
@@ -677,20 +677,19 @@ This means that it is considered present when its value does not equal the defau
         {
             get
             {
-                if (IsRepeated) yield return $"{DelphiField.Name}.DecodeAsUnknownRepeatedField(self, {FieldNumberConstant.Identifier});";
+                if (IsRepeated) yield return $"{DelphiPropertyName}.DecodeAsUnknownRepeatedField(self, {FieldNumberConstant.Identifier});";
                 else if (IsMessage)
                 {
                     IEnumerable<string> lines =
-$@"{DelphiField.Name}.Free;
-{DelphiField.Name} := {Type.Message.GetDelphiDefaultValueExpression()};
-if HasUnknownField({FieldNumberConstant.Identifier}) then
+$@"if HasUnknownField({FieldNumberConstant.Identifier}) then
 begin
-  {DelphiField.Name} := {PrivateDelphiType}.Create;
-  {DelphiField.Name}.DecodeAsUnknownSingularField(self, {FieldNumberConstant.Identifier});
-end;".Lines();
+  {DelphiPropertyName} := {PrivateDelphiType}.Create;
+  {DelphiPropertyName}.DecodeAsUnknownSingularField(self, {FieldNumberConstant.Identifier});
+end
+else {DelphiPropertyName} := {Type.Message.GetDelphiDefaultValueExpression()};".Lines();
                     foreach (string line in lines) yield return line;
                 }
-                else yield return $"{DelphiField.Name} := {field.Type.GetDelphiWireCodec()}.DecodeUnknownField(self, {FieldNumberConstant.Identifier});";
+                else yield return $"{DelphiPropertyName} := {field.Type.GetDelphiWireCodec()}.DecodeUnknownField(self, {FieldNumberConstant.Identifier});";
             }
         }
 
@@ -701,9 +700,8 @@ end;".Lines();
         {
             get
             {
-                if (IsRepeated) yield return $"{DelphiField.Name}.Clear;";
-                else if (IsMessage) yield return $"{DelphiField.Name}.Free;";
-                if (IsSingular) yield return $"{DelphiField.Name} := {field.Type.GetDelphiDefaultValueExpression()};";
+                yield return IsRepeated ? $"{DelphiPropertyName}.Clear;"
+                                        : $"{DelphiPropertyName} := {field.Type.GetDelphiDefaultValueExpression()};";
             }
         }
 
