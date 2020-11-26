@@ -511,7 +511,7 @@ This property corresponds to the protobuf field <c>{field.Name}</c>.
 $@"<summary>
 Getter for <see cref=""{DelphiPresencePropertyName}""/>.
 </summary>
-<returns><c>true</c>if the protobuf field <c>{field.Name}</c> is present</returns>
+<returns><c>true</c> if the protobuf field <c>{field.Name}</c> is present</returns>
 <remarks>
 For details on presence semantics, see <see cref=""{DelphiPresencePropertyName}""/>.
 </remarks>".Lines();
