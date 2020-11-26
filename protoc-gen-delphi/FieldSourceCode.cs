@@ -316,10 +316,7 @@ Protobuf field name of the protobuf field <c>{field.Name}</c>.
         {
             Name = FieldIdentifier.Generate(field, reservedIdentifiers: ProtocGenDelphi.ReservedIdentifiers),
             Type = PrivateDelphiType,
-            Comment = new AnnotationComment()
-            {
-                CommentLines = { DelphiFieldComment }
-            }
+            Comment = new AnnotationComment() { CommentLines = { DelphiFieldComment } }
         };
 
         /// <summary>
