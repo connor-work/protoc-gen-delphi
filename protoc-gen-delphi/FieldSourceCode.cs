@@ -155,12 +155,12 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// <summary>
         /// <see langword="true"/> if the field's type is a protobuf message type (<i>message field</i>)
         /// </summary>
-        private bool IsMessage => field.Type == FieldDescriptorProto.Types.Type.Message;
+        private bool IsMessage => field.Type == Type.Message;
 
         /// <summary>
         /// <see langword="true"/> if the field's type is a protobuf enum (<i>enum field</i>)
         /// </summary>
-        private bool IsEnum => field.Type == FieldDescriptorProto.Types.Type.Enum;
+        private bool IsEnum => field.Type == Type.Enum;
 
         /// <summary>
         /// Determines the required unit references for handling this protobuf field.
