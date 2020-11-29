@@ -33,28 +33,12 @@ interface
 uses
   // TStream for encoding and decoding of messages
 {$IFDEF WORK_CONNOR_DELPHI_COMPILER_UNIT_SCOPE_NAMES}
-  System.Classes,
+  System.Classes;
 {$ELSE}
-  Classes,
-{$ENDIF}
-  // To declare custom exceptions
-{$IFDEF WORK_CONNOR_DELPHI_COMPILER_UNIT_SCOPE_NAMES}
-  System.SysUtils;
-{$ELSE}
-  SysUtils;
+  Classes;
 {$ENDIF}
 
 type
-  /// <summary>
-  /// Indicates that protobuf decoding failed since a message was not compatible with its expected schema.
-  /// </summary>
-  EDecodingSchemaError = class(Exception);
-
-  /// <summary>
-  /// Indicates an invalid operation on a value representing a protobuf entity.
-  /// </summary>
-  EProtobufInvalidOperation = class(Exception);
-
   /// <summary>
   /// Common interface of all generated classes that represent protobuf message types.
   /// </summary>

@@ -82,14 +82,14 @@ type
     /// <param name="aPresent"><c>true</c> if the protobuf field <c>fieldX</c> shall be present, <c>false</c> if absent</param>
     /// <exception cref="EProtobufInvalidOperation">If the field was absent and set to present</exception>
     /// <remarks>
-    /// For details on presence semantics, see <see cref="HasFieldX"/>.
+    /// For details on presence semantics, see <see cref="HasFieldX"/>
     /// </remarks>
     protected procedure SetHasFieldX(aPresent: Boolean);
 
     /// <summary>
     /// Indicates if the protobuf field <c>fieldX</c> is present in this message.
     /// If present, setting it to absent sets it to its default value <see cref="PROTOBUF_DEFAULT_VALUE_STRING"/>.
-    /// If absent, it cannot be set to present using this property, attempting to do so will raise an exception.
+    /// If absent, it cannot be set to present using this property, attempting to do so will raise an <exception cref="EProtobufInvalidOperation">.
     /// </summary>
     /// <remarks>
     /// The field (represented by <see cref="FieldX"/>) is a protobuf 3 field with the <i>no presence</i> serialization discipline.
@@ -243,12 +243,19 @@ end;
 
 procedure TMessageX.MergeFromOwnFields(aSource: TMessageX);
 begin
-  if (aSource.HasFieldX) then FieldX := aSource.FieldX;
+  if (aSource.HasFieldX) then
+  begin
+    FieldX := aSource.FieldX;
+  end;
 end;
 
 procedure TMessageX.AssignOwnFields(aSource: TMessageX);
 begin
-  FieldX := aSource.FieldX;
+  if (aSource.HasFieldX) then
+  begin
+    FieldX := aSource.FieldX;
+  end
+  else HasFieldX := False;
 end;
 
 function TMessageX.GetFieldX: UnicodeString;
@@ -268,11 +275,11 @@ end;
 
 procedure TMessageX.SetHasFieldX(aPresent: Boolean);
 begin
-  if (aPresent) then
+  if (aPresent and (not HasFieldX)) then raise EProtobufInvalidOperation.Create('Attempted to set a protobuf field to present without defining a value')
+  else if (not aPresent) then
   begin
-    if (not HasFieldX) then raise EProtobufInvalidOperation.Create('Attempted to set a protobuf field to present without defining a value');
-  end
-  else FieldX := PROTOBUF_DEFAULT_VALUE_STRING;
+    if (HasFieldX) then FieldX := PROTOBUF_DEFAULT_VALUE_STRING;
+  end;
 end;
 
 end.

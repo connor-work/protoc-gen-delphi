@@ -35,8 +35,6 @@ uses
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uIProtobufMessageInternal,
   // Basic protobuf definitions like TProtobufFieldNumber
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.uProtobuf,
-  // To throw EDecodingSchemaError
-  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uIProtobufMessage,
   // To provide a TEnumerator
 {$IFDEF WORK_CONNOR_DELPHI_COMPILER_UNIT_SCOPE_NAMES}
   System.Generics.Collections,

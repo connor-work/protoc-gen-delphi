@@ -22,11 +22,21 @@
 /// </remarks>
 unit Work.Connor.Protobuf.Delphi.ProtocGenDelphi.uProtobuf;
 
+{$INCLUDE Work.Connor.Delphi.CompilerFeatures.inc}
+
 {$IFDEF FPC}
   {$MODE DELPHI}
 {$ENDIF}
 
 interface
+
+uses
+  // To declare custom exceptions
+{$IFDEF WORK_CONNOR_DELPHI_COMPILER_UNIT_SCOPE_NAMES}
+  System.SysUtils;
+{$ELSE}
+  SysUtils;
+{$ENDIF}
 
 type
   /// <summary>
@@ -45,6 +55,15 @@ type
   /// </summary>
   TProtobufEnumFieldValue = System.Int32;
 
+  /// <summary>
+  /// Indicates that protobuf decoding failed since a message was not compatible with its expected schema.
+  /// </summary>
+  EDecodingSchemaError = class(Exception);
+
+  /// <summary>
+  /// Indicates an invalid operation on a value representing a protobuf entity.
+  /// </summary>
+  EProtobufInvalidOperation = class(Exception);
 const
   /// <summary>
   /// First protobuf field number that is reserved for the protobuf implementation

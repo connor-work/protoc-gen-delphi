@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+message MessageX {
+}
+
+message MessageY {
+    oneof oneofX {
+        MessageX fieldX = 1;
+        string fieldY = 2;
+    }
+}
