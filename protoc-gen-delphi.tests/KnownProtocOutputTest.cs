@@ -213,6 +213,29 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Tests
         }
 
         /// <summary>
+        /// Constructs a planned invocation of the protobuf compiler <c>protoc</c> for a test vector.
+        /// </summary>
+        /// <param name="vector">Test vector</param>
+        /// <param name="outputDirectory">The plug-in output directory</param>
+        /// <returns>The planned <c>protoc</c> invocation</returns>
+        internal static ProtocOperation ConstructProtocOperation(TestVector vector, string outputDirectory)
+        {
+            // Setup file tree as input for protoc, according to the test vector
+            vector.SetupInputFileTree();
+
+            ProtocOperation.PlugInOperation plugIn = new ProtocOperation.PlugInOperation("delphi")
+            {
+                ExecutableFolder = "exe-protoc-gen-delphi",
+                OutDir = outputDirectory
+            };
+            ProtocOperation protoc = new ProtocOperation { ProtocExecutableFolder = Path.Join("Google.Protobuf.Tools", "tools", GetProtocPlatform()) };
+            protoc.ProtoPath.AddRange(vector.ProtoPath);
+            protoc.ProtoFiles.AddRange(vector.InputProtoFileNames);
+            protoc.PlugIns.Add(plugIn);
+            return protoc;
+        }
+
+        /// <summary>
         /// <see cref="ProtocGenDelphi"/> produces the expected output when used as a <c>protoc</c> plug-in.
         /// </summary>
         /// <param name="vector">Test vector</param>
@@ -220,27 +243,17 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Tests
         [MemberData(nameof(TestVectors))]
         public void ProducesExpectedOutput(TestVector vector)
         {
-            // Setup file tree as input for protoc, according to the test vector
-            vector.SetupInputFileTree();
-
             // Run protoc
-            ProtocOperation.PlugInOperation plugIn = new ProtocOperation.PlugInOperation("delphi")
-            {
-                ExecutableFolder = "exe-protoc-gen-delphi",
-                OutDir = CreateScratchFolder()
-            };
-            ProtocOperation protoc = new ProtocOperation { ProtocExecutableFolder = Path.Join("Google.Protobuf.Tools", "tools", GetProtocPlatform()) };
-            protoc.ProtoPath.AddRange(vector.ProtoPath);
-            protoc.ProtoFiles.AddRange(vector.InputProtoFileNames);
-            protoc.PlugIns.Add(plugIn);
+            string outputDirectory = CreateScratchFolder();
+            ProtocOperation protoc = ConstructProtocOperation(vector, outputDirectory);
             (bool protocSuccess, _, string? protocError) = protoc.Perform();
             Assert.True(protocSuccess, protocError!);
 
             IDictionary<string, string> expectedOutputFiles = vector.ExpectedOutputFiles;
             // Check that expected files are generated
-            foreach ((string path, string expectedContent) in expectedOutputFiles) Assert.Equal(expectedContent, File.ReadAllText(Path.Join(plugIn.OutDir, path)));
+            foreach ((string path, string expectedContent) in expectedOutputFiles) Assert.Equal(expectedContent, File.ReadAllText(Path.Join(outputDirectory, path)));
             // Check that no other files are generated
-            foreach (string path in Directory.GetFiles(plugIn.OutDir, "*", SearchOption.AllDirectories)) Assert.Contains(Path.GetRelativePath(plugIn.OutDir, path).Replace('\\', '/'), expectedOutputFiles.Keys);
+            foreach (string path in Directory.GetFiles(outputDirectory, "*", SearchOption.AllDirectories)) Assert.Contains(Path.GetRelativePath(outputDirectory, path).Replace('\\', '/'), expectedOutputFiles.Keys);
         }
     }
 }
