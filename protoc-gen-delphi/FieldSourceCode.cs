@@ -834,7 +834,7 @@ Indicates presence of the protobuf field <c>{field.Name}</c> in the protobuf one
         {
             get
             {
-                if (IsRepeated) yield return $"{DelphiPropertyName}.EncodeAsRepeatedField(self, {FieldNumberConstant.Identifier}, {MessageTypeSourceCode.EncodeDestinationParameter.Name});";
+                if (IsRepeated) yield return $"({DelphiPropertyName} as {PrivateDelphiType}).EncodeAsRepeatedField(self, {FieldNumberConstant.Identifier}, {MessageTypeSourceCode.EncodeDestinationParameter.Name});";
                 else if (IsMessage) yield return $"{DelphiPropertyName}.EncodeAsSingularField(self, {FieldNumberConstant.Identifier}, {MessageTypeSourceCode.EncodeDestinationParameter.Name});";
                 else
                 {
@@ -852,7 +852,7 @@ Indicates presence of the protobuf field <c>{field.Name}</c> in the protobuf one
         {
             get
             {
-                if (IsRepeated) yield return $"{DelphiPropertyName}.DecodeAsUnknownRepeatedField(self, {FieldNumberConstant.Identifier});";
+                if (IsRepeated) yield return $"({DelphiPropertyName} as {PrivateDelphiType}).DecodeAsUnknownRepeatedField(self, {FieldNumberConstant.Identifier});";
                 else if (IsMessage)
                 {
                     IEnumerable<string> lines =
