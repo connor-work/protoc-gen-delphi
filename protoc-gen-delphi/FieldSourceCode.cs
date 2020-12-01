@@ -60,6 +60,11 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         private static IdentifierGenerator<FieldDescriptorProto> PresenceGetterIdentifier => new IdentifierTemplate<FieldDescriptorProto>("presence getter", x => x.Name, "_ProtobufField", IdentifierCase.Pascal, "GetHas", caseSensitive: false);
 
         /// <summary>
+        /// Mapping of protobuf fields to identifiers for Delphi setters for field presence
+        /// </summary>
+        private static IdentifierGenerator<FieldDescriptorProto> PresenceSetterIdentifier => new IdentifierTemplate<FieldDescriptorProto>("presence setter", x => x.Name, "_ProtobufField", IdentifierCase.Pascal, "SetHas", caseSensitive: false);
+
+        /// <summary>
         /// Mapping of protobuf fields to identifiers for Delphi properties indicating field presence
         /// </summary>
         private static IdentifierGenerator<FieldDescriptorProto> PresencePropertyIdentifier => new IdentifierTemplate<FieldDescriptorProto>("presence property", x => x.Name, "_ProtobufField", IdentifierCase.Pascal, "Has", caseSensitive: false);
@@ -85,6 +90,14 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         private static UnitReference SysUtilsReference => new UnitReference() { Unit = new UnitIdentifier() { Unit = "SysUtils", Namespace = { "System" } } };
 
         /// <summary>
+        /// Mapping of protobuf fields in oneofs to identifiers for Delphi enumerated values representing the presence case of the oneof
+        /// </summary>
+        /// <remarks>
+        /// Only applicable for fields in oneof
+        /// </remarks>
+        private IdentifierGenerator<FieldDescriptorProto> PresenceValueIdentifier => new IdentifierTemplate<FieldDescriptorProto>("presence case value", x => x.Name, "_ProtobufField", IdentifierCase.Pascal, Oneof!.PresenceCasePrefix, caseSensitive: false);
+
+        /// <summary>
         /// Required unit reference for using runtime-independent support definitions for generated files (support code)
         /// </summary>
         private static readonly UnitReference SupportCodeReference = new UnitReference()
@@ -99,13 +112,23 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// <summary>
         /// Protobuf field to generate code for
         /// </summary>
-        private readonly FieldDescriptorProto field;
+        public readonly FieldDescriptorProto field;
+
+        /// <summary>
+        /// Optional protobuf oneof that the field is part of
+        /// </summary>
+        private OneofSourceCode? Oneof { get; }
 
         /// <summary>
         /// Constructs Delphi source code representing a protobuf field.
         /// </summary>
         /// <param name="field">Protobuf field to generate code for</param>
-        public FieldSourceCode(FieldDescriptorProto field) => this.field = field;
+        /// <param name="oneof">Optional protobuf oneof that the field is part of</param>
+        public FieldSourceCode(FieldDescriptorProto field, OneofSourceCode? oneof)
+        {
+            this.field = field;
+            Oneof = oneof;
+        }
 
         /// <summary>
         /// Name of the Delphi property
@@ -115,7 +138,15 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// <summary>
         /// Name of the Delphi property indicating field presence
         /// </summary>
-        private string DelphiPresencePropertyName => PresencePropertyIdentifier.Generate(field, reservedIdentifiers: ProtocGenDelphi.ReservedIdentifiers);
+        public string DelphiPresencePropertyName => PresencePropertyIdentifier.Generate(field, reservedIdentifiers: ProtocGenDelphi.ReservedIdentifiers);
+
+        /// <summary>
+        /// Delphi identifier of the Delphi enumerated value that is used to represent the presence case of the containing oneof for the field
+        /// </summary>
+        /// <remarks>
+        /// Only applicable for fields in oneof
+        /// </remarks>
+        private string PresenceEnumValueName => PresenceValueIdentifier.Generate(field, reservedIdentifiers: ProtocGenDelphi.ReservedIdentifiers);
 
         /// <summary>
         /// Delphi type identifier of the Delphi type that is used to represent the protobuf field value(s) when communicating with internal (runtime) code
@@ -150,12 +181,17 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// <summary>
         /// <see langword="true"/> if the field's type is a protobuf message type (<i>message field</i>)
         /// </summary>
-        private bool IsMessage => field.Type == FieldDescriptorProto.Types.Type.Message;
+        private bool IsMessage => field.Type == Type.Message;
 
         /// <summary>
         /// <see langword="true"/> if the field's type is a protobuf enum (<i>enum field</i>)
         /// </summary>
-        private bool IsEnum => field.Type == FieldDescriptorProto.Types.Type.Enum;
+        private bool IsEnum => field.Type == Type.Enum;
+
+        /// <summary>
+        /// <see langword="true"/> if the field is contained in a protobuf oneof
+        /// </summary>
+        private bool IsInOneof => !(Oneof is null);
 
         /// <summary>
         /// Determines the required unit references for handling this protobuf field.
@@ -243,6 +279,11 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
                 };
                 if (IsSingular) yield return new ClassDeclarationNestedDeclaration()
                 {
+                    Visibility = Visibility.Protected,
+                    Member = new ClassMemberDeclaration() { MethodDeclaration = PresenceSetterInterface }
+                };
+                if (IsSingular) yield return new ClassDeclarationNestedDeclaration()
+                {
                     Visibility = Visibility.Public,
                     Member = new ClassMemberDeclaration() { PropertyDeclaration = DelphiPresenceProperty }
                 };
@@ -259,6 +300,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
                 yield return Getter;
                 yield return Setter;
                 if (IsSingular) yield return PresenceGetter;
+                if (IsSingular) yield return PresenceSetter;
             }
         }
 
@@ -305,10 +347,7 @@ Protobuf field name of the protobuf field <c>{field.Name}</c>.
         {
             Name = FieldIdentifier.Generate(field, reservedIdentifiers: ProtocGenDelphi.ReservedIdentifiers),
             Type = PrivateDelphiType,
-            Comment = new AnnotationComment()
-            {
-                CommentLines = { DelphiFieldComment }
-            }
+            Comment = new AnnotationComment() { CommentLines = { DelphiFieldComment } }
         };
 
         /// <summary>
@@ -440,13 +479,37 @@ May be overridden. Overriders shall only add side-effects and must call the ance
         {
             get
             {
+                // TODO raise exception if repeated set to nil
+                // TODO if assigning to the same object, do not free!
+                foreach (string statement in ReleaseFieldValueStatements) yield return statement;
                 string valueExpression;
                 if (IsRepeated) valueExpression = $"{SetterParameter.Name} as {PrivateDelphiType}";
                 else if (IsSingular && IsEnum) valueExpression = $"Ord({SetterParameter.Name})";
                 else valueExpression = SetterParameter.Name;
-                if (IsRepeated || IsMessage) yield return $"{DelphiField.Name}.Free;";
                 yield return $"{DelphiField.Name} := {valueExpression};";
-                if (IsRepeated || IsMessage) yield return $"{DelphiField.Name}.SetOwner(self);";
+                if (IsRepeated) yield return $"{DelphiField.Name}.SetOwner(self);";
+                else if (IsMessage)
+                {
+                    yield return $"if (Assigned({DelphiField.Name})) then {DelphiField.Name}.SetOwner(self);";
+                    if (IsInOneof)
+                    {
+                        yield return $"if ({DelphiField.Name} <> {field.Type.GetDelphiDefaultValueExpression()}) then {Oneof!.DelphiPropertyName} := {PresenceEnumValueName}";
+                        yield return $"else if ({DelphiPresencePropertyName}) then {Oneof!.DelphiPropertyName} := {Oneof!.AbsenceEnumValueName};";
+                    }
+                }
+                else if (IsInOneof) yield return $"{Oneof!.DelphiPropertyName} := {PresenceEnumValueName};";
+            }
+        }
+
+        /// <summary>
+        /// Statements that release the current field value
+        /// </summary>
+        private IEnumerable<string> ReleaseFieldValueStatements
+        {
+            get
+            {
+                if (IsRepeated) yield return $"{DelphiField.Name}.Free;";
+                else if (IsMessage) yield return $"if (Assigned({DelphiField.Name})) then {DelphiField.Name}.Free;";
             }
         }
 
@@ -465,10 +528,18 @@ May be overridden. Overriders shall only add side-effects and must call the ance
         /// <summary>
         /// XML documentation comment for the generated Delphi property
         /// </summary>
-        private IEnumerable<string> DelphiPropertyComment => // TODO transfer protobuf comment
-$@"<remarks>
-This property corresponds to the protobuf field <c>{field.Name}</c>.
-</remarks>".Lines();
+        private IEnumerable<string> DelphiPropertyComment
+        {
+            get
+            {
+                // TODO transfer protobuf comment
+                yield return $"<remarks>";
+                yield return $"This property corresponds to the protobuf field <c>{field.Name}</c>.";
+                if (IsRepeated) yield return $"When written, ownership of the inserted field value collection is transferred to the containing message.";
+                if (IsSingular && IsMessage) yield return $"When written, ownership of the inserted message is transferred to the containing message.";
+                yield return $"</remarks>";
+            }
+        }
 
         /// <summary>
         /// RTTI attribute annotation for the generated Delphi property
@@ -478,6 +549,9 @@ This property corresponds to the protobuf field <c>{field.Name}</c>.
         /// <summary>
         /// Interface declaration of the generated Delphi getter method for field presence
         /// </summary>
+        /// <remarks>
+        /// Not applicable for repeated fields
+        /// </remarks>
         private MethodInterfaceDeclaration PresenceGetterInterface => new MethodInterfaceDeclaration()
         {
             Prototype = PresenceGetterPrototype,
@@ -487,6 +561,9 @@ This property corresponds to the protobuf field <c>{field.Name}</c>.
         /// <summary>
         /// Prototype of the generated Delphi getter method for field presence
         /// </summary>
+        /// <remarks>
+        /// Not applicable for repeated fields
+        /// </remarks>
         private Prototype PresenceGetterPrototype => new Prototype()
         {
             Name = PresenceGetterIdentifier.Generate(field, reservedIdentifiers: ProtocGenDelphi.ReservedIdentifiers),
@@ -497,11 +574,14 @@ This property corresponds to the protobuf field <c>{field.Name}</c>.
         /// <summary>
         /// XML documentation comment for the generated Delphi getter method for field presence
         /// </summary>
+        /// <remarks>
+        /// Not applicable for repeated fields
+        /// </remarks>
         private IEnumerable<string> PresenceGetterComment =>
 $@"<summary>
 Getter for <see cref=""{DelphiPresencePropertyName}""/>.
 </summary>
-<returns><c>true</c>if the protobuf field <c>{field.Name}</c> is present</returns>
+<returns><c>true</c> if the protobuf field <c>{field.Name}</c> is present</returns>
 <remarks>
 For details on presence semantics, see <see cref=""{DelphiPresencePropertyName}""/>.
 </remarks>".Lines();
@@ -509,6 +589,9 @@ For details on presence semantics, see <see cref=""{DelphiPresencePropertyName}"
         /// <summary>
         /// Method declaration of the generated Delphi getter method for field presence
         /// </summary>
+        /// <remarks>
+        /// Not applicable for repeated fields
+        /// </remarks>
         private MethodDeclaration PresenceGetter => new MethodDeclaration()
         {
             // Class not assigned, caller shall assign
@@ -519,38 +602,207 @@ For details on presence semantics, see <see cref=""{DelphiPresencePropertyName}"
         /// <summary>
         /// Statement block of the generated Delphi getter method for field presence
         /// </summary>
+        /// <remarks>
+        /// Not applicable for repeated fields
+        /// </remarks>
         private IEnumerable<string> PresenceGetterStatements
         {
             get
             {
-                string checkedExpression = IsEnum ? $"Ord({DelphiPropertyName})"
-                                                  : DelphiPropertyName;
-                yield return $"result := ({checkedExpression} = {field.Type.GetDelphiDefaultValueExpression()});";
+                if (IsInOneof) yield return $"result := ({Oneof!.DelphiPropertyName} = {PresenceEnumValueName});";
+                else
+                {
+                    string checkedExpression = DelphiPropertyName;
+                    if (IsEnum) checkedExpression = $"Ord({checkedExpression})";
+                    yield return $"result := ({checkedExpression} = {field.Type.GetDelphiDefaultValueExpression()});";
+                }
+            }
+        }
+
+        /// <summary>
+        /// Interface declaration of the generated Delphi setter method for field presence
+        /// </summary>
+        /// <remarks>
+        /// Not applicable for repeated fields
+        /// </remarks>
+        private MethodInterfaceDeclaration PresenceSetterInterface => new MethodInterfaceDeclaration()
+        {
+            Prototype = PresenceSetterPrototype,
+            Comment = new AnnotationComment() { CommentLines = { PresenceSetterComment } }
+        };
+
+        /// <summary>
+        /// Prototype of the generated Delphi setter method for field presence
+        /// </summary>
+        /// <remarks>
+        /// Not applicable for repeated fields
+        /// </remarks>
+        private Prototype PresenceSetterPrototype => new Prototype()
+        {
+            Name = PresenceSetterIdentifier.Generate(field, reservedIdentifiers: ProtocGenDelphi.ReservedIdentifiers),
+            Type = Prototype.Types.Type.Procedure,
+            ParameterList = { PresenceSetterParameter }
+        };
+
+        /// <summary>
+        /// Input parameter of the generated Delphi setter method for field presence
+        /// </summary>
+        /// <remarks>
+        /// Not applicable for repeated fields
+        /// </remarks>
+        private Parameter PresenceSetterParameter => new Parameter()
+        {
+            Name = "aPresent",
+            Type = "Boolean"
+        };
+
+        /// <summary>
+        /// XML documentation comment for the generated Delphi setter method for field presence
+        /// </summary>
+        /// <remarks>
+        /// Not applicable for repeated fields
+        /// </remarks>
+        private IEnumerable<string> PresenceSetterComment
+        {
+            get
+            {
+                yield return $"<summary>";
+                yield return $"Setter for <see cref=\"{DelphiPresencePropertyName}\"/>.";
+                yield return $"</summary>";
+                yield return $"<param name=\"{PresenceSetterParameter.Name}\"><c>true</c> if the protobuf field <c>{field.Name}</c> shall be present, <c>false</c> if absent</param>";
+                if (!IsInOneof) yield return $"<exception cref=\"EProtobufInvalidOperation\">If the field was absent and set to present</exception>";
+                yield return $"<remarks>";
+                yield return $"For details on presence semantics, see <see cref=\"{DelphiPresencePropertyName}\"/>";
+                yield return $"</remarks>";
+            }
+        }
+
+        /// <summary>
+        /// Method declaration of the generated Delphi setter method for field presence
+        /// </summary>
+        /// <remarks>
+        /// Not applicable for repeated fields
+        /// </remarks>
+        private MethodDeclaration PresenceSetter => new MethodDeclaration()
+        {
+            // Class not assigned, caller shall assign
+            Prototype = PresenceSetterPrototype,
+            Statements = { PresenceSetterStatements }
+        };
+
+        /// <summary>
+        /// Statement block of the generated Delphi setter method for field presence
+        /// </summary>
+        /// <remarks>
+        /// Not applicable for repeated fields
+        /// </remarks>
+        private IEnumerable<string> PresenceSetterStatements
+        {
+            get
+            {
+                string presentExpression = IsMessage ? $"{PrivateDelphiType}.Create"
+                                                     : field.Type.GetDelphiDefaultValueExpression();
+                string setPresentStatement = IsInOneof ? $"{DelphiPropertyName} := {presentExpression}"
+                                                       : $"raise EProtobufInvalidOperation.Create('Attempted to set a protobuf field to present without defining a value')";
+                yield return $"if ({PresenceSetterParameter.Name} and (not {DelphiPresencePropertyName})) then {setPresentStatement}";
+                yield return $"else if (not {PresenceSetterParameter.Name}) then";
+                yield return $"begin";
+                if (IsInOneof)
+                {
+                    // Always clear, since this might be called from the oneof's case setter
+                    foreach (string statement in ReleaseFieldValueStatements) yield return $"  {statement}";
+                    yield return $"  {DelphiField.Name} := {field.Type.GetDelphiDefaultValueExpression()};";
+                }
+                string setAbsentStatement;
+                if (IsInOneof) setAbsentStatement = $"{Oneof!.DelphiPropertyName} := {Oneof!.AbsenceEnumValueName}";
+                else
+                {
+                    string valueExpression = field.Type.GetDelphiDefaultValueExpression();
+                    if (IsEnum) valueExpression = $"{PublicDelphiType}({valueExpression})";
+                    setAbsentStatement = $"{DelphiPropertyName} := {valueExpression}";
+                }
+                yield return $"  if ({DelphiPresencePropertyName}) then {setAbsentStatement};";
+                yield return $"end;";
             }
         }
 
         /// <summary>
         /// Generated Delphi property indicating field presence
         /// </summary>
+        /// <remarks>
+        /// Not applicable for repeated fields
+        /// </remarks>
         private PropertyDeclaration DelphiPresenceProperty => new PropertyDeclaration()
         {
             Name = DelphiPresencePropertyName,
             Type = "Boolean",
             ReadSpecifier = PresenceGetterPrototype.Name,
+            WriteSpecifier = PresenceSetterPrototype.Name,
             Comment = new AnnotationComment() { CommentLines = { DelphiPresencePropertyComment } }
         };
 
         /// <summary>
         /// XML documentation comment for the generated Delphi property indicating field presence
         /// </summary>
-        private IEnumerable<string> DelphiPresencePropertyComment =>
+        /// <remarks>
+        /// Not applicable for repeated fields
+        /// </remarks>
+        private IEnumerable<string> DelphiPresencePropertyComment
+        {
+            get
+            {
+                yield return $"<summary>";
+                yield return $"Indicates if the protobuf field <c>{field.Name}</c> is present in this message.";
+                if (IsInOneof)
+                {
+                    yield return $"If present, setting it to absent will set the case of its containing protobuf oneof {Oneof!.DelphiCommentReference} (<see cref=\"{Oneof!.DelphiPropertyName}\"/>) to absent (<see cref=\"{Oneof!.AbsenceEnumValueName}\"/>).";
+                    if (IsMessage) yield return $"If absent, setting it to present will set it to a newly created empty message.";
+                    else yield return $"If absent, setting it to present will set it to its default value <see cref=\"{field.Type.GetDelphiDefaultValueExpression()}\"/>.";
+                }
+                else
+                {
+                    yield return $"If present, setting it to absent sets it to its default value <see cref=\"{field.Type.GetDelphiDefaultValueExpression()}\"/>.";
+                    yield return $"If absent, it cannot be set to present using this property, attempting to do so will raise an <exception cref=\"EProtobufInvalidOperation\">.";
+                }
+                yield return $"</summary>";
+                yield return $"<remarks>";
+                if (IsInOneof)
+                {
+                    yield return $"The field (represented by <see cref=\"{DelphiPropertyName}\"/>) is a protobuf 3 field within the protobuf oneof {Oneof!.DelphiCommentReference} with the <i>explicit presence</i> serialization discipline.";
+                    yield return $"This means that it is considered present when the oneof's case (<see cref=\"{Oneof!.DelphiPropertyName}\"/>) equals the corresponding presence case (<see cref=\"{PresenceEnumValueName}\"/>).";
+                }
+                else
+                {
+                    yield return $"The field (represented by <see cref=\"{DelphiPropertyName}\"/>) is a protobuf 3 field with the <i>no presence</i> serialization discipline.";
+                    yield return $"This means that it is considered present when its value does not equal the default value <see cref=\"{field.Type.GetDelphiDefaultValueExpression()}\"/>.";
+                }
+                yield return $"</remarks>";
+            }
+        }
+
+        /// <summary>
+        /// Generated Delphi enumerated value representing the presence case of the containing oneof for the field
+        /// </summary>
+        /// <remarks>
+        /// Only applicable for fields in oneof
+        /// </remarks>
+        public EnumValueDeclaration PresenceEnumValue => new EnumValueDeclaration()
+        {
+            Name = PresenceEnumValueName,
+            // Ordinality not assigned, caller shall assign
+            Comment = new AnnotationComment() { CommentLines = { PresenceEnumValueComment } }
+        };
+
+        /// <summary>
+        /// XML documentation comment for the generated Delphi enumerated value representing the presence case of the containing oneof for the field
+        /// </summary>
+        /// <remarks>
+        /// Only applicable for fields in oneof
+        /// </remarks>
+        private IEnumerable<string> PresenceEnumValueComment =>
 $@"<summary>
-Indicates if the protobuf field <c>{field.Name}</c> is present in this message.
-</summary>
-<remarks>
-The field (represented by <see cref=""{DelphiPropertyName}""/>) is a protobuf 3 field with the <i>no presence</i> serialization discipline.
-This means that it is considered present when its value does not equal the default value <see cref=""{field.Type.GetDelphiDefaultValueExpression()}""/>.
-</remarks>".Lines();
+Indicates presence of the protobuf field <c>{field.Name}</c> in the protobuf oneof {Oneof!.DelphiCommentReference}.
+</summary>".Lines();
 
         /// <summary>
         /// Source code lines to be added to the <c>Create</c> method's statement block in the containing message class
@@ -582,9 +834,14 @@ This means that it is considered present when its value does not equal the defau
         {
             get
             {
-                if (IsRepeated) yield return $"{DelphiField.Name}.EncodeAsRepeatedField(self, {FieldNumberConstant.Identifier}, {MessageTypeSourceCode.EncodeDestinationParameter.Name});";
-                else if (IsMessage) yield return $"{DelphiField.Name}.EncodeAsSingularField(self, {FieldNumberConstant.Identifier}, {MessageTypeSourceCode.EncodeDestinationParameter.Name});";
-                else yield return $"{field.Type.GetDelphiWireCodec()}.EncodeSingularField({DelphiField.Name}, self, {FieldNumberConstant.Identifier}, {MessageTypeSourceCode.EncodeDestinationParameter.Name});";
+                if (IsRepeated) yield return $"({DelphiPropertyName} as {PrivateDelphiType}).EncodeAsRepeatedField(self, {FieldNumberConstant.Identifier}, {MessageTypeSourceCode.EncodeDestinationParameter.Name});";
+                else if (IsMessage) yield return $"{DelphiPropertyName}.EncodeAsSingularField(self, {FieldNumberConstant.Identifier}, {MessageTypeSourceCode.EncodeDestinationParameter.Name});";
+                else
+                {
+                    string valueExpression = DelphiPropertyName;
+                    if (IsEnum) valueExpression = $"Ord({valueExpression})";
+                    yield return $"{field.Type.GetDelphiWireCodec()}.EncodeSingularField({valueExpression}, self, {FieldNumberConstant.Identifier}, {MessageTypeSourceCode.EncodeDestinationParameter.Name});";
+                }
             }
         }
 
@@ -595,20 +852,24 @@ This means that it is considered present when its value does not equal the defau
         {
             get
             {
-                if (IsRepeated) yield return $"{DelphiField.Name}.DecodeAsUnknownRepeatedField(self, {FieldNumberConstant.Identifier});";
+                if (IsRepeated) yield return $"({DelphiPropertyName} as {PrivateDelphiType}).DecodeAsUnknownRepeatedField(self, {FieldNumberConstant.Identifier});";
                 else if (IsMessage)
                 {
                     IEnumerable<string> lines =
-$@"{DelphiField.Name}.Free;
-{DelphiField.Name} := {Type.Message.GetDelphiDefaultValueExpression()};
-if HasUnknownField({FieldNumberConstant.Identifier}) then
+$@"if HasUnknownField({FieldNumberConstant.Identifier}) then
 begin
-  {DelphiField.Name} := {PrivateDelphiType}.Create;
-  {DelphiField.Name}.DecodeAsUnknownSingularField(self, {FieldNumberConstant.Identifier});
-end;".Lines();
+  {DelphiPropertyName} := {PrivateDelphiType}.Create;
+  {DelphiPropertyName}.DecodeAsUnknownSingularField(self, {FieldNumberConstant.Identifier});
+end
+else {DelphiPresencePropertyName} := False;".Lines();
                     foreach (string line in lines) yield return line;
                 }
-                else yield return $"{DelphiField.Name} := {field.Type.GetDelphiWireCodec()}.DecodeUnknownField(self, {FieldNumberConstant.Identifier});";
+                else
+                {
+                    string valueExpression = $"{field.Type.GetDelphiWireCodec()}.DecodeUnknownField(self, {FieldNumberConstant.Identifier})";
+                    if (IsEnum) valueExpression = $"{PublicDelphiType}({valueExpression})";
+                    yield return $"{DelphiPropertyName} := {valueExpression};";
+                }
             }
         }
 
@@ -619,9 +880,8 @@ end;".Lines();
         {
             get
             {
-                if (IsRepeated) yield return $"{DelphiField.Name}.Clear;";
-                else if (IsMessage) yield return $"{DelphiField.Name}.Free;";
-                if (IsSingular) yield return $"{DelphiField.Name} := {field.Type.GetDelphiDefaultValueExpression()};";
+                yield return IsRepeated ? $"{DelphiPropertyName}.Clear;"
+                                        : $"{DelphiPresencePropertyName} := False;";
             }
         }
 
@@ -650,20 +910,25 @@ end;".Lines();
             {
                 string parameter = MessageTypeSourceCode.MergeFromOwnFieldsSourceParameterName;
                 if (IsRepeated) yield return $"{DelphiPropertyName}.MergeFrom({parameter}.{DelphiPropertyName});";
-                else if (IsMessage)
+                else
                 {
-                    IEnumerable<string> lines =
-$@"if (Assigned({DelphiPropertyName})) then {DelphiPropertyName}.MergeFrom({parameter}.{DelphiPropertyName})
+                    yield return $"if ({parameter}.{DelphiPresencePropertyName}) then";
+                    yield return $"begin";
+                    if (IsMessage)
+                    {
+                        IEnumerable<string> lines =
+$@"if ({DelphiPresencePropertyName}) then {DelphiPropertyName}.MergeFrom({parameter}.{DelphiPropertyName})
 else
 begin
   {MergeFromOwnFieldsScratchVariableName} := {PrivateDelphiType}.Create;
   {MergeFromOwnFieldsScratchVariableName}.Assign({parameter}.{DelphiPropertyName});
   {DelphiPropertyName} := {MergeFromOwnFieldsScratchVariableName};
 end;".Lines();
-                    foreach (string line in lines) yield return line;
+                        foreach (string line in lines) yield return $"  {line}";
+                    }
+                    else yield return $"  {DelphiPropertyName} := {parameter}.{DelphiPropertyName};";
+                    yield return $"end;";
                 }
-                else yield return $"if ({parameter}.{DelphiPresencePropertyName}) then {DelphiPropertyName} := {parameter}.{DelphiPropertyName};";
-
             }
         }
 
@@ -692,15 +957,22 @@ end;".Lines();
             {
                 string parameter = MessageTypeSourceCode.AssignOwnFieldsSourceParameterName;
                 if (IsRepeated) yield return $"({DelphiPropertyName} as TInterfacedPersistent).Assign({parameter}.{DelphiPropertyName} as TInterfacedPersistent);";
-                else if (IsMessage)
+                else
                 {
-                    IEnumerable<string> lines =
+                    yield return $"if ({parameter}.{DelphiPresencePropertyName}) then";
+                    yield return $"begin";
+                    if (IsMessage)
+                    {
+                        IEnumerable<string> lines =
 $@"{AssignOwnFieldsScratchVariableName} := {PrivateDelphiType}.Create;
 {AssignOwnFieldsScratchVariableName}.Assign({parameter}.{DelphiPropertyName});
 {DelphiPropertyName} := {AssignOwnFieldsScratchVariableName};".Lines();
-                    foreach (string line in lines) yield return line;
+                        foreach (string line in lines) yield return $"  {line}";
+                    }
+                    else yield return $"  {DelphiPropertyName} := {parameter}.{DelphiPropertyName};";
+                    yield return $"end";
+                    yield return $"else {DelphiPresencePropertyName} := False;";
                 }
-                else yield return $"{DelphiPropertyName} := {parameter}.{DelphiPropertyName};";
             }
         }
     }

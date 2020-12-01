@@ -74,7 +74,14 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// <summary>
         /// Delphi source code representations of the protobuf fields of the message type
         /// </summary>
-        private IEnumerable<FieldSourceCode> Fields => messageType.Field.Select(field => new FieldSourceCode(field));
+        public IEnumerable<FieldSourceCode> Fields => messageType.Field.Select(field => new FieldSourceCode(field, field.HasOneofIndex ? Oneofs.ElementAt(field.OneofIndex)
+                                                                                                                                       : null));
+
+        /// <summary>
+        /// Delphi source code representations of the protobuf oneofs of the message type
+        /// </summary>
+        public IEnumerable<OneofSourceCode> Oneofs => messageType.OneofDecl.Select((oneof, i) => new OneofSourceCode(oneof, Fields.Where(field => field.field.HasOneofIndex
+                                                                                                                                               && field.field.OneofIndex == i)));
 
         /// <summary>
         /// Determines the required unit references for handling this protobuf message.
@@ -119,6 +126,7 @@ This class corresponds to the protobuf message type <c>{messageType.Name}</c>.
             get
             {
                 foreach (ClassDeclarationNestedDeclaration declaration in Fields.SelectMany(field => field.ClassNestedDeclarations)) yield return declaration;
+                foreach (ClassDeclarationNestedDeclaration declaration in Oneofs.SelectMany(oneof => oneof.ClassNestedDeclarations)) yield return declaration;
                 foreach (EnumSourceCode @enum in NestedEnums) yield return new ClassDeclarationNestedDeclaration()
                 {
                     Visibility = Visibility.Public,
@@ -199,7 +207,8 @@ This class corresponds to the protobuf message type <c>{messageType.Name}</c>.
                 yield return ClearOwnFields;
                 yield return MergeFromOwnFields;
                 yield return AssignOwnFields;
-                foreach (MethodDeclaration method in Fields.SelectMany(field => field.MethodDeclarations))
+                foreach (MethodDeclaration method in Fields.SelectMany(field => field.MethodDeclarations)
+                                             .Concat(Oneofs.SelectMany(oneof => oneof.MethodDeclarations)))
                 {
                     method.Class = DelphiClassName;
                     yield return method;
@@ -257,6 +266,7 @@ For a detailed explanation, see https://developers.google.com/protocol-buffers/d
             get
             {
                 yield return "inherited;";
+                foreach (string statement in Oneofs.SelectMany(oneof => oneof.CreateStatements)) yield return statement;
                 foreach (string statement in Fields.SelectMany(field => field.CreateStatements)) yield return statement;
                 yield return "ClearOwnFields;";
             }

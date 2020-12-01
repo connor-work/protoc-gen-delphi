@@ -71,20 +71,32 @@ type
     /// <summary>
     /// Getter for <see cref="HasFieldX"/>.
     /// </summary>
-    /// <returns><c>true</c>if the protobuf field <c>fieldX</c> is present</returns>
+    /// <returns><c>true</c> if the protobuf field <c>fieldX</c> is present</returns>
     /// <remarks>
     /// For details on presence semantics, see <see cref="HasFieldX"/>.
     /// </remarks>
     protected function GetHasFieldX: Boolean;
 
     /// <summary>
+    /// Setter for <see cref="HasFieldX"/>.
+    /// </summary>
+    /// <param name="aPresent"><c>true</c> if the protobuf field <c>fieldX</c> shall be present, <c>false</c> if absent</param>
+    /// <exception cref="EProtobufInvalidOperation">If the field was absent and set to present</exception>
+    /// <remarks>
+    /// For details on presence semantics, see <see cref="HasFieldX"/>
+    /// </remarks>
+    protected procedure SetHasFieldX(aPresent: Boolean);
+
+    /// <summary>
     /// Indicates if the protobuf field <c>fieldX</c> is present in this message.
+    /// If present, setting it to absent sets it to its default value <see cref="PROTOBUF_DEFAULT_VALUE_UINT32"/>.
+    /// If absent, it cannot be set to present using this property, attempting to do so will raise an <exception cref="EProtobufInvalidOperation">.
     /// </summary>
     /// <remarks>
     /// The field (represented by <see cref="FieldX"/>) is a protobuf 3 field with the <i>no presence</i> serialization discipline.
     /// This means that it is considered present when its value does not equal the default value <see cref="PROTOBUF_DEFAULT_VALUE_UINT32"/>.
     /// </remarks>
-    public property HasFieldX: Boolean read GetHasFieldX;
+    public property HasFieldX: Boolean read GetHasFieldX write SetHasFieldX;
 
     /// <summary>
     /// Protobuf field number of the protobuf field <c>fieldY</c>.
@@ -130,20 +142,32 @@ type
     /// <summary>
     /// Getter for <see cref="HasFieldY"/>.
     /// </summary>
-    /// <returns><c>true</c>if the protobuf field <c>fieldY</c> is present</returns>
+    /// <returns><c>true</c> if the protobuf field <c>fieldY</c> is present</returns>
     /// <remarks>
     /// For details on presence semantics, see <see cref="HasFieldY"/>.
     /// </remarks>
     protected function GetHasFieldY: Boolean;
 
     /// <summary>
+    /// Setter for <see cref="HasFieldY"/>.
+    /// </summary>
+    /// <param name="aPresent"><c>true</c> if the protobuf field <c>fieldY</c> shall be present, <c>false</c> if absent</param>
+    /// <exception cref="EProtobufInvalidOperation">If the field was absent and set to present</exception>
+    /// <remarks>
+    /// For details on presence semantics, see <see cref="HasFieldY"/>
+    /// </remarks>
+    protected procedure SetHasFieldY(aPresent: Boolean);
+
+    /// <summary>
     /// Indicates if the protobuf field <c>fieldY</c> is present in this message.
+    /// If present, setting it to absent sets it to its default value <see cref="PROTOBUF_DEFAULT_VALUE_STRING"/>.
+    /// If absent, it cannot be set to present using this property, attempting to do so will raise an <exception cref="EProtobufInvalidOperation">.
     /// </summary>
     /// <remarks>
     /// The field (represented by <see cref="FieldY"/>) is a protobuf 3 field with the <i>no presence</i> serialization discipline.
     /// This means that it is considered present when its value does not equal the default value <see cref="PROTOBUF_DEFAULT_VALUE_STRING"/>.
     /// </remarks>
-    public property HasFieldY: Boolean read GetHasFieldY;
+    public property HasFieldY: Boolean read GetHasFieldY write SetHasFieldY;
 
     /// <summary>
     /// Creates an empty <see cref="TMessageX"/> that can be used as a protobuf message.
@@ -257,15 +281,15 @@ end;
 procedure TMessageX.Encode(aDest: TStream);
 begin
   inherited;
-  gProtobufWireCodecUint32.EncodeSingularField(FFieldX, self, PROTOBUF_FIELD_NUMBER_FIELD_X, aDest);
-  gProtobufWireCodecString.EncodeSingularField(FFieldY, self, PROTOBUF_FIELD_NUMBER_FIELD_Y, aDest);
+  gProtobufWireCodecUint32.EncodeSingularField(FieldX, self, PROTOBUF_FIELD_NUMBER_FIELD_X, aDest);
+  gProtobufWireCodecString.EncodeSingularField(FieldY, self, PROTOBUF_FIELD_NUMBER_FIELD_Y, aDest);
 end;
 
 procedure TMessageX.Decode(aSource: TStream);
 begin
   inherited;
-  FFieldX := gProtobufWireCodecUint32.DecodeUnknownField(self, PROTOBUF_FIELD_NUMBER_FIELD_X);
-  FFieldY := gProtobufWireCodecString.DecodeUnknownField(self, PROTOBUF_FIELD_NUMBER_FIELD_Y);
+  FieldX := gProtobufWireCodecUint32.DecodeUnknownField(self, PROTOBUF_FIELD_NUMBER_FIELD_X);
+  FieldY := gProtobufWireCodecString.DecodeUnknownField(self, PROTOBUF_FIELD_NUMBER_FIELD_Y);
 end;
 
 procedure TMessageX.MergeFrom(aSource: IProtobufMessage);
@@ -288,20 +312,34 @@ end;
 
 procedure TMessageX.ClearOwnFields;
 begin
-  FFieldX := PROTOBUF_DEFAULT_VALUE_UINT32;
-  FFieldY := PROTOBUF_DEFAULT_VALUE_STRING;
+  HasFieldX := False;
+  HasFieldY := False;
 end;
 
 procedure TMessageX.MergeFromOwnFields(aSource: TMessageX);
 begin
-  if (aSource.HasFieldX) then FieldX := aSource.FieldX;
-  if (aSource.HasFieldY) then FieldY := aSource.FieldY;
+  if (aSource.HasFieldX) then
+  begin
+    FieldX := aSource.FieldX;
+  end;
+  if (aSource.HasFieldY) then
+  begin
+    FieldY := aSource.FieldY;
+  end;
 end;
 
 procedure TMessageX.AssignOwnFields(aSource: TMessageX);
 begin
-  FieldX := aSource.FieldX;
-  FieldY := aSource.FieldY;
+  if (aSource.HasFieldX) then
+  begin
+    FieldX := aSource.FieldX;
+  end
+  else HasFieldX := False;
+  if (aSource.HasFieldY) then
+  begin
+    FieldY := aSource.FieldY;
+  end
+  else HasFieldY := False;
 end;
 
 function TMessageX.GetFieldX: UInt32;
@@ -319,6 +357,15 @@ begin
   result := (FieldX = PROTOBUF_DEFAULT_VALUE_UINT32);
 end;
 
+procedure TMessageX.SetHasFieldX(aPresent: Boolean);
+begin
+  if (aPresent and (not HasFieldX)) then raise EProtobufInvalidOperation.Create('Attempted to set a protobuf field to present without defining a value')
+  else if (not aPresent) then
+  begin
+    if (HasFieldX) then FieldX := PROTOBUF_DEFAULT_VALUE_UINT32;
+  end;
+end;
+
 function TMessageX.GetFieldY: UnicodeString;
 begin
   result := FFieldY;
@@ -332,6 +379,15 @@ end;
 function TMessageX.GetHasFieldY: Boolean;
 begin
   result := (FieldY = PROTOBUF_DEFAULT_VALUE_STRING);
+end;
+
+procedure TMessageX.SetHasFieldY(aPresent: Boolean);
+begin
+  if (aPresent and (not HasFieldY)) then raise EProtobufInvalidOperation.Create('Attempted to set a protobuf field to present without defining a value')
+  else if (not aPresent) then
+  begin
+    if (HasFieldY) then FieldY := PROTOBUF_DEFAULT_VALUE_STRING;
+  end;
 end;
 
 end.

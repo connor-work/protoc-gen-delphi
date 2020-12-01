@@ -1,7 +1,7 @@
 /// <remarks>
-/// This unit corresponds to the protobuf schema definition (.proto file) <c>repeated_message_field.proto</c>.
+/// This unit corresponds to the protobuf schema definition (.proto file) <c>oneof.proto</c>.
 /// </remarks>
-unit uRepeatedMessageField;
+unit uOneof;
 
 {$INCLUDE Work.Connor.Delphi.CompilerFeatures.inc}
 
@@ -17,9 +17,9 @@ uses
 {$ELSE}
   Classes,
 {$ENDIF}
-  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufRepeatedMessage,
-  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uIProtobufRepeatedFieldValues,
-  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uProtobufMessage;
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufString,
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uProtobufMessage,
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.uProtobuf;
 
 type
   /// <remarks>
@@ -134,7 +134,7 @@ type
     /// <summary>
     /// Holds the decoded value of the protobuf field <c>fieldX</c>.
     /// </summary>
-    private var FFieldX: TProtobufRepeatedMessageFieldValues<TMessageX>;
+    private var FFieldX: TMessageX;
 
     /// <summary>
     /// Getter for <see cref="FieldX"/>.
@@ -143,26 +143,174 @@ type
     /// <remarks>
     /// May be overridden. Overriders shall only add side-effects and must call the ancestor implementation.
     /// </remarks>
-    protected function GetFieldX: IProtobufRepeatedFieldValues<TMessageX>; virtual;
+    protected function GetFieldX: TMessageX; virtual;
 
     /// <summary>
     /// Setter for <see cref="FieldX"/>.
     /// </summary>
-    /// <param name="aValues">The new values of the protobuf field <c>fieldX</c></param>
+    /// <param name="aValue">The new value of the protobuf field <c>fieldX</c></param>
     /// <remarks>
-    /// Ownership of the inserted field value collection is transferred to the containing message.
+    /// Ownership of the inserted message is transferred to the containing message.
     /// May be overridden. Overriders shall only add side-effects and must call the ancestor implementation.
     /// </remarks>
-    protected procedure SetFieldX(aValues: IProtobufRepeatedFieldValues<TMessageX>); virtual;
+    protected procedure SetFieldX(aValue: TMessageX); virtual;
 
     /// <remarks>
     /// This property corresponds to the protobuf field <c>fieldX</c>.
-    /// When written, ownership of the inserted field value collection is transferred to the containing message.
+    /// When written, ownership of the inserted message is transferred to the containing message.
     /// </remarks>
 {$IFDEF WORK_CONNOR_DELPHI_COMPILER_CUSTOM_ATTRIBUTES}
     [ProtobufField(PROTOBUF_FIELD_NAME_FIELD_X, PROTOBUF_FIELD_NUMBER_FIELD_X)]
 {$ENDIF}
-    public property FieldX: IProtobufRepeatedFieldValues<TMessageX> read GetFieldX write SetFieldX;
+    public property FieldX: TMessageX read GetFieldX write SetFieldX;
+
+    /// <summary>
+    /// Getter for <see cref="HasFieldX"/>.
+    /// </summary>
+    /// <returns><c>true</c> if the protobuf field <c>fieldX</c> is present</returns>
+    /// <remarks>
+    /// For details on presence semantics, see <see cref="HasFieldX"/>.
+    /// </remarks>
+    protected function GetHasFieldX: Boolean;
+
+    /// <summary>
+    /// Setter for <see cref="HasFieldX"/>.
+    /// </summary>
+    /// <param name="aPresent"><c>true</c> if the protobuf field <c>fieldX</c> shall be present, <c>false</c> if absent</param>
+    /// <remarks>
+    /// For details on presence semantics, see <see cref="HasFieldX"/>
+    /// </remarks>
+    protected procedure SetHasFieldX(aPresent: Boolean);
+
+    /// <summary>
+    /// Indicates if the protobuf field <c>fieldX</c> is present in this message.
+    /// If present, setting it to absent will set the case of its containing protobuf oneof <c>oneofX</c> (<see cref="OneofXCase"/>) to absent (<see cref="OneofXCaseNone"/>).
+    /// If absent, setting it to present will set it to a newly created empty message.
+    /// </summary>
+    /// <remarks>
+    /// The field (represented by <see cref="FieldX"/>) is a protobuf 3 field within the protobuf oneof <c>oneofX</c> with the <i>explicit presence</i> serialization discipline.
+    /// This means that it is considered present when the oneof's case (<see cref="OneofXCase"/>) equals the corresponding presence case (<see cref="OneofXCaseFieldX"/>).
+    /// </remarks>
+    public property HasFieldX: Boolean read GetHasFieldX write SetHasFieldX;
+
+    /// <summary>
+    /// Protobuf field number of the protobuf field <c>fieldY</c>.
+    /// </summary>
+    public const PROTOBUF_FIELD_NUMBER_FIELD_Y = 2;
+
+    /// <summary>
+    /// Protobuf field name of the protobuf field <c>fieldY</c>.
+    /// </summary>
+    public const PROTOBUF_FIELD_NAME_FIELD_Y = 'fieldY';
+
+    /// <summary>
+    /// Holds the decoded value of the protobuf field <c>fieldY</c>.
+    /// </summary>
+    private var FFieldY: UnicodeString;
+
+    /// <summary>
+    /// Getter for <see cref="FieldY"/>.
+    /// </summary>
+    /// <returns>The value of the protobuf field <c>fieldY</c></returns>
+    /// <remarks>
+    /// May be overridden. Overriders shall only add side-effects and must call the ancestor implementation.
+    /// </remarks>
+    protected function GetFieldY: UnicodeString; virtual;
+
+    /// <summary>
+    /// Setter for <see cref="FieldY"/>.
+    /// </summary>
+    /// <param name="aValue">The new value of the protobuf field <c>fieldY</c></param>
+    /// <remarks>
+    /// May be overridden. Overriders shall only add side-effects and must call the ancestor implementation.
+    /// </remarks>
+    protected procedure SetFieldY(aValue: UnicodeString); virtual;
+
+    /// <remarks>
+    /// This property corresponds to the protobuf field <c>fieldY</c>.
+    /// </remarks>
+{$IFDEF WORK_CONNOR_DELPHI_COMPILER_CUSTOM_ATTRIBUTES}
+    [ProtobufField(PROTOBUF_FIELD_NAME_FIELD_Y, PROTOBUF_FIELD_NUMBER_FIELD_Y)]
+{$ENDIF}
+    public property FieldY: UnicodeString read GetFieldY write SetFieldY;
+
+    /// <summary>
+    /// Getter for <see cref="HasFieldY"/>.
+    /// </summary>
+    /// <returns><c>true</c> if the protobuf field <c>fieldY</c> is present</returns>
+    /// <remarks>
+    /// For details on presence semantics, see <see cref="HasFieldY"/>.
+    /// </remarks>
+    protected function GetHasFieldY: Boolean;
+
+    /// <summary>
+    /// Setter for <see cref="HasFieldY"/>.
+    /// </summary>
+    /// <param name="aPresent"><c>true</c> if the protobuf field <c>fieldY</c> shall be present, <c>false</c> if absent</param>
+    /// <remarks>
+    /// For details on presence semantics, see <see cref="HasFieldY"/>
+    /// </remarks>
+    protected procedure SetHasFieldY(aPresent: Boolean);
+
+    /// <summary>
+    /// Indicates if the protobuf field <c>fieldY</c> is present in this message.
+    /// If present, setting it to absent will set the case of its containing protobuf oneof <c>oneofX</c> (<see cref="OneofXCase"/>) to absent (<see cref="OneofXCaseNone"/>).
+    /// If absent, setting it to present will set it to its default value <see cref="PROTOBUF_DEFAULT_VALUE_STRING"/>.
+    /// </summary>
+    /// <remarks>
+    /// The field (represented by <see cref="FieldY"/>) is a protobuf 3 field within the protobuf oneof <c>oneofX</c> with the <i>explicit presence</i> serialization discipline.
+    /// This means that it is considered present when the oneof's case (<see cref="OneofXCase"/>) equals the corresponding presence case (<see cref="OneofXCaseFieldY"/>).
+    /// </remarks>
+    public property HasFieldY: Boolean read GetHasFieldY write SetHasFieldY;
+
+    public type
+      /// <remarks>
+      /// This enumerated type represents the cases of the protobuf oneof <c>oneofX</c>.
+      /// </remarks>
+      TOneofXCase = (
+        /// <summary>
+        /// Indicates absence of the protobuf oneof <c>oneofX</c>.
+        /// </summary>
+        OneofXCaseNone = 0,
+
+        /// <summary>
+        /// Indicates presence of the protobuf field <c>fieldX</c> in the protobuf oneof <c>oneofX</c>.
+        /// </summary>
+        OneofXCaseFieldX = 1,
+
+        /// <summary>
+        /// Indicates presence of the protobuf field <c>fieldY</c> in the protobuf oneof <c>oneofX</c>.
+        /// </summary>
+        OneofXCaseFieldY = 2
+      );
+
+    /// <summary>
+    /// Holds the case of the protobuf oneof <c>oneofX</c>.
+    /// </summary>
+    private var FOneofXCase: TOneofXCase;
+
+    /// <summary>
+    /// Getter for <see cref="OneofXCase"/>.
+    /// </summary>
+    /// <returns>The case of the protobuf oneof <c>oneofX</c></returns>
+    /// <remarks>
+    /// May be overridden. Overriders shall only add side-effects and must call the ancestor implementation.
+    /// </remarks>
+    protected function GetOneofXCase: TOneofXCase; virtual;
+
+    /// <summary>
+    /// Setter for <see cref="OneofXCase"/>.
+    /// </summary>
+    /// <param name="aCase">The new case of the protobuf oneof <c>oneofX</c></param>
+    /// <remarks>
+    /// May be overridden. Overriders shall only add side-effects and must call the ancestor implementation.
+    /// </remarks>
+    protected procedure SetOneofXCase(aCase: TOneofXCase); virtual;
+
+    /// <remarks>
+    /// This property corresponds to the case of the protobuf oneof <c>oneofX</c>.
+    /// </remarks>
+    public property OneofXCase: TOneofXCase read GetOneofXCase write SetOneofXCase;
 
     /// <summary>
     /// Creates an empty <see cref="TMessageY"/> that can be used as a protobuf message.
@@ -316,13 +464,13 @@ end;
 constructor TMessageY.Create;
 begin
   inherited;
-  FFieldX := TProtobufRepeatedMessageFieldValues<TMessageX>.Create;
+  FOneofXCase := OneofXCaseNone;
   ClearOwnFields;
 end;
 
 destructor TMessageY.Destroy;
 begin
-  FFieldX.Destroy;
+  FFieldX.Free;
   inherited;
 end;
 
@@ -335,13 +483,20 @@ end;
 procedure TMessageY.Encode(aDest: TStream);
 begin
   inherited;
-  (FieldX as TProtobufRepeatedMessageFieldValues<TMessageX>).EncodeAsRepeatedField(self, PROTOBUF_FIELD_NUMBER_FIELD_X, aDest);
+  FieldX.EncodeAsSingularField(self, PROTOBUF_FIELD_NUMBER_FIELD_X, aDest);
+  gProtobufWireCodecString.EncodeSingularField(FieldY, self, PROTOBUF_FIELD_NUMBER_FIELD_Y, aDest);
 end;
 
 procedure TMessageY.Decode(aSource: TStream);
 begin
   inherited;
-  (FieldX as TProtobufRepeatedMessageFieldValues<TMessageX>).DecodeAsUnknownRepeatedField(self, PROTOBUF_FIELD_NUMBER_FIELD_X);
+  if HasUnknownField(PROTOBUF_FIELD_NUMBER_FIELD_X) then
+  begin
+    FieldX := TMessageX.Create;
+    FieldX.DecodeAsUnknownSingularField(self, PROTOBUF_FIELD_NUMBER_FIELD_X);
+  end
+  else HasFieldX := False;
+  FieldY := gProtobufWireCodecString.DecodeUnknownField(self, PROTOBUF_FIELD_NUMBER_FIELD_Y);
 end;
 
 procedure TMessageY.MergeFrom(aSource: IProtobufMessage);
@@ -364,29 +519,126 @@ end;
 
 procedure TMessageY.ClearOwnFields;
 begin
-  FieldX.Clear;
+  HasFieldX := False;
+  HasFieldY := False;
 end;
 
 procedure TMessageY.MergeFromOwnFields(aSource: TMessageY);
+var
+  lFieldX: TMessageX;
 begin
-  FieldX.MergeFrom(aSource.FieldX);
+  if (aSource.HasFieldX) then
+  begin
+    if (HasFieldX) then FieldX.MergeFrom(aSource.FieldX)
+    else
+    begin
+      lFieldX := TMessageX.Create;
+      lFieldX.Assign(aSource.FieldX);
+      FieldX := lFieldX;
+    end;
+  end;
+  if (aSource.HasFieldY) then
+  begin
+    FieldY := aSource.FieldY;
+  end;
 end;
 
 procedure TMessageY.AssignOwnFields(aSource: TMessageY);
+var
+  lFieldX: TMessageX;
 begin
-  (FieldX as TInterfacedPersistent).Assign(aSource.FieldX as TInterfacedPersistent);
+  if (aSource.HasFieldX) then
+  begin
+    lFieldX := TMessageX.Create;
+    lFieldX.Assign(aSource.FieldX);
+    FieldX := lFieldX;
+  end
+  else HasFieldX := False;
+  if (aSource.HasFieldY) then
+  begin
+    FieldY := aSource.FieldY;
+  end
+  else HasFieldY := False;
 end;
 
-function TMessageY.GetFieldX: IProtobufRepeatedFieldValues<TMessageX>;
+function TMessageY.GetFieldX: TMessageX;
 begin
   result := FFieldX;
 end;
 
-procedure TMessageY.SetFieldX(aValues: IProtobufRepeatedFieldValues<TMessageX>);
+procedure TMessageY.SetFieldX(aValue: TMessageX);
 begin
-  FFieldX.Free;
-  FFieldX := aValues as TProtobufRepeatedMessageFieldValues<TMessageX>;
-  FFieldX.SetOwner(self);
+  if (Assigned(FFieldX)) then FFieldX.Free;
+  FFieldX := aValue;
+  if (Assigned(FFieldX)) then FFieldX.SetOwner(self);
+  if (FFieldX <> PROTOBUF_DEFAULT_VALUE_MESSAGE) then OneofXCase := OneofXCaseFieldX
+  else if (HasFieldX) then OneofXCase := OneofXCaseNone;
+end;
+
+function TMessageY.GetHasFieldX: Boolean;
+begin
+  result := (OneofXCase = OneofXCaseFieldX);
+end;
+
+procedure TMessageY.SetHasFieldX(aPresent: Boolean);
+begin
+  if (aPresent and (not HasFieldX)) then FieldX := TMessageX.Create
+  else if (not aPresent) then
+  begin
+    if (Assigned(FFieldX)) then FFieldX.Free;
+    FFieldX := PROTOBUF_DEFAULT_VALUE_MESSAGE;
+    if (HasFieldX) then OneofXCase := OneofXCaseNone;
+  end;
+end;
+
+function TMessageY.GetFieldY: UnicodeString;
+begin
+  result := FFieldY;
+end;
+
+procedure TMessageY.SetFieldY(aValue: UnicodeString);
+begin
+  FFieldY := aValue;
+  OneofXCase := OneofXCaseFieldY;
+end;
+
+function TMessageY.GetHasFieldY: Boolean;
+begin
+  result := (OneofXCase = OneofXCaseFieldY);
+end;
+
+procedure TMessageY.SetHasFieldY(aPresent: Boolean);
+begin
+  if (aPresent and (not HasFieldY)) then FieldY := PROTOBUF_DEFAULT_VALUE_STRING
+  else if (not aPresent) then
+  begin
+    FFieldY := PROTOBUF_DEFAULT_VALUE_STRING;
+    if (HasFieldY) then OneofXCase := OneofXCaseNone;
+  end;
+end;
+
+function TMessageY.GetOneofXCase: TOneofXCase;
+begin
+  result := FOneofXCase;
+end;
+
+procedure TMessageY.SetOneofXCase(aCase: TOneofXCase);
+var
+  lCase: TOneofXCase;
+begin
+  if (aCase <> FOneofXCase) then
+  begin
+    lCase := FOneofXCase;
+    FOneofXCase := aCase;
+    case lCase of
+      OneofXCaseFieldX: HasFieldX := False;
+      OneofXCaseFieldY: HasFieldY := False;
+    end;
+    case FOneofXCase of
+      OneofXCaseFieldX: HasFieldX := True;
+      OneofXCaseFieldY: HasFieldY := True;
+    end;
+  end;
 end;
 
 end.
