@@ -335,13 +335,13 @@ end;
 procedure TMessageY.Encode(aDest: TStream);
 begin
   inherited;
-  FieldX.EncodeAsRepeatedField(self, PROTOBUF_FIELD_NUMBER_FIELD_X, aDest);
+  (FieldX as TProtobufRepeatedMessageFieldValues<TMessageX>).EncodeAsRepeatedField(self, PROTOBUF_FIELD_NUMBER_FIELD_X, aDest);
 end;
 
 procedure TMessageY.Decode(aSource: TStream);
 begin
   inherited;
-  FieldX.DecodeAsUnknownRepeatedField(self, PROTOBUF_FIELD_NUMBER_FIELD_X);
+  (FieldX as TProtobufRepeatedMessageFieldValues<TMessageX>).DecodeAsUnknownRepeatedField(self, PROTOBUF_FIELD_NUMBER_FIELD_X);
 end;
 
 procedure TMessageY.MergeFrom(aSource: IProtobufMessage);

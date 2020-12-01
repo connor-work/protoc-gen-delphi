@@ -220,13 +220,13 @@ end;
 procedure TMessageX.Encode(aDest: TStream);
 begin
   inherited;
-  gProtobufWireCodecEnum.EncodeSingularField(FieldX, self, PROTOBUF_FIELD_NUMBER_FIELD_X, aDest);
+  gProtobufWireCodecEnum.EncodeSingularField(Ord(FieldX), self, PROTOBUF_FIELD_NUMBER_FIELD_X, aDest);
 end;
 
 procedure TMessageX.Decode(aSource: TStream);
 begin
   inherited;
-  FieldX := gProtobufWireCodecEnum.DecodeUnknownField(self, PROTOBUF_FIELD_NUMBER_FIELD_X);
+  FieldX := TEnumX(gProtobufWireCodecEnum.DecodeUnknownField(self, PROTOBUF_FIELD_NUMBER_FIELD_X));
 end;
 
 procedure TMessageX.MergeFrom(aSource: IProtobufMessage);
@@ -289,7 +289,7 @@ begin
   if (aPresent and (not HasFieldX)) then raise EProtobufInvalidOperation.Create('Attempted to set a protobuf field to present without defining a value')
   else if (not aPresent) then
   begin
-    if (HasFieldX) then FieldX := PROTOBUF_DEFAULT_VALUE_ENUM;
+    if (HasFieldX) then FieldX := TEnumX(PROTOBUF_DEFAULT_VALUE_ENUM);
   end;
 end;
 

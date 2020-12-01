@@ -184,13 +184,13 @@ end;
 procedure TMessageX.Encode(aDest: TStream);
 begin
   inherited;
-  FieldX.EncodeAsRepeatedField(self, PROTOBUF_FIELD_NUMBER_FIELD_X, aDest);
+  (FieldX as TProtobufRepeatedUint32FieldValues).EncodeAsRepeatedField(self, PROTOBUF_FIELD_NUMBER_FIELD_X, aDest);
 end;
 
 procedure TMessageX.Decode(aSource: TStream);
 begin
   inherited;
-  FieldX.DecodeAsUnknownRepeatedField(self, PROTOBUF_FIELD_NUMBER_FIELD_X);
+  (FieldX as TProtobufRepeatedUint32FieldValues).DecodeAsUnknownRepeatedField(self, PROTOBUF_FIELD_NUMBER_FIELD_X);
 end;
 
 procedure TMessageX.MergeFrom(aSource: IProtobufMessage);
