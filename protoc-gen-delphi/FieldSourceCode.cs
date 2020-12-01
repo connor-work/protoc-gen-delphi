@@ -612,8 +612,8 @@ For details on presence semantics, see <see cref=""{DelphiPresencePropertyName}"
                 if (IsInOneof) yield return $"result := ({Oneof!.DelphiPropertyName} = {PresenceEnumValueName});";
                 else
                 {
-                    string checkedExpression = IsEnum ? $"Ord({DelphiPropertyName})"
-                                                      : DelphiPropertyName;
+                    string checkedExpression = DelphiPropertyName;
+                    if (IsEnum) checkedExpression = $"Ord({checkedExpression})";
                     yield return $"result := ({checkedExpression} = {field.Type.GetDelphiDefaultValueExpression()});";
                 }
             }
@@ -713,8 +713,14 @@ For details on presence semantics, see <see cref=""{DelphiPresencePropertyName}"
                     foreach (string statement in ReleaseFieldValueStatements) yield return $"  {statement}";
                     yield return $"  {DelphiField.Name} := {field.Type.GetDelphiDefaultValueExpression()};";
                 }
-                string setAbsentStatement = IsInOneof ? $"{Oneof!.DelphiPropertyName} := {Oneof!.AbsenceEnumValueName}"
-                                                      : $"{DelphiPropertyName} := {field.Type.GetDelphiDefaultValueExpression()}";
+                string setAbsentStatement;
+                if (IsInOneof) setAbsentStatement = $"{Oneof!.DelphiPropertyName} := {Oneof!.AbsenceEnumValueName}";
+                else
+                {
+                    string valueExpression = field.Type.GetDelphiDefaultValueExpression();
+                    if (IsEnum) valueExpression = $"{PublicDelphiType}({valueExpression})";
+                    setAbsentStatement = $"{DelphiPropertyName} := {valueExpression}";
+                }
                 yield return $"  if ({DelphiPresencePropertyName}) then {setAbsentStatement};";
                 yield return $"end;";
             }
@@ -830,7 +836,12 @@ Indicates presence of the protobuf field <c>{field.Name}</c> in the protobuf one
             {
                 if (IsRepeated) yield return $"{DelphiPropertyName}.EncodeAsRepeatedField(self, {FieldNumberConstant.Identifier}, {MessageTypeSourceCode.EncodeDestinationParameter.Name});";
                 else if (IsMessage) yield return $"{DelphiPropertyName}.EncodeAsSingularField(self, {FieldNumberConstant.Identifier}, {MessageTypeSourceCode.EncodeDestinationParameter.Name});";
-                else yield return $"{field.Type.GetDelphiWireCodec()}.EncodeSingularField({DelphiPropertyName}, self, {FieldNumberConstant.Identifier}, {MessageTypeSourceCode.EncodeDestinationParameter.Name});";
+                else
+                {
+                    string valueExpression = DelphiPropertyName;
+                    if (IsEnum) valueExpression = $"Ord({valueExpression})";
+                    yield return $"{field.Type.GetDelphiWireCodec()}.EncodeSingularField({valueExpression}, self, {FieldNumberConstant.Identifier}, {MessageTypeSourceCode.EncodeDestinationParameter.Name});";
+                }
             }
         }
 
@@ -853,7 +864,12 @@ end
 else {DelphiPresencePropertyName} := False;".Lines();
                     foreach (string line in lines) yield return line;
                 }
-                else yield return $"{DelphiPropertyName} := {field.Type.GetDelphiWireCodec()}.DecodeUnknownField(self, {FieldNumberConstant.Identifier});";
+                else
+                {
+                    string valueExpression = $"{field.Type.GetDelphiWireCodec()}.DecodeUnknownField(self, {FieldNumberConstant.Identifier})";
+                    if (IsEnum) valueExpression = $"{PublicDelphiType}({valueExpression})";
+                    yield return $"{DelphiPropertyName} := {valueExpression};";
+                }
             }
         }
 
