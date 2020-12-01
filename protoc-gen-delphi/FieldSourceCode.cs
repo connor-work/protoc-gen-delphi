@@ -508,7 +508,8 @@ May be overridden. Overriders shall only add side-effects and must call the ance
         {
             get
             {
-                if (IsRepeated || IsMessage) yield return $"if (Assigned({DelphiField.Name})) then {DelphiField.Name}.Free;";
+                if (IsRepeated) yield return $"{DelphiField.Name}.Free;";
+                else if (IsMessage) yield return $"if (Assigned({DelphiField.Name})) then {DelphiField.Name}.Free;";
             }
         }
 

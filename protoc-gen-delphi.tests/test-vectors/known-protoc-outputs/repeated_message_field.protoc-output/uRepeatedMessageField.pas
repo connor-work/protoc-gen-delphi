@@ -157,6 +157,7 @@ type
 
     /// <remarks>
     /// This property corresponds to the protobuf field <c>fieldX</c>.
+    /// When written, ownership of the inserted field value collection is transferred to the containing message.
     /// </remarks>
 {$IFDEF WORK_CONNOR_DELPHI_COMPILER_CUSTOM_ATTRIBUTES}
     [ProtobufField(PROTOBUF_FIELD_NAME_FIELD_X, PROTOBUF_FIELD_NUMBER_FIELD_X)]
@@ -334,13 +335,13 @@ end;
 procedure TMessageY.Encode(aDest: TStream);
 begin
   inherited;
-  FFieldX.EncodeAsRepeatedField(self, PROTOBUF_FIELD_NUMBER_FIELD_X, aDest);
+  FieldX.EncodeAsRepeatedField(self, PROTOBUF_FIELD_NUMBER_FIELD_X, aDest);
 end;
 
 procedure TMessageY.Decode(aSource: TStream);
 begin
   inherited;
-  FFieldX.DecodeAsUnknownRepeatedField(self, PROTOBUF_FIELD_NUMBER_FIELD_X);
+  FieldX.DecodeAsUnknownRepeatedField(self, PROTOBUF_FIELD_NUMBER_FIELD_X);
 end;
 
 procedure TMessageY.MergeFrom(aSource: IProtobufMessage);
@@ -363,7 +364,7 @@ end;
 
 procedure TMessageY.ClearOwnFields;
 begin
-  FFieldX.Clear;
+  FieldX.Clear;
 end;
 
 procedure TMessageY.MergeFromOwnFields(aSource: TMessageY);
