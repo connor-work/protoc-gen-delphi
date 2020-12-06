@@ -1,0 +1,40 @@
+name: publish
+on:
+  push:
+    branches: [main]
+defaults:
+  run:
+    shell: pwsh -command ". '{0}'"
+jobs:
+  test:
+    strategy:
+      matrix:
+        os: [ubuntu-18.04, macos-11.0]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Install FPC 3.2.0 (Linux)
+        if: ${{ runner.os == 'Linux' }}
+        shell: bash
+        run: |
+          curl -LO http://launchpadlibrarian.net/494661083/fp-units-rtl-3.2.0_3.2.0+dfsg-8build2_amd64.deb
+          sudo dpkg -i fp-units-rtl-3.2.0_3.2.0+dfsg-8build2_amd64.deb
+          curl -LO http://launchpadlibrarian.net/494661053/fp-compiler-3.2.0_3.2.0+dfsg-8build2_amd64.deb
+          sudo dpkg -i fp-compiler-3.2.0_3.2.0+dfsg-8build2_amd64.deb
+      - name: Install latest FPC (macOS)
+        if: ${{ runner.os == 'macOS' }}
+        run: brew install fpc
+      - uses: actions/checkout@v2
+      - name: Test package stability
+        env:
+          Work_Connor_Delphi_CodeWriter_Tests_SkipDcc64: 1
+        run: ./script/github-actions-test.ps1
+  deploy:
+    needs: test
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v2
+      - name: Deploy NuGet packages
+        env:
+          NU_GET_ORG_API_KEY: ${{ secrets.NU_GET_ORG_API_KEY }}
+        run: ./script/github-actions-deploy.ps1 -Stable:$('${{ job.status }}' -eq 'success') -NuGetOrgApiKey (ConvertTo-SecureString -AsPlainText -Force -String $env:NU_GET_ORG_API_KEY)
