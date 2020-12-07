@@ -3,7 +3,7 @@
     <CoreVersion>0.8.0</CoreVersion>
     <PrereleaseVersionSuffix></PrereleaseVersionSuffix>
     <OutputType>Exe</OutputType>
-    <SnapshotVersion>true</SnapshotVersion>
+    <SnapshotVersion>false</SnapshotVersion>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <RootNamespace>Work.Connor.Protobuf.Delphi.ProtocGenDelphi</RootNamespace>
     <Nullable>enable</Nullable>
