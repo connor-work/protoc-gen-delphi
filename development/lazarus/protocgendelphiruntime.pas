@@ -83,10 +83,12 @@ uses
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufWireCodec, 
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uStubRuntime, 
   uExampleData, uBool, uDouble, uEmptySchema, uEnumField, uEnums, uFields, 
-  uFloat, uInputFileImports, uMessageField, uMessages, 
-  SpaceX.SpaceY.uInputFileNamespaceFromPath, uNestedEnums, uRepeatedField, 
-  uRepeatedMessageField, uString, uUint32, uImportedA, uImportedB, 
-  LazarusPackageIntf;
+  uFloat, uInputFileImportedTypes, uInputFileImports, uMessageField, 
+  uMessages, SpaceX.SpaceY.uInputFileNamespaceFromPath, uNestedEnums, uOneof, 
+  uRepeatedField, uRepeatedMessageField, uString, uUint32, uImportedA, 
+  uImportedB, Package1.uImportedEnumQualified, 
+  Package1.uImportedMessageQualified, uImportedEnumUnqualified, 
+  uImportedMessageUnqualified, LazarusPackageIntf;
 
 implementation
 

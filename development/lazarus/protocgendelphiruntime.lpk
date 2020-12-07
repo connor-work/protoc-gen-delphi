@@ -9,11 +9,11 @@
       <PathDelim Value="\"/>
       <SearchPaths>
         <IncludeFiles Value="..\..\runtime\Work\Connor\Delphi"/>
-        <OtherUnitFiles Value="..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi;..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime\Internal;..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime;..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\StubRuntime;..\..\example\output;..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\bool.protoc-output;..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\double.protoc-output;..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\empty_schema.protoc-output;..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\enum_field.protoc-output;..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\enums.protoc-output;..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\fields.protoc-output;..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\float.protoc-output;..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\imports.protoc-output;..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\message_field.protoc-output;..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\messages.protoc-output;..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\namespace_from_path.protoc-output\SpaceX\SpaceY;..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\nested_enums.protoc-output;..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\repeated_field.protoc-output;..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\repeated_message_field.protoc-output;..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\string.protoc-output;..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\uint32.protoc-output;..\..\test-vectors\known-schemata\imports.protoc-input"/>
+        <OtherUnitFiles Value="..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi;..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime\Internal;..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime;..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\StubRuntime;..\..\example\output;..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\bool.protoc-output;..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\double.protoc-output;..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\empty_schema.protoc-output;..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\enum_field.protoc-output;..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\enums.protoc-output;..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\fields.protoc-output;..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\float.protoc-output;..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\imports.protoc-output;..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\message_field.protoc-output;..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\messages.protoc-output;..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\namespace_from_path.protoc-output\SpaceX\SpaceY;..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\nested_enums.protoc-output;..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\repeated_field.protoc-output;..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\repeated_message_field.protoc-output;..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\string.protoc-output;..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\uint32.protoc-output;..\..\test-vectors\known-schemata\imports.protoc-input;..\..\test-vectors\known-schemata\imported_types.protoc-input;..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\oneof.protoc-output;..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\imported_types.protoc-output"/>
         <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
       </SearchPaths>
     </CompilerOptions>
-    <Files Count="62">
+    <Files Count="68">
       <Item1>
         <Filename Value="..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.uProtobuf.pas"/>
         <UnitName Value="Work.Connor.Protobuf.Delphi.ProtocGenDelphi.uProtobuf"/>
@@ -219,49 +219,73 @@
         <UnitName Value="uFloat"/>
       </Item51>
       <Item52>
-        <Filename Value="..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\imports.protoc-output\uInputFileImports.pas"/>
-        <UnitName Value="uInputFileImports"/>
+        <Filename Value="..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\imported_types.protoc-output\uInputFileImportedTypes.pas"/>
+        <UnitName Value="uInputFileImportedTypes"/>
       </Item52>
       <Item53>
-        <Filename Value="..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\message_field.protoc-output\uMessageField.pas"/>
-        <UnitName Value="uMessageField"/>
+        <Filename Value="..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\imports.protoc-output\uInputFileImports.pas"/>
+        <UnitName Value="uInputFileImports"/>
       </Item53>
       <Item54>
-        <Filename Value="..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\messages.protoc-output\uMessages.pas"/>
-        <UnitName Value="uMessages"/>
+        <Filename Value="..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\message_field.protoc-output\uMessageField.pas"/>
+        <UnitName Value="uMessageField"/>
       </Item54>
       <Item55>
-        <Filename Value="..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\namespace_from_path.protoc-output\SpaceX\SpaceY\SpaceX.SpaceY.uInputFileNamespaceFromPath.pas"/>
-        <UnitName Value="SpaceX.SpaceY.uInputFileNamespaceFromPath"/>
+        <Filename Value="..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\messages.protoc-output\uMessages.pas"/>
+        <UnitName Value="uMessages"/>
       </Item55>
       <Item56>
-        <Filename Value="..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\nested_enums.protoc-output\uNestedEnums.pas"/>
-        <UnitName Value="uNestedEnums"/>
+        <Filename Value="..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\namespace_from_path.protoc-output\SpaceX\SpaceY\SpaceX.SpaceY.uInputFileNamespaceFromPath.pas"/>
+        <UnitName Value="SpaceX.SpaceY.uInputFileNamespaceFromPath"/>
       </Item56>
       <Item57>
-        <Filename Value="..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\repeated_field.protoc-output\uRepeatedField.pas"/>
-        <UnitName Value="uRepeatedField"/>
+        <Filename Value="..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\nested_enums.protoc-output\uNestedEnums.pas"/>
+        <UnitName Value="uNestedEnums"/>
       </Item57>
       <Item58>
-        <Filename Value="..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\repeated_message_field.protoc-output\uRepeatedMessageField.pas"/>
-        <UnitName Value="uRepeatedMessageField"/>
+        <Filename Value="..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\oneof.protoc-output\uOneof.pas"/>
+        <UnitName Value="uOneof"/>
       </Item58>
       <Item59>
-        <Filename Value="..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\string.protoc-output\uString.pas"/>
-        <UnitName Value="uString"/>
+        <Filename Value="..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\repeated_field.protoc-output\uRepeatedField.pas"/>
+        <UnitName Value="uRepeatedField"/>
       </Item59>
       <Item60>
-        <Filename Value="..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\uint32.protoc-output\uUint32.pas"/>
-        <UnitName Value="uUint32"/>
+        <Filename Value="..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\repeated_message_field.protoc-output\uRepeatedMessageField.pas"/>
+        <UnitName Value="uRepeatedMessageField"/>
       </Item60>
       <Item61>
-        <Filename Value="..\..\test-vectors\known-schemata\imports.protoc-input\uImportedA.pas"/>
-        <UnitName Value="uImportedA"/>
+        <Filename Value="..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\string.protoc-output\uString.pas"/>
+        <UnitName Value="uString"/>
       </Item61>
       <Item62>
+        <Filename Value="..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\uint32.protoc-output\uUint32.pas"/>
+        <UnitName Value="uUint32"/>
+      </Item62>
+      <Item63>
+        <Filename Value="..\..\test-vectors\known-schemata\imports.protoc-input\uImportedA.pas"/>
+        <UnitName Value="uImportedA"/>
+      </Item63>
+      <Item64>
         <Filename Value="..\..\test-vectors\known-schemata\imports.protoc-input\uImportedB.pas"/>
         <UnitName Value="uImportedB"/>
-      </Item62>
+      </Item64>
+      <Item65>
+        <Filename Value="..\..\test-vectors\known-schemata\imported_types.protoc-input\Package1.uImportedEnumQualified.pas"/>
+        <UnitName Value="Package1.uImportedEnumQualified"/>
+      </Item65>
+      <Item66>
+        <Filename Value="..\..\test-vectors\known-schemata\imported_types.protoc-input\Package1.uImportedMessageQualified.pas"/>
+        <UnitName Value="Package1.uImportedMessageQualified"/>
+      </Item66>
+      <Item67>
+        <Filename Value="..\..\test-vectors\known-schemata\imported_types.protoc-input\uImportedEnumUnqualified.pas"/>
+        <UnitName Value="uImportedEnumUnqualified"/>
+      </Item67>
+      <Item68>
+        <Filename Value="..\..\test-vectors\known-schemata\imported_types.protoc-input\uImportedMessageUnqualified.pas"/>
+        <UnitName Value="uImportedMessageUnqualified"/>
+      </Item68>
     </Files>
     <RequiredPkgs Count="1">
       <Item1>
