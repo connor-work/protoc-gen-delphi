@@ -94,6 +94,12 @@ contains
   uRepeatedMessageField in '..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\repeated_message_field.protoc-output\uRepeatedMessageField.pas',
   uString in '..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\string.protoc-output\uString.pas',
   uUint32 in '..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\uint32.protoc-output\uUint32.pas',
-  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufEnum in '..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime\Internal\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufEnum.pas';
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufEnum in '..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime\Internal\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufEnum.pas',
+  Package1.uImportedEnumQualified in '..\..\test-vectors\known-schemata\imported_types.protoc-input\Package1.uImportedEnumQualified.pas',
+  Package1.uImportedMessageQualified in '..\..\test-vectors\known-schemata\imported_types.protoc-input\Package1.uImportedMessageQualified.pas',
+  uImportedEnumUnqualified in '..\..\test-vectors\known-schemata\imported_types.protoc-input\uImportedEnumUnqualified.pas',
+  uImportedMessageUnqualified in '..\..\test-vectors\known-schemata\imported_types.protoc-input\uImportedMessageUnqualified.pas',
+  uOneof in '..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\oneof.protoc-output\uOneof.pas',
+  uInputFileImportedTypes in '..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\imported_types.protoc-output\uInputFileImportedTypes.pas';
 
 end.

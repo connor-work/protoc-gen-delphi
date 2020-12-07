@@ -147,6 +147,12 @@
         <DCCReference Include="..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\string.protoc-output\uString.pas"/>
         <DCCReference Include="..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\uint32.protoc-output\uUint32.pas"/>
         <DCCReference Include="..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime\Internal\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufEnum.pas"/>
+        <DCCReference Include="..\..\test-vectors\known-schemata\imported_types.protoc-input\Package1.uImportedEnumQualified.pas"/>
+        <DCCReference Include="..\..\test-vectors\known-schemata\imported_types.protoc-input\Package1.uImportedMessageQualified.pas"/>
+        <DCCReference Include="..\..\test-vectors\known-schemata\imported_types.protoc-input\uImportedEnumUnqualified.pas"/>
+        <DCCReference Include="..\..\test-vectors\known-schemata\imported_types.protoc-input\uImportedMessageUnqualified.pas"/>
+        <DCCReference Include="..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\oneof.protoc-output\uOneof.pas"/>
+        <DCCReference Include="..\..\protoc-gen-delphi.tests\test-vectors\known-protoc-outputs\imported_types.protoc-output\uInputFileImportedTypes.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
