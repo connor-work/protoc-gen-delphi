@@ -115,6 +115,11 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         public readonly FieldDescriptorProto field;
 
         /// <summary>
+        /// Protobuf schema definition that this field is part of
+        /// </summary>
+        private SchemaSourceCode Schema { get; }
+
+        /// <summary>
         /// Optional protobuf oneof that the field is part of
         /// </summary>
         private OneofSourceCode? Oneof { get; }
@@ -123,10 +128,12 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// Constructs Delphi source code representing a protobuf field.
         /// </summary>
         /// <param name="field">Protobuf field to generate code for</param>
+        /// <param name="schema">Protobuf schema definition that this field is part of</param>
         /// <param name="oneof">Optional protobuf oneof that the field is part of</param>
-        public FieldSourceCode(FieldDescriptorProto field, OneofSourceCode? oneof)
+        public FieldSourceCode(FieldDescriptorProto field, SchemaSourceCode schema, OneofSourceCode? oneof)
         {
             this.field = field;
+            Schema = schema;
             Oneof = oneof;
         }
 
@@ -151,23 +158,48 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// <summary>
         /// Delphi type identifier of the Delphi type that is used to represent the protobuf field value(s) when communicating with internal (runtime) code
         /// </summary>
-        private string PrivateDelphiType => field.Label switch
+        private string PrivateDelphiType
         {
-            Label.Optional => field.Type.GetPrivateDelphiSingleValueType(field.TypeName, name => ProtocGenDelphi.ConstructDelphiTypeName(name)),
-            Label.Repeated => field.Type.GetDelphiRepeatedFieldSubclass(field.TypeName, name => ProtocGenDelphi.ConstructDelphiTypeName(name)),
-            _ => throw new NotImplementedException()
-        };
+            get
+            {
+                if (IsMessage)
+                {
+                    string className = Schema.GetMessageType(field.TypeName).QualifiedDelphiTypeName(Schema);
+                    return IsRepeated ? $"TProtobufRepeatedMessageFieldValues<{className}>" : className;
+                }
+                if (IsEnum && IsRepeated) return $"TProtobufRepeatedEnumField<{Schema.GetEnum(field.TypeName).QualifiedDelphiTypeName(Schema)}>";
+                return field.Label switch
+                {
+                    Label.Optional => field.Type.GetPrivateDelphiSingleValueType(),
+                    Label.Repeated => field.Type.GetDelphiRepeatedFieldSubclass(),
+                    _ => throw new NotImplementedException()
+                };
+            }
+        }
 
         /// <summary>
         /// Delphi type identifier of the Delphi type that is used to represent the protobuf field value(s) when communicating with client code
         /// </summary>
-        private string PublicDelphiType => field.Label switch
+        private string PublicDelphiType
         {
-            Label.Optional => field.Type.GetPublicDelphiSingleValueType(field.TypeName, name => ProtocGenDelphi.ConstructDelphiTypeName(name)),
-            Label.Repeated => $"IProtobufRepeatedFieldValues<{field.Type.GetPublicDelphiElementType(field.TypeName, name => ProtocGenDelphi.ConstructDelphiTypeName(name))}>",
-            _ => throw new NotImplementedException()
-        };
-
+            get
+            {
+                if (IsSingular)
+                {
+                    if (IsMessage) return Schema.GetMessageType(field.TypeName).QualifiedDelphiTypeName(Schema);
+                    else if (IsEnum) return Schema.GetEnum(field.TypeName).QualifiedDelphiTypeName(Schema);
+                    else return field.Type.GetPublicDelphiSingleValueType();
+                }
+                else
+                {
+                    string elementType;
+                    if (IsMessage) elementType = Schema.GetMessageType(field.TypeName).QualifiedDelphiTypeName(Schema);
+                    else if (IsEnum) elementType =  Schema.GetEnum(field.TypeName).QualifiedDelphiTypeName(Schema);
+                    else elementType = field.Type.GetPublicDelphiElementType();
+                    return $"IProtobufRepeatedFieldValues<{elementType}>";
+                }
+            }
+        }
         /// <summary>
         /// <see langword="true"/> if the field is a protobuf repeated field
         /// </summary>
@@ -407,7 +439,7 @@ May be overridden. Overriders shall only add side-effects and must call the ance
         {
             get
             {
-                string valueExpression = (IsSingular && IsEnum) ? $"{ProtocGenDelphi.ConstructDelphiTypeName(field.TypeName)}({DelphiField.Name})"
+                string valueExpression = (IsSingular && IsEnum) ? $"{PublicDelphiType}({DelphiField.Name})"
                                                                 : DelphiField.Name;
                 yield return $"result := {valueExpression};";
             }
