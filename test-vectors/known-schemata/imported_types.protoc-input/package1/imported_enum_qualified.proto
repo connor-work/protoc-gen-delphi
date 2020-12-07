@@ -1,0 +1,7 @@
+syntax = "proto3";
+
+package package1;
+
+enum ImportedEnumX {
+    VALUE_X = 0;
+}
