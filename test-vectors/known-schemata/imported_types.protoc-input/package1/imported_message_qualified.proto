@@ -1,0 +1,6 @@
+syntax = "proto3";
+
+package package1;
+
+message ImportedMessageX {
+}

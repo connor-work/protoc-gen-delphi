@@ -113,7 +113,6 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
             }
         }
 
-
         /// <summary>
         /// Applies a custom plug-in option passed through <c>protoc</c>.
         /// </summary>

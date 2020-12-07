@@ -151,7 +151,7 @@ type
 
     // IProtobufMessageInternal implementation
 
-    protected
+    public
       /// <summary>
       /// Tests if this message has a currently unknown protobuf field (found by <see cref="Decode"/>, but not decoded yet), with a known field number.
       /// </summary>

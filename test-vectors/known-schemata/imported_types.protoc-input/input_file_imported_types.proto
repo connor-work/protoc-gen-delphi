@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+import "imported_message_unqualified.proto";
+import "package1/imported_message_qualified.proto";
+import "imported_enum_unqualified.proto";
+import "package1/imported_enum_qualified.proto";
+
+message MessageX {
+    ImportedMessageX fieldX = 1;
+    package1.ImportedMessageX fieldY = 2;
+    ImportedEnumX fieldZ = 3;
+    package1.ImportedEnumX fieldA = 4;
+}

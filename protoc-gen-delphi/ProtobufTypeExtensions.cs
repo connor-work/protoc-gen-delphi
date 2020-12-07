@@ -83,10 +83,9 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// when communicating with client code.
         /// </summary>
         /// <param name="fieldType">The protobuf field descriptor's type field value</param>
-        /// <param name="fieldTypeName">The protobuf field descriptor's type name field value</param>
-        /// <param name="generator">Function that generates a Delphi type name for a protobuf message type or enumerated type name</param>
         /// <returns>Corresponding Delphi type identifier</returns>
-        public static string GetPublicDelphiSingleValueType(this Type fieldType, string fieldTypeName, Func<string, string> generator) => fieldType switch
+        /// <remarks>This is not used for protobuf message and enum types</remarks>
+        public static string GetPublicDelphiSingleValueType(this Type fieldType) => fieldType switch
         {
             Type.Double   => "Double",
             Type.Float    => "Single",
@@ -103,8 +102,6 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
             Type.Bool     => "Boolean",
             Type.String   => "UnicodeString",
             Type.Bytes    => "TBytes",
-            Type.Enum     => generator.Invoke(fieldTypeName),
-            Type.Message  => generator.Invoke(fieldTypeName),
             _ => throw new NotImplementedException()
         };
 
@@ -113,10 +110,9 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// when communicating with internal (runtime) code.
         /// </summary>
         /// <param name="fieldType">The protobuf field descriptor's type field value</param>
-        /// <param name="fieldTypeName">The protobuf field descriptor's type name field value</param>
-        /// <param name="generator">Function that generates a Delphi type name for a protobuf message type or enumerated type name</param>
         /// <returns>Corresponding Delphi type identifier</returns>
-        public static string GetPrivateDelphiSingleValueType(this Type fieldType, string fieldTypeName, Func<string, string> generator) => fieldType switch
+        /// <remarks>This is not used for protobuf message types</remarks>
+        public static string GetPrivateDelphiSingleValueType(this Type fieldType) => fieldType switch
         {
             Type.Double   => "Double",
             Type.Float    => "Single",
@@ -134,7 +130,6 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
             Type.String   => "UnicodeString",
             Type.Bytes    => "TBytes",
             Type.Enum     => "TProtobufEnumFieldValue",
-            Type.Message  => generator.Invoke(fieldTypeName),
             _ => throw new NotImplementedException()
         };
 
@@ -143,20 +138,18 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// when communicating with client code.
         /// </summary>
         /// <param name="fieldType">The protobuf field descriptor's type field value</param>
-        /// <param name="fieldTypeName">The protobuf field descriptor's type name field value</param>
-        /// <param name="generator">Function that generates a Delphi type name for a protobuf message type or enumerated type name</param>
         /// <returns>Corresponding Delphi type identifier</returns>
-        public static string GetPublicDelphiElementType(this Type fieldType, string fieldTypeName, Func<string, string> generator) => fieldType.GetPublicDelphiSingleValueType(fieldTypeName, generator);
+        /// <remarks>This is not used for protobuf message and enum types</remarks>
+        public static string GetPublicDelphiElementType(this Type fieldType) => fieldType.GetPublicDelphiSingleValueType();
 
         /// <summary>
         /// Determines the Delphi identifier of the subtype of <c>IProtobufRepeatedFieldValues<!<![CDATA[<T>]]></c> that represents repeated fields of
         /// a specific protobuf field type.
         /// </summary>
         /// <param name="fieldType">The protobuf field descriptor's type field value</param>
-        /// <param name="fieldTypeName">The protobuf field descriptor's type name field value</param>
-        /// <param name="generator">Function that generates a Delphi type name for a protobuf message type or enumerated type name</param>
         /// <returns>Delphi identifier of class</returns>
-        public static string GetDelphiRepeatedFieldSubclass(this Type fieldType, string fieldTypeName, Func<string, string> generator) => fieldType switch
+        /// <remarks>This is not used for protobuf message and enum types</remarks>
+        public static string GetDelphiRepeatedFieldSubclass(this Type fieldType) => fieldType switch
         {
             Type.Double   => "TProtobufRepeatedDoubleFieldValues",
             Type.Float    => "TProtobufRepeatedFloatFieldValues",
@@ -173,8 +166,6 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
             Type.Bool     => "TProtobufRepeatedBoolFieldValues",
             Type.String   => "TProtobufRepeatedStringFieldValues",
             Type.Bytes    => "TProtobufRepeatedBytesFieldValues",
-            Type.Enum     => $"TProtobufRepeatedEnumField<{generator.Invoke(fieldTypeName)}>",
-            Type.Message  => $"TProtobufRepeatedMessageFieldValues<{generator.Invoke(fieldTypeName)}>",
             _ => throw new NotImplementedException()
         };
     }

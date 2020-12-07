@@ -48,39 +48,49 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// <summary>
         /// Protobuf message type to generate code for
         /// </summary>
-        private readonly DescriptorProto messageType;
+        public DescriptorProto MessageType;
+
+        /// <summary>
+        /// Protobuf schema definition that this message type is part of
+        /// </summary>
+        private SchemaSourceCode Schema { get; }
 
         /// <summary>
         /// Constructs Delphi source code representing a protobuf message type.
         /// </summary>
         /// <param name="messageType">Protobuf message type to generate code for</param>
-        public MessageTypeSourceCode(DescriptorProto messageType) => this.messageType = messageType;
+        /// <param name="schema">Protobuf schema definition that this message type is part of</param>
+        public MessageTypeSourceCode(DescriptorProto messageType, SchemaSourceCode schema)
+        {
+            MessageType = messageType;
+            Schema = schema;
+        }
 
         /// <summary>
         /// Name of the generated Delphi class
         /// </summary>
-        private string DelphiClassName => ProtocGenDelphi.ConstructDelphiTypeName(messageType.Name); // TODO handling of absent name?
+        public string DelphiClassName => ProtocGenDelphi.ConstructDelphiTypeName(MessageType.Name); // TODO handling of absent name?
 
         /// <summary>
         /// Delphi source code representations of the nested protobuf enums
         /// </summary>
-        private IEnumerable<EnumSourceCode> NestedEnums => messageType.EnumType.Select(@enum => new EnumSourceCode(@enum));
+        private IEnumerable<EnumSourceCode> NestedEnums => MessageType.EnumType.Select(@enum => new EnumSourceCode(@enum, Schema));
 
         /// <summary>
         /// Delphi source code representations of the nested protobuf message types
         /// </summary>
-        private IEnumerable<MessageTypeSourceCode> NestedMessageTypes => messageType.NestedType.Select(nestedMessageType => new MessageTypeSourceCode(nestedMessageType));
+        private IEnumerable<MessageTypeSourceCode> NestedMessageTypes => MessageType.NestedType.Select(nestedMessageType => new MessageTypeSourceCode(nestedMessageType, Schema));
 
         /// <summary>
         /// Delphi source code representations of the protobuf fields of the message type
         /// </summary>
-        public IEnumerable<FieldSourceCode> Fields => messageType.Field.Select(field => new FieldSourceCode(field, field.HasOneofIndex ? Oneofs.ElementAt(field.OneofIndex)
-                                                                                                                                       : null));
+        public IEnumerable<FieldSourceCode> Fields => MessageType.Field.Select(field => new FieldSourceCode(field, Schema, field.HasOneofIndex ? Oneofs.ElementAt(field.OneofIndex)
+                                                                                                                                               : null));
 
         /// <summary>
         /// Delphi source code representations of the protobuf oneofs of the message type
         /// </summary>
-        public IEnumerable<OneofSourceCode> Oneofs => messageType.OneofDecl.Select((oneof, i) => new OneofSourceCode(oneof, Fields.Where(field => field.field.HasOneofIndex
+        public IEnumerable<OneofSourceCode> Oneofs => MessageType.OneofDecl.Select((oneof, i) => new OneofSourceCode(oneof, Fields.Where(field => field.field.HasOneofIndex
                                                                                                                                                && field.field.OneofIndex == i)));
 
         /// <summary>
@@ -99,6 +109,14 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         }
 
         /// <summary>
+        /// Constructs a Delphi identifier for the type, qualifying it if required.
+        /// </summary>
+        /// <param name="referencingSchema">Schema from which the type is referenced</param>
+        /// <returns>The Delphi type identifier</returns>
+        public string QualifiedDelphiTypeName(SchemaSourceCode referencingSchema) => referencingSchema.Equals(Schema) ? DelphiClassName
+                                                                                                                      : $"{Schema.DelphiUnitName}.{DelphiClassName}";
+
+        /// <summary>
         /// Generated Delphi class (message class)
         /// </summary>
         public ClassDeclaration DelphiClass => new ClassDeclaration()
@@ -115,7 +133,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// </summary>
         public IEnumerable<string> ClassComment => // TODO transfer protobuf comment
 $@"<remarks>
-This class corresponds to the protobuf message type <c>{messageType.Name}</c>.
+This class corresponds to the protobuf message type <c>{MessageType.Name}</c>.
 </remarks>".Lines();
 
         /// <summary>
