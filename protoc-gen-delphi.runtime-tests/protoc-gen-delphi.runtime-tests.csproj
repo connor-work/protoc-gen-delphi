@@ -3,7 +3,7 @@
     <!-- TODO: Version should be always same as protoc-gen-delphi -->
     <CoreVersion>0.8.0</CoreVersion>
     <PrereleaseVersionSuffix></PrereleaseVersionSuffix>
-    <SnapshotVersion>false</SnapshotVersion>
+    <SnapshotVersion>true</SnapshotVersion>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <RootNamespace>Work.Connor.Protobuf.Delphi.ProtocGenDelphi.RuntimeTests</RootNamespace>
     <IsPackable>true</IsPackable>
@@ -95,38 +95,52 @@
   <ItemGroup>
     <!-- Runtime-independent support code for generated files -->
     <EmbeddedResource Include="../runtime/Work/Connor/Protobuf/Delphi/ProtocGenDelphi/*.pas"
-                      LogicalName="[support code unit]%(Filename)%(Extension)" />
+                      LogicalName="[support code unit]%(Filename)%(Extension)"
+                      Link="Support Code/%(Filename)%(Extension)" />
     <!-- Source code of runtime public API -->
     <EmbeddedResource Include="../runtime/Work/Connor/Protobuf/Delphi/ProtocGenDelphi/Runtime/*.pas"
-                      LogicalName="[runtime public API unit]%(Filename)%(Extension)" />
+                      LogicalName="[runtime public API unit]%(Filename)%(Extension)"
+                      Link="Runtime API/Public/%(Filename)%(Extension)" />
     <!-- Source code of runtime internal API -->
     <EmbeddedResource Include="../runtime/Work/Connor/Protobuf/Delphi/ProtocGenDelphi/Runtime/Internal/*.pas"
-                      LogicalName="[runtime internal API unit]%(Filename)%(Extension)" />
+                      LogicalName="[runtime internal API unit]%(Filename)%(Extension)"
+                      Link="Runtime API/Internal/%(Filename)%(Extension)" />
     <!-- Source code of stub runtime library implementation -->
     <EmbeddedResource Include="../runtime/Work/Connor/Protobuf/Delphi/ProtocGenDelphi/StubRuntime/*.pas"
-                      LogicalName="[stub runtime unit]%(Filename)%(Extension)" />
+                      LogicalName="[stub runtime unit]%(Filename)%(Extension)"
+                      Link="Stub Runtime/%(Filename)%(Extension)" />
     <!-- Support source code for Delphi tests -->
     <EmbeddedResource Include="test-support/**/*.pas"
-                      LogicalName="[Delphi test support code unit]%(RecursiveDir)%(Filename)%(Extension)" />
+                      LogicalName="[Delphi test support code unit]%(RecursiveDir)%(Filename)%(Extension)"
+                      Link="Test Support Code/%(RecursiveDir)%(Filename)%(Extension)" />
     <EmbeddedResource Include="test-support/**/*.dpr"
-                      LogicalName="[Delphi test support code program]%(RecursiveDir)%(Filename)%(Extension)" />
+                      LogicalName="[Delphi test support code program]%(RecursiveDir)%(Filename)%(Extension)"
+                      Link="Test Support Code/%(RecursiveDir)%(Filename)%(Extension)" />
     <EmbeddedResource Include="test-support/**/*.inc"
-                      LogicalName="[Delphi test support code include file]%(RecursiveDir)%(Filename)%(Extension)" />
+                      LogicalName="[Delphi test support code include file]%(RecursiveDir)%(Filename)%(Extension)"
+                      Link="Test Support Code/%(RecursiveDir)%(Filename)%(Extension)" />
   </ItemGroup>
 
   <ItemGroup>
     <!-- Known schema folders -->
-    <EmbeddedResource Include="../test-vectors/known-schemata/**/*.protoc-input/**/*" LogicalName="[known schema folder]%(RecursiveDir)%(Filename)%(Extension)" />
+    <EmbeddedResource Include="../test-vectors/known-schemata/**/*.protoc-input/**/*"
+                      LogicalName="[known schema folder]%(RecursiveDir)%(Filename)%(Extension)"
+                      Link="Known Schemata/%(RecursiveDir)%(Filename)%(Extension)" />
     <!-- Known schema files -->
-    <EmbeddedResource Include="../test-vectors/known-schemata/**/*.proto" Exclude="../test-vectors/known-schemata/**/*.protoc-input/**/*" LogicalName="[known schema file]%(RecursiveDir)%(Filename)%(Extension)" />
+    <EmbeddedResource Include="../test-vectors/known-schemata/**/*.proto"
+                      Exclude="../test-vectors/known-schemata/**/*.protoc-input/**/*"
+                      LogicalName="[known schema file]%(RecursiveDir)%(Filename)%(Extension)"
+                      Link="Known Schemata/%(RecursiveDir)%(Filename)%(Extension)" />
   </ItemGroup>
 
   <ItemGroup>
     <!-- For each known message, there is a unit that constructs it -->
     <EmbeddedResource Include="test-vectors/known-messages/**/uConstruct.pas"
-                      LogicalName="[known message][constructor unit]%(RecursiveDir)" />
+                      LogicalName="[known message][constructor unit]%(RecursiveDir)"
+                      Link="Known Messages/%(RecursiveDir)%(Filename)%(Extension)" />
     <!-- For each known message, there is a unit that validates it -->
     <EmbeddedResource Include="test-vectors/known-messages/**/uValidate.pas"
-                      LogicalName="[known message][validator unit]%(RecursiveDir)" />
+                      LogicalName="[known message][validator unit]%(RecursiveDir)"
+                      Link="Known Messages/%(RecursiveDir)%(Filename)%(Extension)" />
   </ItemGroup>
 </Project>
