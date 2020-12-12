@@ -22,12 +22,12 @@ using static Work.Connor.Delphi.CodeWriter.StringExtensions;
 namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
 {
     /// <summary>
-	/// Aggregation of Delphi source code elements that represent a protobuf enum.
+    /// Aggregation of Delphi source code elements that represent a protobuf enum.
     /// </summary>
     /// <remarks>
     /// The protobuf enum is mapped to a Delphi enumerated type.
     /// </remarks>
-    internal class EnumSourceCode
+    internal class EnumSourceCode : TypeSourceCode
     {
         /// <summary>
         /// Protobuf enum to generate code for
@@ -35,25 +35,18 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         public EnumDescriptorProto Enum { get; }
 
         /// <summary>
-        /// Protobuf schema definition that this enum is part of
-        /// </summary>
-        private SchemaSourceCode Schema { get; }
-
-        /// <summary>
         /// Constructs Delphi source code representing a protobuf enum.
         /// </summary>
         /// <param name="enum">Protobuf enum to generate code for</param>
         /// <param name="schema">Protobuf schema definition that this enum is part of</param>
-        public EnumSourceCode(EnumDescriptorProto @enum, SchemaSourceCode schema)
-        {
-            Enum = @enum;
-            Schema = schema;
-        }
+        /// <param name="containerType">Representation of the message type that this enum is nested in, absent if this is not a nested enum</param>
+        public EnumSourceCode(EnumDescriptorProto @enum, SchemaSourceCode schema, MessageTypeSourceCode? containerType) : base(schema, containerType) => Enum = @enum;
 
-        /// <summary>
-        /// Name of the Delphi enumerated type
-        /// </summary>
-        public string DelphiEnumName => ProtocGenDelphi.ConstructDelphiTypeName(Enum.Name); // TODO handling of absent name?
+        public override string TypeName => Enum.Name; // TODO handling of absent name?
+
+        public override InterfaceDeclaration InterfaceDeclaration => new InterfaceDeclaration() { EnumDeclaration = DelphiEnum };
+
+        public override NestedTypeDeclaration NestedTypeDeclaration => new NestedTypeDeclaration() { EnumDeclaration = DelphiEnum };
 
         /// <summary>
         /// Delphi source code representations of the protobuf enum values
@@ -61,19 +54,11 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         private IEnumerable<EnumValueSourceCode> EnumValues => Enum.Value.Select(enumValue => new EnumValueSourceCode(Enum.Name.ToCase(IdentifierCase.Pascal), enumValue));
 
         /// <summary>
-        /// Constructs a Delphi identifier for the type, qualifying it if required.
-        /// </summary>
-        /// <param name="referencingSchema">Schema from which the type is referenced</param>
-        /// <returns>The Delphi type identifier</returns>
-        public string QualifiedDelphiTypeName(SchemaSourceCode referencingSchema) => referencingSchema.Equals(Schema) ? DelphiEnumName
-                                                                                                                      : $"{Schema.DelphiUnitName}.{DelphiEnumName}";
-
-        /// <summary>
         /// Generated Delphi enumerated type
         /// </summary>
-        public EnumDeclaration DelphiEnum => new EnumDeclaration()
+        private EnumDeclaration DelphiEnum => new EnumDeclaration()
         {
-            Name = DelphiEnumName,
+            Name = DelphiTypeName,
             Values = { EnumValues.Select(enumValue => enumValue.DelphiEnumValue) },
             Comment = new AnnotationComment() { CommentLines = { EnumComment } }
             // TODO annotate
@@ -84,7 +69,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// </summary>
         private IEnumerable<string> EnumComment => // TODO transfer protobuf comment
 $@"<remarks>
-This enumerated type corresponds to the protobuf enum <c>{Enum.Name}</c>.
+This enumerated type corresponds to the protobuf enum <c>{TypeName}</c>.
 </remarks>".Lines();
     }
 }
