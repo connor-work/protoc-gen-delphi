@@ -26,7 +26,7 @@ using static Work.Connor.Delphi.CodeWriter.StringExtensions;
 namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
 {
     /// <summary>
-	/// Aggregation of Delphi source code elements that represent a protobuf field.
+    /// Aggregation of Delphi source code elements that represent a protobuf field.
     /// </summary>
     /// <remarks>
     /// The protobuf field is mapped to a Delphi property with a backing field, getter and setter.
@@ -164,10 +164,10 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
             {
                 if (IsMessage)
                 {
-                    string className = Schema.GetMessageType(field.TypeName).QualifiedDelphiTypeName(Schema);
+                    string className = Schema.GetMessageType(field.TypeName).ReferenceDelphiTypeName(Schema);
                     return IsRepeated ? $"TProtobufRepeatedMessageFieldValues<{className}>" : className;
                 }
-                if (IsEnum && IsRepeated) return $"TProtobufRepeatedEnumField<{Schema.GetEnum(field.TypeName).QualifiedDelphiTypeName(Schema)}>";
+                if (IsEnum && IsRepeated) return $"TProtobufRepeatedEnumField<{Schema.GetEnum(field.TypeName).ReferenceDelphiTypeName(Schema)}>";
                 return field.Label switch
                 {
                     Label.Optional => field.Type.GetPrivateDelphiSingleValueType(),
@@ -186,15 +186,15 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
             {
                 if (IsSingular)
                 {
-                    if (IsMessage) return Schema.GetMessageType(field.TypeName).QualifiedDelphiTypeName(Schema);
-                    else if (IsEnum) return Schema.GetEnum(field.TypeName).QualifiedDelphiTypeName(Schema);
+                    if (IsMessage) return Schema.GetMessageType(field.TypeName).ReferenceDelphiTypeName(Schema);
+                    else if (IsEnum) return Schema.GetEnum(field.TypeName).ReferenceDelphiTypeName(Schema);
                     else return field.Type.GetPublicDelphiSingleValueType();
                 }
                 else
                 {
                     string elementType;
-                    if (IsMessage) elementType = Schema.GetMessageType(field.TypeName).QualifiedDelphiTypeName(Schema);
-                    else if (IsEnum) elementType =  Schema.GetEnum(field.TypeName).QualifiedDelphiTypeName(Schema);
+                    if (IsMessage) elementType = Schema.GetMessageType(field.TypeName).ReferenceDelphiTypeName(Schema);
+                    else if (IsEnum) elementType =  Schema.GetEnum(field.TypeName).ReferenceDelphiTypeName(Schema);
                     else elementType = field.Type.GetPublicDelphiElementType();
                     return $"IProtobufRepeatedFieldValues<{elementType}>";
                 }

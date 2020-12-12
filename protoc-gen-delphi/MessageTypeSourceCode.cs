@@ -23,12 +23,12 @@ using Binding = Work.Connor.Delphi.MethodInterfaceDeclaration.Types.Binding;
 namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
 {
     /// <summary>
-	/// Aggregation of Delphi source code elements that represent a protobuf message type.
+    /// Aggregation of Delphi source code elements that represent a protobuf message type.
     /// </summary>
     /// <remarks>
     /// The protobuf message type is mapped to a Delphi class (<i>message class</i>).
     /// </remarks>
-    internal class MessageTypeSourceCode
+    internal class MessageTypeSourceCode : TypeSourceCode
     {
         /// <summary>
         /// Required unit reference for using Delphi classes
@@ -51,35 +51,38 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         public DescriptorProto MessageType;
 
         /// <summary>
-        /// Protobuf schema definition that this message type is part of
-        /// </summary>
-        private SchemaSourceCode Schema { get; }
-
-        /// <summary>
         /// Constructs Delphi source code representing a protobuf message type.
         /// </summary>
         /// <param name="messageType">Protobuf message type to generate code for</param>
         /// <param name="schema">Protobuf schema definition that this message type is part of</param>
-        public MessageTypeSourceCode(DescriptorProto messageType, SchemaSourceCode schema)
-        {
-            MessageType = messageType;
-            Schema = schema;
-        }
+        /// <param name="containerType">Representation of the message type that this type is nested in, absent if this is not a nested type</param>
+        public MessageTypeSourceCode(DescriptorProto messageType, SchemaSourceCode schema, MessageTypeSourceCode? containerType) : base(schema, containerType) => MessageType = messageType;
+
+        public override string TypeName => MessageType.Name; // TODO handling of absent name?
+
+        public override InterfaceDeclaration InterfaceDeclaration => new InterfaceDeclaration() { ClassDeclaration = DelphiClass };
+
+        public override NestedTypeDeclaration NestedTypeDeclaration => new NestedTypeDeclaration() { ClassDeclaration = DelphiClass };
 
         /// <summary>
-        /// Name of the generated Delphi class
+        /// Delphi source code representations of the directly nested protobuf enums
         /// </summary>
-        public string DelphiClassName => ProtocGenDelphi.ConstructDelphiTypeName(MessageType.Name); // TODO handling of absent name?
+        private IEnumerable<EnumSourceCode> NestedEnums => MessageType.EnumType.Select(@enum => new EnumSourceCode(@enum, Schema, this));
 
         /// <summary>
-        /// Delphi source code representations of the nested protobuf enums
+        /// Delphi source code representations of the transitively nested protobuf enums
         /// </summary>
-        private IEnumerable<EnumSourceCode> NestedEnums => MessageType.EnumType.Select(@enum => new EnumSourceCode(@enum, Schema));
+        public IEnumerable<EnumSourceCode> TransitivelyNestedEnums => NestedEnums.Concat(NestedMessageTypes.SelectMany(messageType => messageType.TransitivelyNestedEnums));
 
         /// <summary>
-        /// Delphi source code representations of the nested protobuf message types
+        /// Delphi source code representations of the directly nested protobuf message types
         /// </summary>
-        private IEnumerable<MessageTypeSourceCode> NestedMessageTypes => MessageType.NestedType.Select(nestedMessageType => new MessageTypeSourceCode(nestedMessageType, Schema));
+        private IEnumerable<MessageTypeSourceCode> NestedMessageTypes => MessageType.NestedType.Select(nestedMessageType => new MessageTypeSourceCode(nestedMessageType, Schema, this));
+
+        /// <summary>
+        /// Delphi source code representations of the transivitely nested protobuf message types (including this message type)
+        /// </summary>
+        public IEnumerable<MessageTypeSourceCode> TransitivelyNestedMessages => NestedMessageTypes.SelectMany(messageType => messageType.TransitivelyNestedMessages).Prepend(this);
 
         /// <summary>
         /// Delphi source code representations of the protobuf fields of the message type
@@ -105,23 +108,15 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
                 yield return runtime.GetDependencyForMessages();
                 yield return ClassesReference;
             }
-            return baseDependencies().Concat(Fields.SelectMany(field => field.Dependencies(runtime))).Distinct();
+            return baseDependencies().Concat(Fields.SelectMany(field => field.Dependencies(runtime))).Concat(NestedMessageTypes.SelectMany(messageType => messageType.Dependencies(runtime))).Distinct();
         }
-
-        /// <summary>
-        /// Constructs a Delphi identifier for the type, qualifying it if required.
-        /// </summary>
-        /// <param name="referencingSchema">Schema from which the type is referenced</param>
-        /// <returns>The Delphi type identifier</returns>
-        public string QualifiedDelphiTypeName(SchemaSourceCode referencingSchema) => referencingSchema.Equals(Schema) ? DelphiClassName
-                                                                                                                      : $"{Schema.DelphiUnitName}.{DelphiClassName}";
 
         /// <summary>
         /// Generated Delphi class (message class)
         /// </summary>
-        public ClassDeclaration DelphiClass => new ClassDeclaration()
+        private ClassDeclaration DelphiClass => new ClassDeclaration()
         {
-            Name = DelphiClassName,
+            Name = DelphiTypeName,
             Ancestor = messageRootClass,
             NestedDeclarations = { ClassNestedDeclarations },
             Comment = new AnnotationComment() { CommentLines = { ClassComment } }
@@ -133,7 +128,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// </summary>
         public IEnumerable<string> ClassComment => // TODO transfer protobuf comment
 $@"<remarks>
-This class corresponds to the protobuf message type <c>{MessageType.Name}</c>.
+This class corresponds to the protobuf message type <c>{TypeName}</c>.
 </remarks>".Lines();
 
         /// <summary>
@@ -143,18 +138,13 @@ This class corresponds to the protobuf message type <c>{MessageType.Name}</c>.
         {
             get
             {
+                foreach (TypeSourceCode nestedType in NestedEnums.Concat<TypeSourceCode>(NestedMessageTypes)) yield return new ClassDeclarationNestedDeclaration()
+                {
+                    Visibility = Visibility.Public,
+                    NestedTypeDeclaration = nestedType.NestedTypeDeclaration
+                };
                 foreach (ClassDeclarationNestedDeclaration declaration in Fields.SelectMany(field => field.ClassNestedDeclarations)) yield return declaration;
                 foreach (ClassDeclarationNestedDeclaration declaration in Oneofs.SelectMany(oneof => oneof.ClassNestedDeclarations)) yield return declaration;
-                foreach (EnumSourceCode @enum in NestedEnums) yield return new ClassDeclarationNestedDeclaration()
-                {
-                    Visibility = Visibility.Public,
-                    NestedTypeDeclaration = new NestedTypeDeclaration() { EnumDeclaration = @enum.DelphiEnum }
-                };
-                foreach (MessageTypeSourceCode nestedMessageType in NestedMessageTypes) yield return new ClassDeclarationNestedDeclaration()
-                {
-                    Visibility = Visibility.Public,
-                    NestedTypeDeclaration = new NestedTypeDeclaration() { ClassDeclaration = nestedMessageType.DelphiClass }
-                };
                 yield return new ClassDeclarationNestedDeclaration()
                 {
                     Visibility = Visibility.Public,
@@ -209,7 +199,7 @@ This class corresponds to the protobuf message type <c>{MessageType.Name}</c>.
         }
 
         /// <summary>
-        /// Message declarations of the message class
+        /// Method declarations of the message class
         /// </summary>
         public IEnumerable<MethodDeclaration> MethodDeclarations
         {
@@ -225,10 +215,11 @@ This class corresponds to the protobuf message type <c>{MessageType.Name}</c>.
                 yield return ClearOwnFields;
                 yield return MergeFromOwnFields;
                 yield return AssignOwnFields;
-                foreach (MethodDeclaration method in Fields.SelectMany(field => field.MethodDeclarations)
-                                             .Concat(Oneofs.SelectMany(oneof => oneof.MethodDeclarations)))
+                foreach ((MessageTypeSourceCode type, MethodDeclaration method) in Fields.SelectMany(field => field.MethodDeclarations.Select(method => (this, method)))
+                                                                           .Concat(Oneofs.SelectMany(oneof => oneof.MethodDeclarations.Select(method => (this, method))))
+                                                                           .Concat(NestedMessageTypes.SelectMany(messageType => messageType.MethodDeclarations.Select(method => (messageType, method)))))
                 {
-                    method.Class = DelphiClassName;
+                    method.Class = type.ContainerQualifiedDelphiTypeName;
                     yield return method;
                 }
             }
@@ -258,7 +249,7 @@ This class corresponds to the protobuf message type <c>{MessageType.Name}</c>.
         /// </summary>
         private IEnumerable<string> CreateComment =>
 $@"<summary>
-Creates an empty <see cref=""{DelphiClassName}""/> that can be used as a protobuf message.
+Creates an empty <see cref=""{DelphiTypeName}""/> that can be used as a protobuf message.
 Initially, all protobuf fields are absent, meaning that they are set to their default values.
 </summary>
 <remarks>
@@ -271,7 +262,7 @@ For a detailed explanation, see https://developers.google.com/protocol-buffers/d
         /// </summary>
         private MethodDeclaration Create => new MethodDeclaration()
         {
-            Class = DelphiClassName,
+            Class = DelphiTypeName,
             Prototype = CreatePrototype,
             Statements = { CreateStatements }
         };
@@ -325,7 +316,7 @@ Developers must ensure that no shared ownership of current field values or furth
         /// </summary>
         private MethodDeclaration Destroy => new MethodDeclaration()
         {
-            Class = DelphiClassName,
+            Class = DelphiTypeName,
             Prototype = DestroyPrototype,
             Statements = { DestroyStatements }
         };
@@ -369,7 +360,7 @@ $@"<summary>
 Renders all protobuf fields absent by setting them to their default values.
 </summary>
 <remarks>
-The resulting instance state is equivalent to a newly constructed <see cref=""{DelphiClassName}""/>.
+The resulting instance state is equivalent to a newly constructed <see cref=""{DelphiTypeName}""/>.
 For more details, see the documentation of <see cref=""Create""/>.
 This procedure may cause the destruction of transitively owned objects.
 Developers must ensure that no shared ownership of current field values or further nested embedded objects is held.
@@ -380,7 +371,7 @@ Developers must ensure that no shared ownership of current field values or furth
         /// </summary>
         private MethodDeclaration Clear => new MethodDeclaration()
         {
-            Class = DelphiClassName,
+            Class = DelphiTypeName,
             Prototype = ClearPrototype,
             Statements = { ClearStatements }
         };
@@ -435,7 +426,7 @@ Encodes the message using the protobuf binary wire format and writes it to a str
         /// </summary>
         private MethodDeclaration Encode => new MethodDeclaration()
         {
-            Class = DelphiClassName,
+            Class = DelphiTypeName,
             Prototype = EncodePrototype,
             Statements = { EncodeStatements }
         };
@@ -500,7 +491,7 @@ Developers must ensure that no shared ownership of current field values or furth
         /// </summary>
         private MethodDeclaration Decode => new MethodDeclaration()
         {
-            Class = DelphiClassName,
+            Class = DelphiTypeName,
             Prototype = DecodePrototype,
             Statements = { DecodeStatements }
         };
@@ -568,9 +559,9 @@ This procedure does not cause the destruction of any transitively owned objects 
         /// </summary>
         private MethodDeclaration MergeFrom => new MethodDeclaration()
         {
-            Class = DelphiClassName,
+            Class = DelphiTypeName,
             Prototype = MergeFromPrototype,
-            LocalDeclarations = { $"{MergeFromScratchVariableName}: {DelphiClassName};" },
+            LocalDeclarations = { $"{MergeFromScratchVariableName}: {DelphiTypeName};" },
             Statements = { MergeFromStatements }
         };
 
@@ -583,7 +574,7 @@ This procedure does not cause the destruction of any transitively owned objects 
         /// Source code lines within the generated <c>MergeFrom</c> method's statement block
         /// </summary>
         private IEnumerable<string> MergeFromStatements =>
-$@"{MergeFromScratchVariableName} := {MergeFromSourceParameter.Name} as {DelphiClassName};
+$@"{MergeFromScratchVariableName} := {MergeFromSourceParameter.Name} as {DelphiTypeName};
 inherited MergeFrom({MergeFromScratchVariableName});
 if (Assigned({MergeFromScratchVariableName})) then MergeFromOwnFields({MergeFromScratchVariableName});".Lines();
 
@@ -636,9 +627,9 @@ Developers must ensure that no shared ownership of current field values or furth
         /// </summary>
         private MethodDeclaration Assign => new MethodDeclaration()
         {
-            Class = DelphiClassName,
+            Class = DelphiTypeName,
             Prototype = AssignPrototype,
-            LocalDeclarations = { $"{AssignScratchVariableName}: {DelphiClassName};" },
+            LocalDeclarations = { $"{AssignScratchVariableName}: {DelphiTypeName};" },
             Statements = { AssignStatements }
         };
 
@@ -651,7 +642,7 @@ Developers must ensure that no shared ownership of current field values or furth
         /// Source code lines within the generated <c>Assign</c> method's statement block
         /// </summary>
         private IEnumerable<string> AssignStatements =>
-$@"{AssignScratchVariableName} := {AssignSourceParameter.Name} as {DelphiClassName};
+$@"{AssignScratchVariableName} := {AssignSourceParameter.Name} as {DelphiTypeName};
 inherited Assign({AssignScratchVariableName});
 AssignOwnFields({AssignScratchVariableName});".Lines();
 
@@ -679,7 +670,7 @@ AssignOwnFields({AssignScratchVariableName});".Lines();
         /// </summary>
         private IEnumerable<string> ClearOwnFieldsComment =>
 $@"<summary>
-Renders those protobuf fields absent that belong to <see cref=""{DelphiClassName}""/> (i.e., are not managed by an ancestor class), by setting them to their default values.
+Renders those protobuf fields absent that belong to <see cref=""{DelphiTypeName}""/> (i.e., are not managed by an ancestor class), by setting them to their default values.
 </summary>".Lines();
 
         /// <summary>
@@ -687,7 +678,7 @@ Renders those protobuf fields absent that belong to <see cref=""{DelphiClassName
         /// </summary>
         private MethodDeclaration ClearOwnFields => new MethodDeclaration()
         {
-            Class = DelphiClassName,
+            Class = DelphiTypeName,
             Prototype = ClearOwnFieldsPrototype,
             Statements = { ClearOwnFieldsStatements }
         };
@@ -734,7 +725,7 @@ Renders those protobuf fields absent that belong to <see cref=""{DelphiClassName
         private Parameter MergeFromOwnFieldsSourceParameter => new Parameter()
         {
             Name = MergeFromOwnFieldsSourceParameterName,
-            Type = DelphiClassName
+            Type = DelphiTypeName
         };
 
         /// <summary>
@@ -742,7 +733,7 @@ Renders those protobuf fields absent that belong to <see cref=""{DelphiClassName
         /// </summary>
         private IEnumerable<string> MergeFromOwnFieldsComment =>
 $@"<summary>
-Merges those protobuf fields that belong to <see cref=""{DelphiClassName}""/> (i.e., are not managed by an ancestor class), during a call to <see cref=""MergeFrom""/>.
+Merges those protobuf fields that belong to <see cref=""{DelphiTypeName}""/> (i.e., are not managed by an ancestor class), during a call to <see cref=""MergeFrom""/>.
 </summary>
 <param name=""{MergeFromOwnFieldsSourceParameter.Name}"">Message to merge into this one</param>".Lines();
 
@@ -751,7 +742,7 @@ Merges those protobuf fields that belong to <see cref=""{DelphiClassName}""/> (i
         /// </summary>
         private MethodDeclaration MergeFromOwnFields => new MethodDeclaration()
         {
-            Class = DelphiClassName,
+            Class = DelphiTypeName,
             Prototype = MergeFromOwnFieldsPrototype,
             LocalDeclarations = { MergeFromOwnFieldsLocalDeclarations },
             Statements = { MergeFromOwnFieldsStatements }
@@ -810,7 +801,7 @@ Merges those protobuf fields that belong to <see cref=""{DelphiClassName}""/> (i
         private Parameter AssignOwnFieldsSourceParameter => new Parameter()
         {
             Name = AssignOwnFieldsSourceParameterName,
-            Type = DelphiClassName
+            Type = DelphiTypeName
         };
 
         /// <summary>
@@ -818,7 +809,7 @@ Merges those protobuf fields that belong to <see cref=""{DelphiClassName}""/> (i
         /// </summary>
         private IEnumerable<string> AssignOwnFieldsComment =>
 $@"<summary>
-Copies those protobuf fields that belong to <see cref=""{DelphiClassName}""/> (i.e., are not managed by an ancestor class), during a call to <see cref=""TInterfacedPersistent.Assign""/>.
+Copies those protobuf fields that belong to <see cref=""{DelphiTypeName}""/> (i.e., are not managed by an ancestor class), during a call to <see cref=""TInterfacedPersistent.Assign""/>.
 </summary>
 <param name=""{AssignOwnFieldsSourceParameter.Name}"">Source message to copy from</param>".Lines();
 
@@ -827,7 +818,7 @@ Copies those protobuf fields that belong to <see cref=""{DelphiClassName}""/> (i
         /// </summary>
         private MethodDeclaration AssignOwnFields => new MethodDeclaration()
         {
-            Class = DelphiClassName,
+            Class = DelphiTypeName,
             Prototype = AssignOwnFieldsPrototype,
             LocalDeclarations = { AssignOwnFieldsLocalDeclarations },
             Statements = { AssignOwnFieldsStatements }

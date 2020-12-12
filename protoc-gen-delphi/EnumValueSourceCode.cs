@@ -21,7 +21,7 @@ using static Work.Connor.Delphi.CodeWriter.StringExtensions;
 namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
 {
     /// <summary>
-	/// Aggregation of Delphi source code elements that represent a protobuf enum value.
+    /// Aggregation of Delphi source code elements that represent a protobuf enum value.
     /// </summary>
     /// <remarks>
     /// The protobuf enum value is mapped to a Delphi enumerated value.

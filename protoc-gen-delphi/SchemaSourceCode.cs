@@ -23,7 +23,7 @@ using System;
 namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
 {
     /// <summary>
-	/// Aggregation of Delphi source code elements that represent a protobuf schema definition.
+    /// Aggregation of Delphi source code elements that represent a protobuf schema definition.
     /// </summary>
     /// <remarks>
     /// The protobuf schema definition is mapped to a Delphi unit.
@@ -72,12 +72,22 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// <summary>
         /// Delphi source code representations of the top-level protobuf enums
         /// </summary>
-        private IEnumerable<EnumSourceCode> Enums => ProtoFile.EnumType.Select(@enum => new EnumSourceCode(@enum, this));
+        private IEnumerable<EnumSourceCode> TopLevelEnums => ProtoFile.EnumType.Select(@enum => new EnumSourceCode(@enum, this, null));
+
+        /// <summary>
+        /// Delphi source code representations of all protobuf enums in the schema
+        /// </summary>
+        private IEnumerable<EnumSourceCode> Enums => TopLevelEnums.Concat(TopLevelMessageTypes.SelectMany(messageType => messageType.TransitivelyNestedEnums));
 
         /// <summary>
         /// Delphi source code representations of the top-level protobuf message types
         /// </summary>
-        private IEnumerable<MessageTypeSourceCode> MessageTypes => ProtoFile.MessageType.Select(messageType => new MessageTypeSourceCode(messageType, this));
+        private IEnumerable<MessageTypeSourceCode> TopLevelMessageTypes => ProtoFile.MessageType.Select(messageType => new MessageTypeSourceCode(messageType, this, null));
+
+        /// <summary>
+        /// Delphi source code representations of all protobuf message types in the schema
+        /// </summary>
+        private IEnumerable<MessageTypeSourceCode> MessageTypes => TopLevelMessageTypes.SelectMany(messageType => messageType.TransitivelyNestedMessages);
 
         /// <summary>
         /// Delphi unit identifier of the generated unit
@@ -112,18 +122,27 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         };
 
         /// <summary>
-        /// Splits a field type name provided by <c>protoc</c> into package and unqualified type name.
+        /// Splits a potentially package-qualified field type name provided by <c>protoc</c> into package and type name.
+        /// Returns all possible solutions without testing whether a name segment is part of the type name or package name.
         /// </summary>
-        /// <param name="typeName">The (potentially qualified) field type name</param>
-        /// <returns>The package name (empty if qualified and empty, <c>null</c> if unqualified) and the unqualified type name</returns>
-        private static (string? package, string unqualifiedName) SplitTypeName(string typeName)
+        /// <param name="typeName">The (potentially package-qualified) field type name</param>
+        /// <returns>For each possible split, the package name (empty if qualified and empty, <c>null</c> if unqualified) and the type name</returns>
+        private static IEnumerable<(string? package, string typeName)> SplitTypeName(string fieldTypeName)
         {
-            if (!typeName.StartsWith(".")) return (null, typeName);
+            if (!fieldTypeName.StartsWith(".")) yield return (null, fieldTypeName); // Unqualified name
             else
             {
-                int dotIndex = typeName.LastIndexOf(".");
-                string unqualifiedName = typeName.Substring(dotIndex + 1);
-                return (dotIndex == 0 ? "" : typeName[1..dotIndex], unqualifiedName);
+                int dotIndex = fieldTypeName.LastIndexOf(".");
+                string unqualifiedName = fieldTypeName.Substring(dotIndex + 1);
+                if (dotIndex == 0) yield return ("", unqualifiedName);
+                else
+                {
+                    string qualifier = fieldTypeName[1..dotIndex];
+                    // First solution: the qualifier is the entire package name
+                    yield return (qualifier, unqualifiedName);
+                    // Then work backwards through potential container types
+                    foreach ((string? package, string containerTypeName) in SplitTypeName(qualifier)) yield return (package, $"{containerTypeName}.{unqualifiedName}");
+                }
             }
         }
 
@@ -144,25 +163,18 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// </summary>
         /// <param name="typeName">The field type name</param>
         /// <returns>The protobuf enum</returns>
-        public EnumSourceCode GetEnum(string typeName)
-        {
-            (string? package, string unqualifiedName) = SplitTypeName(typeName);
-            return GetSchemataInPackage(package).SelectMany(schema => schema.Enums).First(@enum => @enum.Enum.Name == unqualifiedName);
-        }
+        public EnumSourceCode GetEnum(string typeName) => SplitTypeName(typeName).SelectMany(nameSplit => GetSchemataInPackage(nameSplit.package).SelectMany(schema => schema.Enums)
+                                                                                                                                                 .Where(@enum => @enum.ContainerQualifiedTypeName == nameSplit.typeName)
+                                                                                            ).First();
 
         /// <summary>
         /// Finds the representation of a protobuf message type by field type name. 
         /// </summary>
         /// <param name="typeName">The field type name</param>
         /// <returns>The protobuf message type</returns>
-        public MessageTypeSourceCode GetMessageType(string typeName)
-        {
-            (string? package, string unqualifiedName) = SplitTypeName(typeName);
-            IEnumerable<string> names = GetSchemataInPackage(package).SelectMany(schema => schema.MessageTypes).Select(messageType => messageType.MessageType.Name);
-            string test = string.Join(", ", names);
-            if (!names.Contains(unqualifiedName)) throw new Exception($"{typeName} {package} {unqualifiedName} {test} {names.Contains(unqualifiedName)}");
-            return GetSchemataInPackage(package).SelectMany(schema => schema.MessageTypes).First(messageType => messageType.MessageType.Name == unqualifiedName);
-        }
+        public MessageTypeSourceCode GetMessageType(string typeName) => SplitTypeName(typeName).SelectMany(nameSplit => GetSchemataInPackage(nameSplit.package).SelectMany(schema => schema.MessageTypes)
+                                                                                                                                                               .Where(messageType => messageType.ContainerQualifiedTypeName == nameSplit.typeName)
+                                                                                                          ).First();
 
         /// <summary>
         /// Interface section of the generated Delphi unit
@@ -174,22 +186,10 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
                 Interface @interface = new Interface()
                 {
                     UsesClause = { Dependencies },
-                    Declarations = { InterfaceDeclarations }
+                    Declarations = { TopLevelEnums.Concat<TypeSourceCode>(TopLevelMessageTypes).Select(type => type.InterfaceDeclaration) }
                 };
                 @interface.UsesClause.SortUsesClause();
                 return @interface;
-            }
-        }
-
-        /// <summary>
-        /// Declarations within the interface section of the generated Delphi unit
-        /// </summary>
-        private IEnumerable<InterfaceDeclaration> InterfaceDeclarations
-        {
-            get
-            {
-                foreach (EnumSourceCode @enum in Enums) yield return new InterfaceDeclaration() { EnumDeclaration = @enum.DelphiEnum };
-                foreach (MessageTypeSourceCode messageType in MessageTypes) yield return new InterfaceDeclaration() { ClassDeclaration = messageType.DelphiClass };
             }
         }
 
@@ -198,7 +198,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// </summary>
         /// <returns>Sequence of required unit references</returns>
         private IEnumerable<UnitReference> Dependencies => Imports.Select(import => new UnitReference() { Unit = import.DelphiUnitIdentifier })
-                                                   .Concat(MessageTypes.SelectMany(messageType => messageType.Dependencies(runtime)))
+                                                   .Concat(TopLevelMessageTypes.SelectMany(messageType => messageType.Dependencies(runtime)))
                                                                .Distinct();
 
         /// <summary>
@@ -206,8 +206,8 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// </summary>
         private Implementation Implementation => new Implementation()
         {
-            Declarations = { MessageTypes.SelectMany(messageType => messageType.MethodDeclarations)
-                                         .Select(method => new ImplementationDeclaration() { MethodDeclaration = method }) }
+            Declarations = { TopLevelMessageTypes.SelectMany(messageType => messageType.MethodDeclarations)
+                                                 .Select(method => new ImplementationDeclaration() { MethodDeclaration = method }) }
         };
 
         /// <summary>
