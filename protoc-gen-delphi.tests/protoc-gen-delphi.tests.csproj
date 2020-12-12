@@ -47,42 +47,51 @@
   <ItemGroup>
     <!-- Runtime-independent support code for generated files -->
     <EmbeddedResource Include="../runtime/Work/Connor/Protobuf/Delphi/ProtocGenDelphi/*.pas"
-                      LogicalName="[support code unit]%(Filename)%(Extension)" />
+                      LogicalName="[support code unit]%(Filename)%(Extension)"
+                      Link="Support Code/%(Filename)%(Extension)" />
     <!-- Source code of stub runtime library implementation -->
     <EmbeddedResource Include="../runtime/Work/Connor/Protobuf/Delphi/ProtocGenDelphi/StubRuntime/*.pas"
-                      LogicalName="[stub runtime unit]%(Filename)%(Extension)" />
+                      LogicalName="[stub runtime unit]%(Filename)%(Extension)"
+                      Link="Stub Runtime/%(Filename)%(Extension)" />
   </ItemGroup>
 
   <ItemGroup>
     <!-- Known schema folders -->
     <EmbeddedResource Include="../test-vectors/known-schemata/**/*.protoc-input/**/*"
-                      LogicalName="[known schema folder]%(RecursiveDir)%(Filename)%(Extension)" />
+                      LogicalName="[known schema folder]%(RecursiveDir)%(Filename)%(Extension)"
+                      Link="Known Schemata/%(RecursiveDir)%(Filename)%(Extension)" />
     <!-- Known schema files -->
     <EmbeddedResource Include="../test-vectors/known-schemata/**/*.proto"
                       Exclude="../test-vectors/known-schemata/**/*.protoc-input/**/*"
-                      LogicalName="[known schema file]%(RecursiveDir)%(Filename)%(Extension)" />
+                      LogicalName="[known schema file]%(RecursiveDir)%(Filename)%(Extension)"
+                      Link="Known Schemata/%(RecursiveDir)%(Filename)%(Extension)" />
   </ItemGroup>
 
   <ItemGroup>
     <!-- Each known protoc output file tree is stored in a marked sub-directory -->
     <EmbeddedResource Include="test-vectors/known-protoc-outputs/**/*.protoc-output/**/*"
-                      LogicalName="[known protoc output][expected output folder]%(RecursiveDir)%(Filename)%(Extension)" />
+                      LogicalName="[known protoc output][expected output folder]%(RecursiveDir)%(Filename)%(Extension)"
+                      Link="Known Protoc Outputs/Expected Outputs/%(RecursiveDir)%(Filename)%(Extension)" />
     <!-- For each known protoc output file tree, there is either an input folder... -->
     <EmbeddedResource Include="test-vectors/known-protoc-outputs/**/*.protoc-input/**/*"
-                      LogicalName="[known protoc output][input folder]%(RecursiveDir)%(Filename)%(Extension)" />
+                      LogicalName="[known protoc output][input folder]%(RecursiveDir)%(Filename)%(Extension)"
+                      Link="Known Protoc Outputs/Inputs/%(RecursiveDir)%(Filename)%(Extension)" />
     <!-- ... or a single input .proto file with matching name ... -->
     <EmbeddedResource Include="test-vectors/known-protoc-outputs/**/*.proto"
                       Exclude="test-vectors/known-protoc-outputs/**/*.protoc-input/**/*"
-                      LogicalName="[known protoc output][input schema file]%(RecursiveDir)%(Filename)%(Extension)" />
+                      LogicalName="[known protoc output][input schema file]%(RecursiveDir)%(Filename)%(Extension)"
+                      Link="Known Protoc Outputs/Inputs/%(RecursiveDir)%(Filename)%(Extension)" />
     <!-- ... or a known schema folder or schema file used as input (may be shared with other tests) -->
   </ItemGroup>
 
   <ItemGroup>
     <!-- Each known response to protoc is stored in a JSON-encoded file -->
     <EmbeddedResource Include="test-vectors/known-responses-to-protoc/**/*.response.pb.json"
-                      LogicalName="[known response to protoc][expected response]%(RecursiveDir)%(Filename)%(Extension)" />
+                      LogicalName="[known response to protoc][expected response]%(RecursiveDir)%(Filename)%(Extension)"
+                      Link="Known Protoc Responses/Expected Responses/%(RecursiveDir)%(Filename)%(Extension)" />
     <!-- For each known response to protoc, there is a request stored in a JSON-encoded file with matching name -->
     <EmbeddedResource Include="test-vectors/known-responses-to-protoc/**/*.request.pb.json"
-                      LogicalName="[known response to protoc][request]%(RecursiveDir)%(Filename)%(Extension)" />
+                      LogicalName="[known response to protoc][request]%(RecursiveDir)%(Filename)%(Extension)"
+                      Link="Known Protoc Responses/Requests/%(RecursiveDir)%(Filename)%(Extension)" />
   </ItemGroup>
 </Project>
