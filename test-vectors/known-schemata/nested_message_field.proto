@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+message MessageX {
+    message MessageY {
+        uint32 fieldX = 1;
+    }  
+
+    MessageX fieldY = 1;
+}

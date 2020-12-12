@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+message MessageX {
+    message MessageY{
+
+    }
+    
+    message MessageZ {
+        uint32 fieldX = 1;
+    }
+}
