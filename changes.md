@@ -17,7 +17,7 @@ This file tracks significant changes to the project setup that are not easily re
 3. Created new .NET Core project for a Console Application (protoc-gen-delphi).
 
     ```powershell
-    dotnet new console --language C`# --name protoc-gen-delphi --framework netcoreapp3.1 --output protoc-gen-delphi
+    dotnet new console --language C`# --name protoc-gen-delphi --framework net5.0 --langVersion 9.0 --output protoc-gen-delphi
     ```
 
 4. Created new .NET Core solution (protoc-gen-delphi).
@@ -35,7 +35,7 @@ This file tracks significant changes to the project setup that are not easily re
 6. Created new xUnit test project (tests for protoc-gen-delphi).
 
     ```powershell
-    dotnet new xunit --name protoc-gen-delphi.tests --framework netcoreapp3.1 --output protoc-gen-delphi.tests
+    dotnet new xunit --name protoc-gen-delphi.tests --framework net5.0 --output protoc-gen-delphi.tests
     ```
 
 7. Added `protoc-gen-delphi.tests` project to `protoc-gen-delphi` solution.
@@ -47,7 +47,7 @@ This file tracks significant changes to the project setup that are not easily re
 8. Added SonarAnalyzer for static code analysis to `protoc-gen-delphi` project. Further package additions do not need to be tracked here.
 
     ```powershell
-    dotnet add protoc-gen-delphi package SonarAnalyzer.CSharp --version 8.12.0.21095
+    dotnet add protoc-gen-delphi package SonarAnalyzer.CSharp --version 8.15.0.24505
     ```
 
 9. Created a *[manifest file](https://docs.microsoft.com/en-us/dotnet/core/tools/local-tools-how-to-use)* for .NET Core local tools.
@@ -56,7 +56,7 @@ This file tracks significant changes to the project setup that are not easily re
     dotnet new tool-manifest
     ```
 
-10. Installed [`dotnet-grpc`](https://docs.microsoft.com/en-us/aspnet/core/grpc/dotnet-grpc?view=aspnetcore-3.1) tool to manage protobuf references.
+10. Installed [`dotnet-grpc`](https://docs.microsoft.com/en-us/aspnet/core/grpc/dotnet-grpc?view=aspnetcore-5.0) tool to manage protobuf references.
 
     ```powershell
     dotnet tool install dotnet-grpc
@@ -74,8 +74,8 @@ This file tracks significant changes to the project setup that are not easily re
     cd protoc-gen-delphi
     dotnet grpc add-file --services None --access Public ../proto/google/protobuf/compiler/plugin.proto
     cd ..
-    dotnet add protoc-gen-delphi package Google.Protobuf --version 3.13.0
-    dotnet add protoc-gen-delphi package Grpc.Tools --version 2.23.0
+    dotnet add protoc-gen-delphi package Google.Protobuf --version 3.14.0
+    dotnet add protoc-gen-delphi package Grpc.Tools --version 2.34.0
     ```
 
 13. Upgraded fixed .NET Core SDK version.

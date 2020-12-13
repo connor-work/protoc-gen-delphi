@@ -33,7 +33,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// <summary>
         /// Required unit reference for using Delphi classes
         /// </summary>
-        private static UnitReference ClassesReference => new UnitReference() { Unit = new UnitIdentifier() { Unit = "Classes", Namespace = { "System" } } };
+        private static UnitReference ClassesReference => new() { Unit = new() { Unit = "Classes", Namespace = { "System" } } };
 
         /// <summary>
         /// Name of the Delphi root base class of all generated Delphi classes for protobuf messages
@@ -60,9 +60,9 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
 
         public override string TypeName => MessageType.Name; // TODO handling of absent name?
 
-        public override InterfaceDeclaration InterfaceDeclaration => new InterfaceDeclaration() { ClassDeclaration = DelphiClass };
+        public override InterfaceDeclaration InterfaceDeclaration => new() { ClassDeclaration = DelphiClass };
 
-        public override NestedTypeDeclaration NestedTypeDeclaration => new NestedTypeDeclaration() { ClassDeclaration = DelphiClass };
+        public override NestedTypeDeclaration NestedTypeDeclaration => new() { ClassDeclaration = DelphiClass };
 
         /// <summary>
         /// Delphi source code representations of the directly nested protobuf enums
@@ -114,12 +114,12 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// <summary>
         /// Generated Delphi class (message class)
         /// </summary>
-        private ClassDeclaration DelphiClass => new ClassDeclaration()
+        private ClassDeclaration DelphiClass => new()
         {
             Name = DelphiTypeName,
             Ancestor = messageRootClass,
             NestedDeclarations = { ClassNestedDeclarations },
-            Comment = new AnnotationComment() { CommentLines = { ClassComment } }
+            Comment = new() { CommentLines = { ClassComment } }
             // TODO annotate
         };
 
@@ -138,62 +138,62 @@ This class corresponds to the protobuf message type <c>{TypeName}</c>.
         {
             get
             {
-                foreach (TypeSourceCode nestedType in NestedEnums.Concat<TypeSourceCode>(NestedMessageTypes)) yield return new ClassDeclarationNestedDeclaration()
+                foreach (TypeSourceCode nestedType in NestedEnums.Concat<TypeSourceCode>(NestedMessageTypes)) yield return new()
                 {
                     Visibility = Visibility.Public,
                     NestedTypeDeclaration = nestedType.NestedTypeDeclaration
                 };
                 foreach (ClassDeclarationNestedDeclaration declaration in Fields.SelectMany(field => field.ClassNestedDeclarations)) yield return declaration;
                 foreach (ClassDeclarationNestedDeclaration declaration in Oneofs.SelectMany(oneof => oneof.ClassNestedDeclarations)) yield return declaration;
-                yield return new ClassDeclarationNestedDeclaration()
+                yield return new()
                 {
                     Visibility = Visibility.Public,
-                    Member = new ClassMemberDeclaration() { MethodDeclaration = CreateInterface }
+                    Member = new() { MethodDeclaration = CreateInterface }
                 };
-                yield return new ClassDeclarationNestedDeclaration()
+                yield return new()
                 {
                     Visibility = Visibility.Public,
-                    Member = new ClassMemberDeclaration() { MethodDeclaration = DestroyInterface }
+                    Member = new() { MethodDeclaration = DestroyInterface }
                 };
-                yield return new ClassDeclarationNestedDeclaration()
+                yield return new()
                 {
                     Visibility = Visibility.Public,
-                    Member = new ClassMemberDeclaration() { MethodDeclaration = ClearInterface }
+                    Member = new() { MethodDeclaration = ClearInterface }
                 };
-                yield return new ClassDeclarationNestedDeclaration()
+                yield return new()
                 {
                     Visibility = Visibility.Public,
-                    Member = new ClassMemberDeclaration() { MethodDeclaration = EncodeInterface }
+                    Member = new() { MethodDeclaration = EncodeInterface }
                 };
-                yield return new ClassDeclarationNestedDeclaration()
+                yield return new()
                 {
                     Visibility = Visibility.Public,
-                    Member = new ClassMemberDeclaration() { MethodDeclaration = DecodeInterface }
+                    Member = new() { MethodDeclaration = DecodeInterface }
                 };
-                yield return new ClassDeclarationNestedDeclaration()
+                yield return new()
                 {
                     Visibility = Visibility.Public,
-                    Member = new ClassMemberDeclaration() { MethodDeclaration = MergeFromInterface }
+                    Member = new() { MethodDeclaration = MergeFromInterface }
                 };
-                yield return new ClassDeclarationNestedDeclaration()
+                yield return new()
                 {
                     Visibility = Visibility.Public,
-                    Member = new ClassMemberDeclaration() { MethodDeclaration = AssignInterface }
+                    Member = new() { MethodDeclaration = AssignInterface }
                 };
-                yield return new ClassDeclarationNestedDeclaration()
+                yield return new()
                 {
                     Visibility = Visibility.Private,
-                    Member = new ClassMemberDeclaration() { MethodDeclaration = ClearOwnFieldsInterface }
+                    Member = new() { MethodDeclaration = ClearOwnFieldsInterface }
                 };
-                yield return new ClassDeclarationNestedDeclaration()
+                yield return new()
                 {
                     Visibility = Visibility.Private,
-                    Member = new ClassMemberDeclaration() { MethodDeclaration = MergeFromOwnFieldsInterface }
+                    Member = new() { MethodDeclaration = MergeFromOwnFieldsInterface }
                 };
-                yield return new ClassDeclarationNestedDeclaration()
+                yield return new()
                 {
                     Visibility = Visibility.Private,
-                    Member = new ClassMemberDeclaration() { MethodDeclaration = AssignOwnFieldsInterface }
+                    Member = new() { MethodDeclaration = AssignOwnFieldsInterface }
                 };
             }
         }
@@ -228,17 +228,17 @@ This class corresponds to the protobuf message type <c>{TypeName}</c>.
         /// <summary>
         /// Interface declaration of the generated <c>Create</c> method
         /// </summary>
-        private MethodInterfaceDeclaration CreateInterface => new MethodInterfaceDeclaration()
+        private MethodInterfaceDeclaration CreateInterface => new()
         {
             Binding = Binding.Override,
             Prototype = CreatePrototype,
-            Comment = new AnnotationComment { CommentLines = { CreateComment } }
+            Comment = new() { CommentLines = { CreateComment } }
         };
 
         /// <summary>
         /// Prototype of the generated <c>Create</c> method
         /// </summary>
-        private Prototype CreatePrototype => new Prototype()
+        private Prototype CreatePrototype => new()
         {
             Name = "Create",
             Type = Prototype.Types.Type.Constructor
@@ -260,7 +260,7 @@ For a detailed explanation, see https://developers.google.com/protocol-buffers/d
         /// <summary>
         /// Method declaration of the generated <c>Create</c> method
         /// </summary>
-        private MethodDeclaration Create => new MethodDeclaration()
+        private MethodDeclaration Create => new()
         {
             Class = DelphiTypeName,
             Prototype = CreatePrototype,
@@ -284,17 +284,17 @@ For a detailed explanation, see https://developers.google.com/protocol-buffers/d
         /// <summary>
         /// Interface declaration of the generated <c>Destroy</c> method
         /// </summary>
-        private MethodInterfaceDeclaration DestroyInterface => new MethodInterfaceDeclaration()
+        private MethodInterfaceDeclaration DestroyInterface => new()
         {
             Binding = Binding.Override,
             Prototype = DestroyPrototype,
-            Comment = new AnnotationComment { CommentLines = { DestroyComment } }
+            Comment = new() { CommentLines = { DestroyComment } }
         };
 
         /// <summary>
         /// Prototype of the generated <c>Destroy</c> method
         /// </summary>
-        private Prototype DestroyPrototype => new Prototype()
+        private Prototype DestroyPrototype => new()
         {
             Name = "Destroy",
             Type = Prototype.Types.Type.Destructor
@@ -314,7 +314,7 @@ Developers must ensure that no shared ownership of current field values or furth
         /// <summary>
         /// Method declaration of the generated <c>Destroy</c> method
         /// </summary>
-        private MethodDeclaration Destroy => new MethodDeclaration()
+        private MethodDeclaration Destroy => new()
         {
             Class = DelphiTypeName,
             Prototype = DestroyPrototype,
@@ -336,17 +336,17 @@ Developers must ensure that no shared ownership of current field values or furth
         /// <summary>
         /// Interface declaration of the generated <c>Clear</c> method
         /// </summary>
-        private MethodInterfaceDeclaration ClearInterface => new MethodInterfaceDeclaration()
+        private MethodInterfaceDeclaration ClearInterface => new()
         {
             Binding = Binding.Override,
             Prototype = ClearPrototype,
-            Comment = new AnnotationComment { CommentLines = { ClearComment } }
+            Comment = new() { CommentLines = { ClearComment } }
         };
 
         /// <summary>
         /// Prototype of the generated <c>Clear</c> method
         /// </summary>
-        private Prototype ClearPrototype => new Prototype()
+        private Prototype ClearPrototype => new()
         {
             Name = "Clear",
             Type = Prototype.Types.Type.Procedure
@@ -369,7 +369,7 @@ Developers must ensure that no shared ownership of current field values or furth
         /// <summary>
         /// Method declaration of the generated <c>Clear</c> method
         /// </summary>
-        private MethodDeclaration Clear => new MethodDeclaration()
+        private MethodDeclaration Clear => new()
         {
             Class = DelphiTypeName,
             Prototype = ClearPrototype,
@@ -386,17 +386,17 @@ ClearOwnFields;".Lines();
         /// <summary>
         /// Interface declaration of the generated <c>Encode</c> method
         /// </summary>
-        private MethodInterfaceDeclaration EncodeInterface => new MethodInterfaceDeclaration()
+        private MethodInterfaceDeclaration EncodeInterface => new()
         {
             Binding = Binding.Override,
             Prototype = EncodePrototype,
-            Comment = new AnnotationComment { CommentLines = { EncodeComment } }
+            Comment = new() { CommentLines = { EncodeComment } }
         };
 
         /// <summary>
         /// Prototype of the generated <c>Encode</c> method
         /// </summary>
-        private Prototype EncodePrototype => new Prototype()
+        private Prototype EncodePrototype => new()
         {
             Name = "Encode",
             Type = Prototype.Types.Type.Procedure,
@@ -406,7 +406,7 @@ ClearOwnFields;".Lines();
         /// <summary>
         /// Destination stream parameter of the generated <c>Encode</c> method
         /// </summary>
-        public static Parameter EncodeDestinationParameter => new Parameter()
+        public static Parameter EncodeDestinationParameter => new()
         {
             Name = "aDest",
             Type = "TStream"
@@ -424,7 +424,7 @@ Encodes the message using the protobuf binary wire format and writes it to a str
         /// <summary>
         /// Method declaration of the generated <c>Encode</c> method
         /// </summary>
-        private MethodDeclaration Encode => new MethodDeclaration()
+        private MethodDeclaration Encode => new()
         {
             Class = DelphiTypeName,
             Prototype = EncodePrototype,
@@ -446,17 +446,17 @@ Encodes the message using the protobuf binary wire format and writes it to a str
         /// <summary>
         /// Interface declaration of the generated <c>Decode</c> method
         /// </summary>
-        private MethodInterfaceDeclaration DecodeInterface => new MethodInterfaceDeclaration()
+        private MethodInterfaceDeclaration DecodeInterface => new()
         {
             Binding = Binding.Override,
             Prototype = DecodePrototype,
-            Comment = new AnnotationComment { CommentLines = { DecodeComment } }
+            Comment = new() { CommentLines = { DecodeComment } }
         };
 
         /// <summary>
         /// Prototype of the generated <c>Decode</c> method
         /// </summary>
-        private Prototype DecodePrototype => new Prototype()
+        private Prototype DecodePrototype => new()
         {
             Name = "Decode",
             Type = Prototype.Types.Type.Procedure,
@@ -466,7 +466,7 @@ Encodes the message using the protobuf binary wire format and writes it to a str
         /// <summary>
         /// Source stream parameter of the generated <c>Decode</c> method
         /// </summary>
-        private Parameter DecodeSourceParameter => new Parameter()
+        private Parameter DecodeSourceParameter => new()
         {
             Name = "aSource",
             Type = "TStream"
@@ -489,7 +489,7 @@ Developers must ensure that no shared ownership of current field values or furth
         /// <summary>
         /// Method declaration of the generated <c>Decode</c> method
         /// </summary>
-        private MethodDeclaration Decode => new MethodDeclaration()
+        private MethodDeclaration Decode => new()
         {
             Class = DelphiTypeName,
             Prototype = DecodePrototype,
@@ -511,17 +511,17 @@ Developers must ensure that no shared ownership of current field values or furth
         /// <summary>
         /// Interface declaration of the generated <c>MergeFrom</c> method
         /// </summary>
-        private MethodInterfaceDeclaration MergeFromInterface => new MethodInterfaceDeclaration()
+        private MethodInterfaceDeclaration MergeFromInterface => new()
         {
             Binding = Binding.Override,
             Prototype = MergeFromPrototype,
-            Comment = new AnnotationComment { CommentLines = { MergeFromComment } }
+            Comment = new() { CommentLines = { MergeFromComment } }
         };
 
         /// <summary>
         /// Prototype of the generated <c>MergeFrom</c> method
         /// </summary>
-        private Prototype MergeFromPrototype => new Prototype()
+        private Prototype MergeFromPrototype => new()
         {
             Name = "MergeFrom",
             Type = Prototype.Types.Type.Procedure,
@@ -531,7 +531,7 @@ Developers must ensure that no shared ownership of current field values or furth
         /// <summary>
         /// Source object parameter of the generated <c>MergeFrom</c> method
         /// </summary>
-        private Parameter MergeFromSourceParameter => new Parameter()
+        private Parameter MergeFromSourceParameter => new()
         {
             Name = "aSource",
             Type = messagePublicInterface
@@ -557,7 +557,7 @@ This procedure does not cause the destruction of any transitively owned objects 
         /// <summary>
         /// Method declaration of the generated <c>MergeFrom</c> method
         /// </summary>
-        private MethodDeclaration MergeFrom => new MethodDeclaration()
+        private MethodDeclaration MergeFrom => new()
         {
             Class = DelphiTypeName,
             Prototype = MergeFromPrototype,
@@ -581,17 +581,17 @@ if (Assigned({MergeFromScratchVariableName})) then MergeFromOwnFields({MergeFrom
         /// <summary>
         /// Interface declaration of the generated <c>Assign</c> method
         /// </summary>
-        private MethodInterfaceDeclaration AssignInterface => new MethodInterfaceDeclaration()
+        private MethodInterfaceDeclaration AssignInterface => new()
         {
             Binding = Binding.Override,
             Prototype = AssignPrototype,
-            Comment = new AnnotationComment { CommentLines = { AssignComment } }
+            Comment = new() { CommentLines = { AssignComment } }
         };
 
         /// <summary>
         /// Prototype of the generated <c>Assign</c> method
         /// </summary>
-        private Prototype AssignPrototype => new Prototype()
+        private Prototype AssignPrototype => new()
         {
             Name = "Assign",
             Type = Prototype.Types.Type.Procedure,
@@ -601,7 +601,7 @@ if (Assigned({MergeFromScratchVariableName})) then MergeFromOwnFields({MergeFrom
         /// <summary>
         /// Source object parameter of the generated <c>Assign</c> method
         /// </summary>
-        private Parameter AssignSourceParameter => new Parameter()
+        private Parameter AssignSourceParameter => new()
         {
             Name = "aSource",
             Type = "TPersistent"
@@ -625,7 +625,7 @@ Developers must ensure that no shared ownership of current field values or furth
         /// <summary>
         /// Method declaration of the generated <c>Assign</c> method
         /// </summary>
-        private MethodDeclaration Assign => new MethodDeclaration()
+        private MethodDeclaration Assign => new()
         {
             Class = DelphiTypeName,
             Prototype = AssignPrototype,
@@ -649,17 +649,17 @@ AssignOwnFields({AssignScratchVariableName});".Lines();
         /// <summary>
         /// Interface declaration of the generated <c>ClearOwnFields</c> method
         /// </summary>
-        private MethodInterfaceDeclaration ClearOwnFieldsInterface => new MethodInterfaceDeclaration()
+        private MethodInterfaceDeclaration ClearOwnFieldsInterface => new()
         {
             Binding = Binding.Static,
             Prototype = ClearOwnFieldsPrototype,
-            Comment = new AnnotationComment { CommentLines = { ClearOwnFieldsComment } }
+            Comment = new() { CommentLines = { ClearOwnFieldsComment } }
         };
 
         /// <summary>
         /// Prototype for the generated <c>ClearOwnFields</c> method
         /// </summary>
-        private Prototype ClearOwnFieldsPrototype => new Prototype()
+        private Prototype ClearOwnFieldsPrototype => new()
         {
             Name = "ClearOwnFields",
             Type = Prototype.Types.Type.Procedure
@@ -676,7 +676,7 @@ Renders those protobuf fields absent that belong to <see cref=""{DelphiTypeName}
         /// <summary>
         /// Method declaration of the generated <c>ClearOwnFields</c> method
         /// </summary>
-        private MethodDeclaration ClearOwnFields => new MethodDeclaration()
+        private MethodDeclaration ClearOwnFields => new()
         {
             Class = DelphiTypeName,
             Prototype = ClearOwnFieldsPrototype,
@@ -697,17 +697,17 @@ Renders those protobuf fields absent that belong to <see cref=""{DelphiTypeName}
         /// <summary>
         /// Interface declaration of the generated <c>MergeFromOwnFields</c> method
         /// </summary>
-        private MethodInterfaceDeclaration MergeFromOwnFieldsInterface => new MethodInterfaceDeclaration()
+        private MethodInterfaceDeclaration MergeFromOwnFieldsInterface => new()
         {
             Binding = Binding.Static,
             Prototype = MergeFromOwnFieldsPrototype,
-            Comment = new AnnotationComment { CommentLines = { MergeFromOwnFieldsComment } }
+            Comment = new() { CommentLines = { MergeFromOwnFieldsComment } }
         };
 
         /// <summary>
         /// Prototype of the generated <c>MergeFromOwnFields</c> method
         /// </summary>
-        private Prototype MergeFromOwnFieldsPrototype => new Prototype()
+        private Prototype MergeFromOwnFieldsPrototype => new()
         {
             Name = "MergeFromOwnFields",
             Type = Prototype.Types.Type.Procedure,
@@ -722,7 +722,7 @@ Renders those protobuf fields absent that belong to <see cref=""{DelphiTypeName}
         /// <summary>
         /// Source object parameter of the generated <c>MergeFromOwnFields</c> method
         /// </summary>
-        private Parameter MergeFromOwnFieldsSourceParameter => new Parameter()
+        private Parameter MergeFromOwnFieldsSourceParameter => new()
         {
             Name = MergeFromOwnFieldsSourceParameterName,
             Type = DelphiTypeName
@@ -740,7 +740,7 @@ Merges those protobuf fields that belong to <see cref=""{DelphiTypeName}""/> (i.
         /// <summary>
         /// Method declaration of the generated <c>MergeFromOwnFields</c> method
         /// </summary>
-        private MethodDeclaration MergeFromOwnFields => new MethodDeclaration()
+        private MethodDeclaration MergeFromOwnFields => new()
         {
             Class = DelphiTypeName,
             Prototype = MergeFromOwnFieldsPrototype,
@@ -773,17 +773,17 @@ Merges those protobuf fields that belong to <see cref=""{DelphiTypeName}""/> (i.
         /// <summary>
         /// Interface declaration of the generated <c>AssignOwnFields</c> method
         /// </summary>
-        private MethodInterfaceDeclaration AssignOwnFieldsInterface => new MethodInterfaceDeclaration()
+        private MethodInterfaceDeclaration AssignOwnFieldsInterface => new()
         {
             Binding = Binding.Static,
             Prototype = AssignOwnFieldsPrototype,
-            Comment = new AnnotationComment { CommentLines = { AssignOwnFieldsComment } }
+            Comment = new() { CommentLines = { AssignOwnFieldsComment } }
         };
 
         /// <summary>
         /// Prototype of the generated <c>AssignOwnFields</c> method
         /// </summary>
-        private Prototype AssignOwnFieldsPrototype => new Prototype()
+        private Prototype AssignOwnFieldsPrototype => new()
         {
             Name = "AssignOwnFields",
             Type = Prototype.Types.Type.Procedure,
@@ -798,7 +798,7 @@ Merges those protobuf fields that belong to <see cref=""{DelphiTypeName}""/> (i.
         /// <summary>
         /// Source object parameter of the generated <c>AssignOwnFields</c> method
         /// </summary>
-        private Parameter AssignOwnFieldsSourceParameter => new Parameter()
+        private Parameter AssignOwnFieldsSourceParameter => new()
         {
             Name = AssignOwnFieldsSourceParameterName,
             Type = DelphiTypeName
@@ -816,7 +816,7 @@ Copies those protobuf fields that belong to <see cref=""{DelphiTypeName}""/> (i.
         /// <summary>
         /// Method declaration of the generated <c>AssignOwnFields</c> method
         /// </summary>
-        private MethodDeclaration AssignOwnFields => new MethodDeclaration()
+        private MethodDeclaration AssignOwnFields => new()
         {
             Class = DelphiTypeName,
             Prototype = AssignOwnFieldsPrototype,

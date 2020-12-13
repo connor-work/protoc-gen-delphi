@@ -21,7 +21,7 @@ using static Work.Connor.Delphi.CodeWriter.StringExtensions;
 namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
 {
     /// <summary>
-	/// Aggregation of Delphi source code elements that represent a protobuf oneof.
+    /// Aggregation of Delphi source code elements that represent a protobuf oneof.
     /// </summary>
     /// <remarks>
     /// The protobuf oneof is mapped to a Delphi property with a backing field and getter.
@@ -112,30 +112,30 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         {
             get
             {
-                yield return new ClassDeclarationNestedDeclaration()
+                yield return new()
                 {
                     Visibility = Visibility.Public,
-                    NestedTypeDeclaration = new NestedTypeDeclaration() { EnumDeclaration = DelphiEnum }
+                    NestedTypeDeclaration = new() { EnumDeclaration = DelphiEnum }
                 };
-                yield return new ClassDeclarationNestedDeclaration()
+                yield return new()
                 {
                     Visibility = Visibility.Private,
-                    Member = new ClassMemberDeclaration() { FieldDeclaration = DelphiField }
+                    Member = new() { FieldDeclaration = DelphiField }
                 };
-                yield return new ClassDeclarationNestedDeclaration()
+                yield return new()
                 {
                     Visibility = Visibility.Protected,
-                    Member = new ClassMemberDeclaration() { MethodDeclaration = GetterInterface }
+                    Member = new() { MethodDeclaration = GetterInterface }
                 };
-                yield return new ClassDeclarationNestedDeclaration()
+                yield return new()
                 {
                     Visibility = Visibility.Protected,
-                    Member = new ClassMemberDeclaration() { MethodDeclaration = SetterInterface }
+                    Member = new() { MethodDeclaration = SetterInterface }
                 };
-                yield return new ClassDeclarationNestedDeclaration()
+                yield return new()
                 {
                     Visibility = Visibility.Public,
-                    Member = new ClassMemberDeclaration() { PropertyDeclaration = DelphiProperty }
+                    Member = new() { PropertyDeclaration = DelphiProperty }
                 };
             }
         }
@@ -155,11 +155,11 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// <summary>
         /// Generated Delphi enumerated value representing the absence case of the oneof
         /// </summary>
-        private EnumValueDeclaration AbsenceEnumValue => new EnumValueDeclaration()
+        private EnumValueDeclaration AbsenceEnumValue => new()
         {
             Name = AbsenceEnumValueName,
             Ordinality = 0,
-            Comment = new AnnotationComment() { CommentLines = { AbsenceEnumValueComment } }
+            Comment = new() { CommentLines = { AbsenceEnumValueComment } }
         };
 
         /// <summary>
@@ -188,11 +188,11 @@ Indicates absence of the protobuf oneof {DelphiCommentReference}.
         /// <summary>
         /// Generated Delphi enumerated type representing the cases of the oneof
         /// </summary>
-        private EnumDeclaration DelphiEnum => new EnumDeclaration()
+        private EnumDeclaration DelphiEnum => new()
         {
             Name = DelphiEnumName,
             Values = { PresenceEnumValues.Prepend(AbsenceEnumValue) },
-            Comment = new AnnotationComment() { CommentLines = { DelphiEnumComment } }
+            Comment = new() { CommentLines = { DelphiEnumComment } }
             // TODO annotate
         };
 
@@ -207,11 +207,11 @@ This enumerated type represents the cases of the protobuf oneof {DelphiCommentRe
         /// <summary>
         /// Generated Delphi field backing the generated property for the oneof case
         /// </summary>
-        private FieldDeclaration DelphiField => new FieldDeclaration()
+        private FieldDeclaration DelphiField => new()
         {
             Name = FieldIdentifier.Generate(oneof, reservedIdentifiers: ProtocGenDelphi.ReservedIdentifiers),
             Type = DelphiEnumName,
-            Comment = new AnnotationComment() { CommentLines = { DelphiFieldComment } }
+            Comment = new() { CommentLines = { DelphiFieldComment } }
         };
 
         /// <summary>
@@ -225,17 +225,17 @@ Holds the case of the protobuf oneof {DelphiCommentReference}.
         /// <summary>
         /// Interface declaration of the generated Delphi getter method for the oneof case
         /// </summary>
-        private MethodInterfaceDeclaration GetterInterface => new MethodInterfaceDeclaration()
+        private MethodInterfaceDeclaration GetterInterface => new()
         {
             Prototype = GetterPrototype,
             Binding = MethodInterfaceDeclaration.Types.Binding.Virtual,
-            Comment = new AnnotationComment() { CommentLines = { GetterComment } }
+            Comment = new() { CommentLines = { GetterComment } }
         };
 
         /// <summary>
         /// Prototype of the generated Delphi getter method for the oneof case
         /// </summary>
-        private Prototype GetterPrototype => new Prototype()
+        private Prototype GetterPrototype => new()
         {
             Name = GetterIdentifier.Generate(oneof, reservedIdentifiers: ProtocGenDelphi.ReservedIdentifiers),
             Type = Prototype.Types.Type.Function,
@@ -257,7 +257,7 @@ May be overridden. Overriders shall only add side-effects and must call the ance
         /// <summary>
         /// Method declaration of the Delphi getter method for the generated property for the oneof case
         /// </summary>
-        private MethodDeclaration Getter => new MethodDeclaration()
+        private MethodDeclaration Getter => new()
         {
             // Class not assigned, caller shall assign
             Prototype = GetterPrototype,
@@ -278,17 +278,17 @@ May be overridden. Overriders shall only add side-effects and must call the ance
         /// <summary>
         /// Interface declaration of the generated Delphi setter method for the oneof case
         /// </summary>
-        private MethodInterfaceDeclaration SetterInterface => new MethodInterfaceDeclaration()
+        private MethodInterfaceDeclaration SetterInterface => new()
         {
             Prototype = SetterPrototype,
             Binding = MethodInterfaceDeclaration.Types.Binding.Virtual,
-            Comment = new AnnotationComment() { CommentLines = { SetterComment } }
+            Comment = new() { CommentLines = { SetterComment } }
         };
 
         /// <summary>
         /// Prototype of the generated Delphi setter method for the oneof case
         /// </summary>
-        private Prototype SetterPrototype => new Prototype()
+        private Prototype SetterPrototype => new()
         {
             Name = SetterIdentifier.Generate(oneof, reservedIdentifiers: ProtocGenDelphi.ReservedIdentifiers),
             Type = Prototype.Types.Type.Procedure,
@@ -298,7 +298,7 @@ May be overridden. Overriders shall only add side-effects and must call the ance
         /// <summary>
         /// Input parameter of the generated Delphi setter method for the oneof case
         /// </summary>
-        private Parameter SetterParameter => new Parameter()
+        private Parameter SetterParameter => new()
         {
             Name = "aCase",
             Type = DelphiEnumName
@@ -319,7 +319,7 @@ May be overridden. Overriders shall only add side-effects and must call the ance
         /// <summary>
         /// Method declaration of the Delphi setter method for the generated property for the oneof case
         /// </summary>
-        private MethodDeclaration Setter => new MethodDeclaration()
+        private MethodDeclaration Setter => new()
         {
             // Class not assigned, caller shall assign
             Prototype = SetterPrototype,
@@ -356,13 +356,13 @@ May be overridden. Overriders shall only add side-effects and must call the ance
         /// <summary>
         /// Generated Delphi property for the oneof case
         /// </summary>
-        private PropertyDeclaration DelphiProperty => new PropertyDeclaration()
+        private PropertyDeclaration DelphiProperty => new()
         {
             Name = DelphiPropertyName,
             Type = DelphiEnumName,
             ReadSpecifier = GetterPrototype.Name,
             WriteSpecifier = SetterPrototype.Name,
-            Comment = new AnnotationComment() { CommentLines = { DelphiPropertyComment } }
+            Comment = new() { CommentLines = { DelphiPropertyComment } }
         };
 
         /// <summary>

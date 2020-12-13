@@ -46,19 +46,19 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Tests
         /// Mutable list of protobuf schema definitions (<c>.proto</c> files) used as input.
         /// Must not be empty when performing operation.
         /// </summary>
-        public List<string> ProtoFiles { get; } = new List<string>();
+        public List<string> ProtoFiles { get; } = new();
 
         /// <summary>
         /// Mutable list of directories in which <c>protoc</c> searches for imports (in order).
         /// This implementation does not support searches based on the current working directory.
         /// </summary>
-        public List<string> ProtoPath { get; } = new List<string>();
+        public List<string> ProtoPath { get; } = new();
 
         /// <summary>
         /// Mutable list of planned plug-in invocations that <c>protoc</c> shall perform.
         /// Each plug-in (identified by <see cref="PlugInOperation.Name" />) may only be included once.
         /// </summary>
-        public List<PlugInOperation> PlugIns { get; } = new List<PlugInOperation>();
+        public List<PlugInOperation> PlugIns { get; } = new();
 
         /// <summary>
         /// Actual location of the <c>protoc</c> executable (if known).
@@ -98,7 +98,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Tests
         /// <returns><see langword="true" /> if the operation succeeded, the exit code of <c>protoc</c> and an optional error message</returns>
         public (bool success, int exitCode, string? errorText) Perform()
         {
-            using Process protoc = new Process();
+            using Process protoc = new();
             protoc.StartInfo.FileName = ActualProtocExecutablePath ?? GetExecutableName("protoc");
             foreach (string plugInArg in PlugIns.SelectMany(plugIn => plugIn.ProtocArgs)) protoc.StartInfo.ArgumentList.Add(plugInArg);
             foreach (string protoPathFolder in ProtoPath) protoc.StartInfo.ArgumentList.Add($"--proto_path={protoPathFolder}");
@@ -108,7 +108,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Tests
             protoc.StartInfo.RedirectStandardError = true;
             // Prevent plug-ins being affected by working directory
             protoc.StartInfo.WorkingDirectory = CreateScratchFolder();
-            StringBuilder error = new StringBuilder();
+            StringBuilder error = new();
             protoc.Start();
             protoc.ErrorDataReceived += delegate (object sender, DataReceivedEventArgs e) { error.AppendLine(e.Data); };
             protoc.BeginErrorReadLine();

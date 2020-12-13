@@ -62,11 +62,11 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// <summary>
         /// Generated Delphi enumerated value
         /// </summary>
-        public EnumValueDeclaration DelphiEnumValue => new EnumValueDeclaration()
+        public EnumValueDeclaration DelphiEnumValue => new()
         {
             Name = DelphiEnumValueName,
             Ordinality = enumValue.Number,
-            Comment = new AnnotationComment() { CommentLines = { EnumValueComment } }
+            Comment = new() { CommentLines = { EnumValueComment } }
         };
 
         /// <summary>

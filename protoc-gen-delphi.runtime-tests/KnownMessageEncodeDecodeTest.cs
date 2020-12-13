@@ -80,7 +80,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.RuntimeTests
         /// <summary>
         /// Delphi compilers used for testing
         /// </summary>
-        private static IEnumerable<DelphiCompiler> TestCompilers => (DelphiCompiler[])  Enum.GetValues(typeof(DelphiCompiler));
+        private static IEnumerable<DelphiCompiler> TestCompilers => Enum.GetValues<DelphiCompiler>();
 
         /// <summary>
         /// Prefix to the name of .proto files in test input folders that shall be used as input files
@@ -231,7 +231,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.RuntimeTests
             /// </summary>
             public IEnumerable<UnitReference> ReferencedUnits => InputProtoFileNames.Select(name => new UnitReference()
             {
-                Unit = new UnitIdentifier()
+                Unit = new()
                 {
                     Namespace = { GetNamespaceSegmentsForProtoFile(name) },
                     Unit = $"u{Path.GetFileName(name).Split(".")[0].ToCase(IdentifierCase.Pascal)}"
@@ -254,7 +254,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.RuntimeTests
                 foreach ((string name, string content) in ProtoFilesToSetup)
                 {
                     string path = Path.Join(inputFolder, name);
-                    Directory.CreateDirectory(Directory.GetParent(path).FullName);
+                    Directory.CreateDirectory(Directory.GetParent(path)!.FullName);
                     File.WriteAllText(path, content);
                 }
             }
@@ -297,13 +297,13 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.RuntimeTests
             // Setup file tree as input for protoc, according to the test vector
             vector.SetupInputFileTree();
             // Run protoc
-            ProtocOperation.PlugInOperation plugIn = new ProtocOperation.PlugInOperation("delphi")
+            ProtocOperation.PlugInOperation plugIn = new("delphi")
             {
                 ExecutableFolder = "exe-protoc-gen-delphi",
                 FallbackToPath = true,
                 OutDir = CreateScratchFolder()
             };
-            ProtocOperation protoc = new ProtocOperation();
+            ProtocOperation protoc = new();
             protoc.ProtoPath.AddRange(vector.ProtoPath);
             protoc.ProtoFiles.AddRange(vector.InputProtoFileNames);
             protoc.PlugIns.Add(plugIn);
@@ -328,7 +328,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.RuntimeTests
                         else if (name.EndsWith($".{ProtocGenDelphi.includeFileExtension}")) pathSet = compilation.IncludePath;
                         else continue;
                         string path = Path.Join(rootFolder, name);
-                        string folder = Directory.GetParent(path).FullName;
+                        string folder = Directory.GetParent(path)!.FullName;
                         Directory.CreateDirectory(folder);
                         File.WriteAllText(path, content);
                         if (!pathSet.Contains(folder)) pathSet.Add(folder);
@@ -350,12 +350,12 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.RuntimeTests
 
             // Run encode/decode test program
             string executableFile = compile(programFile);
-            using Process process = new Process();
+            using Process process = new();
             process.StartInfo.FileName = executableFile;
             process.StartInfo.CreateNoWindow = true;
             process.StartInfo.UseShellExecute = false;
             process.StartInfo.RedirectStandardError = true;
-            StringBuilder error = new StringBuilder();
+            StringBuilder error = new();
             process.Start();
             process.ErrorDataReceived += delegate (object sender, DataReceivedEventArgs e) { error.AppendLine(e.Data); };
             process.BeginErrorReadLine();

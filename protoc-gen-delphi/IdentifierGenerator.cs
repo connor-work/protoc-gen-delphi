@@ -76,7 +76,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
             if (avoidedReservedIdentifier is null) return identifier;
             identifier = GenerateOwn(entity, true);
             IdentifierGenerator<T>? unavoidableCollider = colliders.FirstOrDefault(generator => generator.CouldGenerate(identifier));
-            if (!(unavoidableCollider is null)) throw new ArgumentException($"Even after collision avoidance, generated identifier \"{identifier}\" for entity {entity} might collide with {unavoidableCollider}", nameof(entity));
+            if (unavoidableCollider is not null) throw new ArgumentException($"Even after collision avoidance, generated identifier \"{identifier}\" for entity {entity} might collide with {unavoidableCollider}", nameof(entity));
             return identifier;
         }
     }
@@ -126,12 +126,12 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// <summary>
         /// Regular expression matching a potential output of the generation scheme (case-sensitive)
         /// </summary>
-        private Regex IdentifierRegex => new Regex($@"^{Regex.Escape(Prefix)}{Case.IdentifierRegex()}{Regex.Escape(Suffix)}$");
+        private Regex IdentifierRegex => new($@"^{Regex.Escape(Prefix)}{Case.IdentifierRegex()}{Regex.Escape(Suffix)}$");
 
         /// <summary>
         /// Regular expression matching a potential output of the generation scheme (case-insensitive version)
         /// </summary>
-        private Regex IdentifierCaseInsensitiveRegex => new Regex($@"(?i){IdentifierRegex}(?-i)");
+        private Regex IdentifierCaseInsensitiveRegex => new($@"(?i){IdentifierRegex}(?-i)");
 
         protected override string IdentifierType => Type;
 

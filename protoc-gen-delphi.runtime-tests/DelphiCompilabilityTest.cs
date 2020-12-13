@@ -77,7 +77,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.RuntimeTests
         /// <summary>
         /// Delphi compilers used for testing
         /// </summary>
-        private static IEnumerable<DelphiCompiler> TestCompilers => (DelphiCompiler[])  Enum.GetValues(typeof(DelphiCompiler));
+        private static IEnumerable<DelphiCompiler> TestCompilers => Enum.GetValues<DelphiCompiler>();
 
         /// <summary>
         /// Prefix to the name of .proto files in test input folders that shall be used as input files
@@ -201,7 +201,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.RuntimeTests
             /// </summary>
             public IEnumerable<UnitReference> ReferencedUnits => InputProtoFileNames.Select(name => new UnitReference()
             {
-                Unit = new UnitIdentifier()
+                Unit = new()
                 {
                     Namespace = { GetNamespaceSegmentsForProtoFile(name) },
                     Unit = $"u{Path.GetFileName(name).Split(".")[0].ToCase(IdentifierCase.Pascal)}"
@@ -269,13 +269,13 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.RuntimeTests
             // Setup file tree as input for protoc, according to the test vector
             vector.SetupInputFileTree();
             // Run protoc
-            ProtocOperation.PlugInOperation plugIn = new ProtocOperation.PlugInOperation("delphi")
+            ProtocOperation.PlugInOperation plugIn = new("delphi")
             {
                 ExecutableFolder = "exe-protoc-gen-delphi",
                 FallbackToPath = true,
                 OutDir = CreateScratchFolder()
             };
-            ProtocOperation protoc = new ProtocOperation();
+            ProtocOperation protoc = new();
             protoc.ProtoPath.AddRange(vector.ProtoPath);
             protoc.ProtoFiles.AddRange(vector.InputProtoFileNames);
             protoc.PlugIns.Add(plugIn);
@@ -284,7 +284,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.RuntimeTests
 
             // Create a test runner program as input for FPC
             string programFile = Path.Join(CreateScratchFolder(), "DelphiCompilationTestProgram.dpr");
-            Program program = new Program()
+            Program program = new()
             {
                 Heading = "DelphiCompilationTestProgram",
                 UsesClause = { vector.ReferencedUnits }
@@ -305,7 +305,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.RuntimeTests
                     else if (name.EndsWith($".{ProtocGenDelphi.includeFileExtension}")) pathSet = compilation.IncludePath;
                     else continue;
                     string path = Path.Join(rootFolder, name);
-                    string folder = Directory.GetParent(path).FullName;
+                    string folder = Directory.GetParent(path)!.FullName;
                     Directory.CreateDirectory(folder);
                     File.WriteAllText(path, content);
                     if (!pathSet.Contains(folder)) pathSet.Add(folder);

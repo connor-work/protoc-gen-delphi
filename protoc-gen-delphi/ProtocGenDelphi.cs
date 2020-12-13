@@ -45,7 +45,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// <summary>
         /// Reserved identifiers that shall not be used by generated source code
         /// </summary>
-        internal static IEnumerable<string> ReservedIdentifiers => ((ReservedWord[]) Enum.GetValues(typeof(ReservedWord))).Select(word => word.ToSourceCode());
+        internal static IEnumerable<string> ReservedIdentifiers => Enum.GetValues<ReservedWord>().Select(word => word.ToSourceCode());
 
         /// <summary>
         /// File name extension (without leading dot) for protobuf schema definitions
@@ -79,7 +79,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
             using Stream input = Console.OpenStandardInput();
             using Stream output = Console.OpenStandardOutput();
             CodeGeneratorRequest request = CodeGeneratorRequest.Parser.ParseFrom(input);
-            ProtocGenDelphi plugIn = new ProtocGenDelphi();
+            ProtocGenDelphi plugIn = new();
             CodeGeneratorResponse response = plugIn.HandleRequest(request);
             response.WriteTo(output);
         }
@@ -93,7 +93,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         public CodeGeneratorResponse HandleRequest(CodeGeneratorRequest request)
         {
             if (request.Parameter.Length != 0) ApplyOptions(request.Parameter.Split(","));
-            CodeGeneratorResponse response = new CodeGeneratorResponse();
+            CodeGeneratorResponse response = new();
             FileDescriptorProto lookupProtoFile(string name) => request.ProtoFile.First(file => file.Name == name);
             // Generate one source code file for each .proto file
             foreach (string protoFileName in request.FileToGenerate) response.File.Add(GenerateSourceFile(lookupProtoFile(protoFileName), lookupProtoFile));
@@ -134,11 +134,11 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// <returns>The source code file in the format expected by <c>protoc</c></returns>
         private CodeGeneratorResponse.Types.File GenerateSourceFile(FileDescriptorProto protoFile, Func<string, FileDescriptorProto> lookupProtoFile)
         {
-            SchemaSourceCode schema = new SchemaSourceCode(lookupProtoFile, runtime, protoFile);
+            SchemaSourceCode schema = new(lookupProtoFile, runtime, protoFile);
             // Generate a new Delphi unit
             Unit unit = schema.DelphiUnit;
             unit.AdaptForDelphiCommons();
-            return new CodeGeneratorResponse.Types.File()
+            return new()
             {
                 Name = string.Join(protoFileNamePathSeparator, unit.ToSourceFilePath()),
                 Content = unit.ToSourceCode()
@@ -165,7 +165,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// <param name="nameSpaceSegments">Segments in the protobuf namespace string</param>
         /// <param name="schemaName">Unqualified schema name (should be .proto file name without extension)</param>
         /// <returns>The unit identifier</returns>
-        internal static UnitIdentifier ConstructUnitIdentifier(string[] nameSpaceSegments, string schemaName) => new UnitIdentifier()
+        internal static UnitIdentifier ConstructUnitIdentifier(string[] nameSpaceSegments, string schemaName) => new()
         {
             Unit = UnitIdentifier.Generate(schemaName, reservedIdentifiers: ReservedIdentifiers),
             Namespace = { nameSpaceSegments.Select(segment => segment.ToCase(IdentifierCase.Pascal)) }

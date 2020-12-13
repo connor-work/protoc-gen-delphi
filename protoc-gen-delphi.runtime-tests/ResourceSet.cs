@@ -34,7 +34,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.RuntimeTests
         /// <returns>The filtered sequence, without the prefixes</returns>
         public static IEnumerable<string> WherePrefixed(this IEnumerable<string> source, Regex prefixRegex)
         {
-            Regex regex = new Regex("^" + prefixRegex.ToString(), prefixRegex.Options, prefixRegex.MatchTimeout);
+            Regex regex = new("^" + prefixRegex.ToString(), prefixRegex.Options, prefixRegex.MatchTimeout);
             foreach (string element in source)
             {
                 Match match = regex.Match(element);
@@ -51,7 +51,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.RuntimeTests
         /// <returns>The filtered sequence, without the suffixes</returns>
         public static IEnumerable<string> WhereSuffixed(this IEnumerable<string> source, Regex suffixRegex)
         {
-            Regex regex = new Regex(suffixRegex.ToString() + "$", suffixRegex.Options | RegexOptions.RightToLeft, suffixRegex.MatchTimeout);
+            Regex regex = new(suffixRegex.ToString() + "$", suffixRegex.Options | RegexOptions.RightToLeft, suffixRegex.MatchTimeout);
             foreach (string element in source)
             {
                 Match match = regex.Match(element);
@@ -100,7 +100,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.RuntimeTests
         {
             Stream? stream = GetResourceStream(resourceID);
             if (stream == null) return null;
-            using StreamReader reader = new StreamReader(stream);
+            using StreamReader reader = new(stream);
             return reader.ReadToEnd();
         }
 
@@ -146,7 +146,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.RuntimeTests
             /// <summary>
             /// Regular expression used for slash sequence replacement
             /// </summary>
-            private static readonly Regex slashSequenceRegex = new Regex("[/\\\\]+");
+            private static readonly Regex slashSequenceRegex = new("[/\\\\]+");
             /// <summary>
             /// Assembly containing the embedded resources
             /// </summary>
@@ -226,7 +226,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.RuntimeTests
             /// Constructs a combined resource set that looks up resources in the second set if they are not present in the first.
             /// </summary>
             /// <param name="first">First resource set</param>
-            /// <param name="second">Second resource set, shadowed by <paramref name="first" /></param>
+            /// <param name="second">Second resource set, shadowed by <paramref name="first"/></param>
             public CombinedResourceSet(IResourceSet first, IResourceSet second)
             {
                 this.first = first;

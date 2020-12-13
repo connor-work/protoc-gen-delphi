@@ -34,7 +34,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.RuntimeTests
                                                  .GetMethods().Where(method => method.Name == "Main").First();
             if (vsTestMain == null) throw new InvalidOperationException("Missing VS Test main");
             Directory.SetCurrentDirectory(testDLLFolder);
-            return (int)vsTestMain.Invoke(null, new object[] { new string[] { testDLL } })!;
+            return (int) vsTestMain.Invoke(null, new object[] { new string[] { testDLL } })!;
         }
     }
 }

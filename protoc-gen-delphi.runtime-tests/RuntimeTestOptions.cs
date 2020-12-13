@@ -1,5 +1,3 @@
-
-using System;
 /// Copyright 2020 Connor Roehricht (connor.work)
 /// Copyright 2020 Sotax AG
 /// 
@@ -14,6 +12,9 @@ using System;
 /// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
+
+using System;
+
 namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.RuntimeTests
 {
     /// <summary>

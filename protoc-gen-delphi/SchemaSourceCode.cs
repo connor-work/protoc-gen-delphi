@@ -113,12 +113,12 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// <summary>
         /// Generated Delphi unit
         /// </summary>
-        public Unit DelphiUnit => new Unit()
+        public Unit DelphiUnit => new()
         {
             Heading = DelphiUnitIdentifier,
             Interface = Interface,
             Implementation = Implementation,
-            Comment = new AnnotationComment { CommentLines = { UnitComment } }
+            Comment = new() { CommentLines = { UnitComment } }
         };
 
         /// <summary>
@@ -183,7 +183,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         {
             get
             {
-                Interface @interface = new Interface()
+                Interface @interface = new()
                 {
                     UsesClause = { Dependencies },
                     Declarations = { TopLevelEnums.Concat<TypeSourceCode>(TopLevelMessageTypes).Select(type => type.InterfaceDeclaration) }
@@ -204,7 +204,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// <summary>
         /// Implementation section of the generated Delphi unit
         /// </summary>
-        private Implementation Implementation => new Implementation()
+        private Implementation Implementation => new()
         {
             Declarations = { TopLevelMessageTypes.SelectMany(messageType => messageType.MethodDeclarations)
                                                  .Select(method => new ImplementationDeclaration() { MethodDeclaration = method }) }
