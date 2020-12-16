@@ -28,7 +28,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// <summary>
         /// Support definitions for a runtime library implementation implementing the default runtime API.
         /// </summary>
-        public static readonly ReferenceRuntimeSupport Default = new ReferenceRuntimeSupport();
+        public static readonly ReferenceRuntimeSupport Default = new();
 
         /// <summary>
         /// Provides the required unit reference for using compiled protobuf messages.
@@ -71,9 +71,9 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
             /// </summary>
             /// <param name="unit">The unqualified unit name</param>
             /// <returns>The unit reference</returns>
-            private UnitReference GetPublicUnitReference(string unit) => new UnitReference()
+            private UnitReference GetPublicUnitReference(string unit) => new()
             {
-                Unit = new UnitIdentifier()
+                Unit = new()
                 {
                     Unit = unit,
                     Namespace = { PublicNamespace.Split(".") }
@@ -85,9 +85,9 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
             /// </summary>
             /// <param name="unit">The unqualified unit name</param>
             /// <returns>The unit reference</returns>
-            private UnitReference GetInternalUnitReference(string unit) => new UnitReference()
+            private UnitReference GetInternalUnitReference(string unit) => new()
             {
-                Unit = new UnitIdentifier()
+                Unit = new()
                 {
                     Unit = unit,
                     Namespace = { InternalNamespace.Split(".") }

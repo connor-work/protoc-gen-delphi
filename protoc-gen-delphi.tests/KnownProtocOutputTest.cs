@@ -160,7 +160,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Tests
                 foreach ((string name, string content) in ProtoFilesToSetup)
                 {
                     string path = Path.Join(inputFolder, name);
-                    Directory.CreateDirectory(Directory.GetParent(path).FullName);
+                    Directory.CreateDirectory(Directory.GetParent(path)!.FullName);
                     File.WriteAllText(path, content);
                 }
             }
@@ -172,7 +172,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Tests
             {
                 get
                 {
-                    Dictionary<string, string> files = new Dictionary<string, string>();
+                    IDictionary<string, string> files = new Dictionary<string, string>();
                     foreach (string expectedOutputFile in expectedOutputFolderResources.GetIDs())
                     {
                         string? content = expectedOutputFolderResources.ReadResource(expectedOutputFile);
@@ -223,12 +223,12 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Tests
             // Setup file tree as input for protoc, according to the test vector
             vector.SetupInputFileTree();
 
-            ProtocOperation.PlugInOperation plugIn = new ProtocOperation.PlugInOperation("delphi")
+            ProtocOperation.PlugInOperation plugIn = new("delphi")
             {
                 ExecutableFolder = "exe-protoc-gen-delphi",
                 OutDir = outputDirectory
             };
-            ProtocOperation protoc = new ProtocOperation { ProtocExecutableFolder = Path.Join("Google.Protobuf.Tools", "tools", GetProtocPlatform()) };
+            ProtocOperation protoc = new() { ProtocExecutableFolder = Path.Join("Google.Protobuf.Tools", "tools", GetProtocPlatform()) };
             protoc.ProtoPath.AddRange(vector.ProtoPath);
             protoc.ProtoFiles.AddRange(vector.InputProtoFileNames);
             protoc.PlugIns.Add(plugIn);

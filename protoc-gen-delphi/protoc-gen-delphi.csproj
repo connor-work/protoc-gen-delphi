@@ -4,7 +4,8 @@
     <PrereleaseVersionSuffix></PrereleaseVersionSuffix>
     <OutputType>Exe</OutputType>
     <SnapshotVersion>false</SnapshotVersion>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
+    <LangVersion>9.0</LangVersion>
     <RootNamespace>Work.Connor.Protobuf.Delphi.ProtocGenDelphi</RootNamespace>
     <Nullable>enable</Nullable>
     <PackAsTool>true</PackAsTool>
@@ -60,9 +61,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Google.Protobuf" Version="3.13.0" />
-    <PackageReference Include="Grpc.Tools" Version="2.31.0" PrivateAssets="all" />
-    <PackageReference Include="SonarAnalyzer.CSharp" Version="8.12.0.21095">
+    <PackageReference Include="Google.Protobuf" Version="3.14.0" />
+    <PackageReference Include="Grpc.Tools" Version="2.34.0" PrivateAssets="all" />
+    <PackageReference Include="SonarAnalyzer.CSharp" Version="8.15.0.24505">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>

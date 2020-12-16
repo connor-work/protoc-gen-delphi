@@ -44,9 +44,9 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
 
         public override string TypeName => Enum.Name; // TODO handling of absent name?
 
-        public override InterfaceDeclaration InterfaceDeclaration => new InterfaceDeclaration() { EnumDeclaration = DelphiEnum };
+        public override InterfaceDeclaration InterfaceDeclaration => new() { EnumDeclaration = DelphiEnum };
 
-        public override NestedTypeDeclaration NestedTypeDeclaration => new NestedTypeDeclaration() { EnumDeclaration = DelphiEnum };
+        public override NestedTypeDeclaration NestedTypeDeclaration => new() { EnumDeclaration = DelphiEnum };
 
         /// <summary>
         /// Delphi source code representations of the protobuf enum values
@@ -56,11 +56,11 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// <summary>
         /// Generated Delphi enumerated type
         /// </summary>
-        private EnumDeclaration DelphiEnum => new EnumDeclaration()
+        private EnumDeclaration DelphiEnum => new()
         {
             Name = DelphiTypeName,
             Values = { EnumValues.Select(enumValue => enumValue.DelphiEnumValue) },
-            Comment = new AnnotationComment() { CommentLines = { EnumComment } }
+            Comment = new() { CommentLines = { EnumComment } }
             // TODO annotate
         };
 

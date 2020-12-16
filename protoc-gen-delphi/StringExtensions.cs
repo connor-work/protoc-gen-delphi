@@ -29,7 +29,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// <returns>Sequence of lines</returns>
         public static IEnumerable<string> Lines(this string multiLineString)
         {
-            using StringReader reader = new StringReader(multiLineString);
+            using StringReader reader = new(multiLineString);
             string? line;
             while ((line = reader.ReadLine()) != null) yield return line;
         }

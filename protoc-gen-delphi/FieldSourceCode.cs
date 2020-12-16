@@ -87,7 +87,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// <summary>
         /// Unit reference for the Delphi <c>SysUtils</c> unit
         /// </summary>
-        private static UnitReference SysUtilsReference => new UnitReference() { Unit = new UnitIdentifier() { Unit = "SysUtils", Namespace = { "System" } } };
+        private static UnitReference SysUtilsReference => new() { Unit = new() { Unit = "SysUtils", Namespace = { "System" } } };
 
         /// <summary>
         /// Mapping of protobuf fields in oneofs to identifiers for Delphi enumerated values representing the presence case of the oneof
@@ -100,9 +100,9 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// <summary>
         /// Required unit reference for using runtime-independent support definitions for generated files (support code)
         /// </summary>
-        private static readonly UnitReference SupportCodeReference = new UnitReference()
+        private static readonly UnitReference SupportCodeReference = new()
         {
-            Unit = new UnitIdentifier()
+            Unit = new()
             {
                 Unit = "uProtobuf",
                 Namespace = { "Work.Connor.Protobuf.Delphi.ProtocGenDelphi".Split(".") }
@@ -223,7 +223,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// <summary>
         /// <see langword="true"/> if the field is contained in a protobuf oneof
         /// </summary>
-        private bool IsInOneof => !(Oneof is null);
+        private bool IsInOneof => Oneof is not null;
 
         /// <summary>
         /// Determines the required unit references for handling this protobuf field.
@@ -270,54 +270,54 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         {
             get
             {
-                yield return new ClassDeclarationNestedDeclaration()
+                yield return new()
                 {
                     Visibility = Visibility.Public,
-                    NestedConstDeclaration = new ConstDeclaration() { TrueConstDeclaration = FieldNumberConstant }
+                    NestedConstDeclaration = new() { TrueConstDeclaration = FieldNumberConstant }
                 };
-                yield return new ClassDeclarationNestedDeclaration()
+                yield return new()
                 {
                     Visibility = Visibility.Public,
-                    NestedConstDeclaration = new ConstDeclaration() { TrueConstDeclaration = FieldNameConstant }
+                    NestedConstDeclaration = new() { TrueConstDeclaration = FieldNameConstant }
                 };
-                yield return new ClassDeclarationNestedDeclaration()
+                yield return new()
                 {
                     Visibility = Visibility.Private,
-                    Member = new ClassMemberDeclaration() { FieldDeclaration = DelphiField }
+                    Member = new() { FieldDeclaration = DelphiField }
                 };
-                yield return new ClassDeclarationNestedDeclaration()
+                yield return new()
                 {
                     Visibility = Visibility.Protected,
-                    Member = new ClassMemberDeclaration() { MethodDeclaration = GetterInterface }
+                    Member = new() { MethodDeclaration = GetterInterface }
                 };
-                yield return new ClassDeclarationNestedDeclaration()
+                yield return new()
                 {
                     Visibility = Visibility.Protected,
-                    Member = new ClassMemberDeclaration() { MethodDeclaration = SetterInterface }
+                    Member = new() { MethodDeclaration = SetterInterface }
                 };
-                yield return new ClassDeclarationNestedDeclaration()
+                yield return new()
                 {
                     Visibility = Visibility.Public,
-                    Member = new ClassMemberDeclaration()
+                    Member = new()
                     {
                         PropertyDeclaration = DelphiProperty,
                         AttributeAnnotations = { DelphiPropertyAttribute }
                     }
                 };
-                if (IsSingular) yield return new ClassDeclarationNestedDeclaration()
+                if (IsSingular) yield return new()
                 {
                     Visibility = Visibility.Protected,
-                    Member = new ClassMemberDeclaration() { MethodDeclaration = PresenceGetterInterface }
+                    Member = new() { MethodDeclaration = PresenceGetterInterface }
                 };
-                if (IsSingular) yield return new ClassDeclarationNestedDeclaration()
+                if (IsSingular) yield return new()
                 {
                     Visibility = Visibility.Protected,
-                    Member = new ClassMemberDeclaration() { MethodDeclaration = PresenceSetterInterface }
+                    Member = new() { MethodDeclaration = PresenceSetterInterface }
                 };
-                if (IsSingular) yield return new ClassDeclarationNestedDeclaration()
+                if (IsSingular) yield return new()
                 {
                     Visibility = Visibility.Public,
-                    Member = new ClassMemberDeclaration() { PropertyDeclaration = DelphiPresenceProperty }
+                    Member = new() { PropertyDeclaration = DelphiPresenceProperty }
                 };
             }
         }
@@ -339,11 +339,11 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// <summary>
         /// Delphi true constant to hold the protobuf field number of the field
         /// </summary>
-        private TrueConstDeclaration FieldNumberConstant => new TrueConstDeclaration()
+        private TrueConstDeclaration FieldNumberConstant => new()
         {
             Identifier = FieldNumberConstantIdentifier.Generate(field, reservedIdentifiers: ProtocGenDelphi.ReservedIdentifiers),
             Value = field.Number.ToString(),
-            Comment = new AnnotationComment() { CommentLines = { FieldNumberConstantComment } }
+            Comment = new() { CommentLines = { FieldNumberConstantComment } }
         };
 
         /// <summary>
@@ -357,11 +357,11 @@ Protobuf field number of the protobuf field <c>{field.Name}</c>.
         /// <summary>
         /// Delphi true constant to hold the protobuf field name of the field
         /// </summary>
-        private TrueConstDeclaration FieldNameConstant => new TrueConstDeclaration()
+        private TrueConstDeclaration FieldNameConstant => new()
         {
             Identifier = FieldNameConstantIdentifier.Generate(field, reservedIdentifiers: ProtocGenDelphi.ReservedIdentifiers),
             Value = $"'{field.Name}'",
-            Comment = new AnnotationComment() { CommentLines = { FieldNameConstantComment } }
+            Comment = new() { CommentLines = { FieldNameConstantComment } }
         };
 
         /// <summary>
@@ -375,11 +375,11 @@ Protobuf field name of the protobuf field <c>{field.Name}</c>.
         /// <summary>
         /// Generated Delphi field backing the generated property
         /// </summary>
-        private FieldDeclaration DelphiField => new FieldDeclaration()
+        private FieldDeclaration DelphiField => new()
         {
             Name = FieldIdentifier.Generate(field, reservedIdentifiers: ProtocGenDelphi.ReservedIdentifiers),
             Type = PrivateDelphiType,
-            Comment = new AnnotationComment() { CommentLines = { DelphiFieldComment } }
+            Comment = new() { CommentLines = { DelphiFieldComment } }
         };
 
         /// <summary>
@@ -393,17 +393,17 @@ Holds the decoded value of the protobuf field <c>{field.Name}</c>.
         /// <summary>
         /// Interface declaration of the generated Delphi getter method
         /// </summary>
-        private MethodInterfaceDeclaration GetterInterface => new MethodInterfaceDeclaration()
+        private MethodInterfaceDeclaration GetterInterface => new()
         {
             Prototype = GetterPrototype,
             Binding = MethodInterfaceDeclaration.Types.Binding.Virtual,
-            Comment = new AnnotationComment() { CommentLines = { GetterComment } }
+            Comment = new() { CommentLines = { GetterComment } }
         };
 
         /// <summary>
         /// Prototype of the generated Delphi getter method
         /// </summary>
-        private Prototype GetterPrototype => new Prototype()
+        private Prototype GetterPrototype => new()
         {
             Name = GetterIdentifier.Generate(field, reservedIdentifiers: ProtocGenDelphi.ReservedIdentifiers),
             Type = Prototype.Types.Type.Function,
@@ -425,7 +425,7 @@ May be overridden. Overriders shall only add side-effects and must call the ance
         /// <summary>
         /// Method declaration of the Delphi getter method for the generated property
         /// </summary>
-        private MethodDeclaration Getter => new MethodDeclaration()
+        private MethodDeclaration Getter => new()
         {
             // Class not assigned, caller shall assign
             Prototype = GetterPrototype,
@@ -448,17 +448,17 @@ May be overridden. Overriders shall only add side-effects and must call the ance
         /// <summary>
         /// Interface declaration of the generated Delphi setter method
         /// </summary>
-        private MethodInterfaceDeclaration SetterInterface => new MethodInterfaceDeclaration()
+        private MethodInterfaceDeclaration SetterInterface => new()
         {
             Prototype = SetterPrototype,
             Binding = MethodInterfaceDeclaration.Types.Binding.Virtual,
-            Comment = new AnnotationComment() { CommentLines = { SetterComment } }
+            Comment = new() { CommentLines = { SetterComment } }
         };
 
         /// <summary>
         /// Prototype of the generated Delphi setter method
         /// </summary>
-        private Prototype SetterPrototype => new Prototype()
+        private Prototype SetterPrototype => new()
         {
             Name = SetterIdentifier.Generate(field, reservedIdentifiers: ProtocGenDelphi.ReservedIdentifiers),
             Type = Prototype.Types.Type.Procedure,
@@ -468,7 +468,7 @@ May be overridden. Overriders shall only add side-effects and must call the ance
         /// <summary>
         /// Input parameter of the generated Delphi setter method
         /// </summary>
-        private Parameter SetterParameter => new Parameter()
+        private Parameter SetterParameter => new()
         {
             Name = IsRepeated ? "aValues" : "aValue",
             Type = PublicDelphiType
@@ -497,7 +497,7 @@ May be overridden. Overriders shall only add side-effects and must call the ance
         /// <summary>
         /// Method declaration of the Delphi setter method for the generated property
         /// </summary>
-        private MethodDeclaration Setter => new MethodDeclaration()
+        private MethodDeclaration Setter => new()
         {
             // Class not assigned, caller shall assign
             Prototype = SetterInterface.Prototype,
@@ -548,13 +548,13 @@ May be overridden. Overriders shall only add side-effects and must call the ance
         /// <summary>
         /// Generated Delphi property
         /// </summary>
-        private PropertyDeclaration DelphiProperty => new PropertyDeclaration()
+        private PropertyDeclaration DelphiProperty => new()
         {
             Name = DelphiPropertyName,
             Type = PublicDelphiType,
             ReadSpecifier = GetterPrototype.Name,
             WriteSpecifier = SetterPrototype.Name,
-            Comment = new AnnotationComment() { CommentLines = { DelphiPropertyComment } }
+            Comment = new() { CommentLines = { DelphiPropertyComment } }
         };
 
         /// <summary>
@@ -576,7 +576,7 @@ May be overridden. Overriders shall only add side-effects and must call the ance
         /// <summary>
         /// RTTI attribute annotation for the generated Delphi property
         /// </summary>
-        private AttributeAnnotation DelphiPropertyAttribute => new AttributeAnnotation() { Attribute = $"ProtobufField({FieldNameConstant.Identifier}, {FieldNumberConstant.Identifier})" };
+        private AttributeAnnotation DelphiPropertyAttribute => new() { Attribute = $"ProtobufField({FieldNameConstant.Identifier}, {FieldNumberConstant.Identifier})" };
 
         /// <summary>
         /// Interface declaration of the generated Delphi getter method for field presence
@@ -584,10 +584,10 @@ May be overridden. Overriders shall only add side-effects and must call the ance
         /// <remarks>
         /// Not applicable for repeated fields
         /// </remarks>
-        private MethodInterfaceDeclaration PresenceGetterInterface => new MethodInterfaceDeclaration()
+        private MethodInterfaceDeclaration PresenceGetterInterface => new()
         {
             Prototype = PresenceGetterPrototype,
-            Comment = new AnnotationComment() { CommentLines = { PresenceGetterComment } }
+            Comment = new() { CommentLines = { PresenceGetterComment } }
         };
 
         /// <summary>
@@ -596,7 +596,7 @@ May be overridden. Overriders shall only add side-effects and must call the ance
         /// <remarks>
         /// Not applicable for repeated fields
         /// </remarks>
-        private Prototype PresenceGetterPrototype => new Prototype()
+        private Prototype PresenceGetterPrototype => new()
         {
             Name = PresenceGetterIdentifier.Generate(field, reservedIdentifiers: ProtocGenDelphi.ReservedIdentifiers),
             Type = Prototype.Types.Type.Function,
@@ -624,7 +624,7 @@ For details on presence semantics, see <see cref=""{DelphiPresencePropertyName}"
         /// <remarks>
         /// Not applicable for repeated fields
         /// </remarks>
-        private MethodDeclaration PresenceGetter => new MethodDeclaration()
+        private MethodDeclaration PresenceGetter => new()
         {
             // Class not assigned, caller shall assign
             Prototype = PresenceGetterPrototype,
@@ -657,10 +657,10 @@ For details on presence semantics, see <see cref=""{DelphiPresencePropertyName}"
         /// <remarks>
         /// Not applicable for repeated fields
         /// </remarks>
-        private MethodInterfaceDeclaration PresenceSetterInterface => new MethodInterfaceDeclaration()
+        private MethodInterfaceDeclaration PresenceSetterInterface => new()
         {
             Prototype = PresenceSetterPrototype,
-            Comment = new AnnotationComment() { CommentLines = { PresenceSetterComment } }
+            Comment = new() { CommentLines = { PresenceSetterComment } }
         };
 
         /// <summary>
@@ -669,7 +669,7 @@ For details on presence semantics, see <see cref=""{DelphiPresencePropertyName}"
         /// <remarks>
         /// Not applicable for repeated fields
         /// </remarks>
-        private Prototype PresenceSetterPrototype => new Prototype()
+        private Prototype PresenceSetterPrototype => new()
         {
             Name = PresenceSetterIdentifier.Generate(field, reservedIdentifiers: ProtocGenDelphi.ReservedIdentifiers),
             Type = Prototype.Types.Type.Procedure,
@@ -682,7 +682,7 @@ For details on presence semantics, see <see cref=""{DelphiPresencePropertyName}"
         /// <remarks>
         /// Not applicable for repeated fields
         /// </remarks>
-        private Parameter PresenceSetterParameter => new Parameter()
+        private Parameter PresenceSetterParameter => new()
         {
             Name = "aPresent",
             Type = "Boolean"
@@ -715,7 +715,7 @@ For details on presence semantics, see <see cref=""{DelphiPresencePropertyName}"
         /// <remarks>
         /// Not applicable for repeated fields
         /// </remarks>
-        private MethodDeclaration PresenceSetter => new MethodDeclaration()
+        private MethodDeclaration PresenceSetter => new()
         {
             // Class not assigned, caller shall assign
             Prototype = PresenceSetterPrototype,
@@ -764,13 +764,13 @@ For details on presence semantics, see <see cref=""{DelphiPresencePropertyName}"
         /// <remarks>
         /// Not applicable for repeated fields
         /// </remarks>
-        private PropertyDeclaration DelphiPresenceProperty => new PropertyDeclaration()
+        private PropertyDeclaration DelphiPresenceProperty => new()
         {
             Name = DelphiPresencePropertyName,
             Type = "Boolean",
             ReadSpecifier = PresenceGetterPrototype.Name,
             WriteSpecifier = PresenceSetterPrototype.Name,
-            Comment = new AnnotationComment() { CommentLines = { DelphiPresencePropertyComment } }
+            Comment = new() { CommentLines = { DelphiPresencePropertyComment } }
         };
 
         /// <summary>
@@ -818,11 +818,11 @@ For details on presence semantics, see <see cref=""{DelphiPresencePropertyName}"
         /// <remarks>
         /// Only applicable for fields in oneof
         /// </remarks>
-        public EnumValueDeclaration PresenceEnumValue => new EnumValueDeclaration()
+        public EnumValueDeclaration PresenceEnumValue => new()
         {
             Name = PresenceEnumValueName,
             // Ordinality not assigned, caller shall assign
-            Comment = new AnnotationComment() { CommentLines = { PresenceEnumValueComment } }
+            Comment = new() { CommentLines = { PresenceEnumValueComment } }
         };
 
         /// <summary>

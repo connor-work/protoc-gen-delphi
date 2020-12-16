@@ -82,7 +82,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Tests
             /// <summary>
             /// Parser for JSON-encoded protobuf test data
             /// </summary>
-            private static readonly JsonParser jsonParser = new JsonParser(protobufJsonParseSettings);
+            private static readonly JsonParser jsonParser = new(protobufJsonParseSettings);
 
             /// <summary>
             /// Name of the test vector
@@ -110,7 +110,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Tests
                 get
                 {
                     string resourceName = $"{name}.{requestFileExtension}";
-                    using StreamReader reader = new StreamReader(allRequestResources.GetResourceStream(resourceName) ?? throw new FileNotFoundException(resourceName));
+                    using StreamReader reader = new(allRequestResources.GetResourceStream(resourceName) ?? throw new FileNotFoundException(resourceName));
                     return jsonParser.Parse<CodeGeneratorRequest>(reader);
                 }
             }
@@ -122,7 +122,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Tests
             {
                 get
                 {
-                    using StreamReader reader = new StreamReader(allExpectedResponseResources.GetResourceStream($"{name}.{responseFileExtension}")!);
+                    using StreamReader reader = new(allExpectedResponseResources.GetResourceStream($"{name}.{responseFileExtension}")!);
                     return jsonParser.Parse<CodeGeneratorResponse>(reader);
                 }
             }
