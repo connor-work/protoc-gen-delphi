@@ -1,14 +1,26 @@
 unit Com.GitHub.Pikaju.Protobuf.Delphi.Test.uProtobufTestUtility;
 
+{$INCLUDE Work.Connor.Delphi.CompilerFeatures.inc}
+
 {$IFDEF FPC}
   {$MODE DELPHI}
 {$ENDIF}
 
 interface
 
-uses 
+uses
+  // For Exception
+{$IFDEF WORK_CONNOR_DELPHI_COMPILER_UNIT_SCOPE_NAMES}
+  System.Classes,
+{$ELSE}
   Classes,
-  Sysutils;
+{$ENDIF}
+ // For TBytes
+{$IFDEF WORK_CONNOR_DELPHI_COMPILER_UNIT_SCOPE_NAMES}
+  System.SysUtils;
+{$ELSE}
+  SysUtils;
+{$ENDIF}
 
 type
   ETestFailed = class(Exception);

@@ -19,13 +19,21 @@
 /// </summary>
 program MessageEncodeDecodeTest;
 
+{$INCLUDE Work.Connor.Delphi.CompilerFeatures.inc}
+
 {$IFDEF FPC}
   {$MODE DELPHI}
 {$ENDIF}
 
+interface
+
 uses
-  // TMemoryStream
+  // For TStream
+{$IFDEF WORK_CONNOR_DELPHI_COMPILER_UNIT_SCOPE_NAMES}
+  System.Classes,
+{$ELSE}
   Classes,
+{$ENDIF}
   // Message constructor
   uConstruct,
   // Message validator
