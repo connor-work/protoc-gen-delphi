@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <!-- TODO: Version should be always same as protoc-gen-delphi -->
-    <CoreVersion>0.9.1</CoreVersion>
+    <CoreVersion>0.9.2</CoreVersion>
     <PrereleaseVersionSuffix></PrereleaseVersionSuffix>
     <SnapshotVersion>false</SnapshotVersion>
     <TargetFramework>net5.0</TargetFramework>
