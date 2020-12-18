@@ -25,8 +25,6 @@ program MessageEncodeDecodeTest;
   {$MODE DELPHI}
 {$ENDIF}
 
-interface
-
 uses
   // For TStream
 {$IFDEF WORK_CONNOR_DELPHI_COMPILER_UNIT_SCOPE_NAMES}
