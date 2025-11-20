@@ -9,7 +9,7 @@ jobs:
   test:
     strategy:
       matrix:
-        os: [ubuntu-18.04, macos-11.0]
+        os: [ubuntu-22.04, macos-13]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Install protoc 3.13.0 (Linux)
@@ -41,7 +41,7 @@ jobs:
   deploy:
     needs: test
     if: ${{ !cancelled() }}
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v2
       - name: Deploy NuGet packages
