@@ -33,6 +33,9 @@ jobs:
       - name: Install latest FPC (macOS)
         if: ${{ runner.os == 'macOS' }}
         run: brew install fpc
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.0'
       - uses: actions/checkout@v2
       - name: Test package stability
         env:
@@ -43,6 +46,9 @@ jobs:
     if: ${{ !cancelled() }}
     runs-on: ubuntu-22.04
     steps:
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.0'
       - uses: actions/checkout@v2
       - name: Deploy NuGet packages
         env:
