@@ -15,4 +15,4 @@
 # Performs stability tests in GitHub Actions
 # Requires Powershell 7+, the .NET Core CLI and Git
 
-& $PSScriptRoot/integrate.ps1 -NoDeploy
+& dotnet test .\protoc-gen-delphi.tests\
