@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <!-- TODO: Version should be always same as protoc-gen-delphi -->
-    <CoreVersion>0.9.3</CoreVersion>
+    <CoreVersion>0.10.0</CoreVersion>
     <PrereleaseVersionSuffix></PrereleaseVersionSuffix>
-    <SnapshotVersion>false</SnapshotVersion>
+    <SnapshotVersion>true</SnapshotVersion>
     <TargetFramework>net10.0</TargetFramework>
     <LangVersion>9.0</LangVersion>
     <RootNamespace>Work.Connor.Protobuf.Delphi.ProtocGenDelphi.RuntimeTests</RootNamespace>
