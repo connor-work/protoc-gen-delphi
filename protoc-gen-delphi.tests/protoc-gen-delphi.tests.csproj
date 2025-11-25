@@ -23,6 +23,18 @@
     <ProjectReference Include="..\protoc-gen-delphi\protoc-gen-delphi.csproj" />
   </ItemGroup>
 
+  <!-- Include published version of tested project for integration tests -->
+  <!-- Solution based on https://github.com/dotnet/sdk/issues/1675#issuecomment-675590262 -->
+  <PropertyGroup>
+    <TestedExeSubDirectory>exe-protoc-gen-delphi</TestedExeSubDirectory>
+  </PropertyGroup>
+  <Target Name="AddExeDependencyForBuild" BeforeTargets="CopyFilesToOutputDirectory">
+    <MSBuild Projects="..\protoc-gen-delphi\protoc-gen-delphi.csproj"
+             Targets="Publish"
+             Properties="PublishDir=$([System.IO.Path]::GetFullPath($(OutDir)))/$(TestedExeSubDirectory);PublishReadyToRun=false"
+             BuildInParallel="$(BuildInParallel)" />
+  </Target>
+
   <Target Name="CopyProtobufTools" AfterTargets="Build">
     <ItemGroup>
       <ProtobufTools Include="$(PkgGoogle_Protobuf_Tools)/tools/**/*.*" />
