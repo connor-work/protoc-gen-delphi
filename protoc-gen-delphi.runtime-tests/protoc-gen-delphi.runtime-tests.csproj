@@ -87,7 +87,7 @@
     <MSBuild Projects="..\protoc-gen-delphi\protoc-gen-delphi.csproj"
              Targets="Publish"
              Properties="PublishDir=$([System.IO.Path]::GetFullPath($(OutDir)))/$(TestedExeSubDirectory);PublishReadyToRun=false"
-             BuildInParallel="$(BuildInParallel)" />
+             BuildInParallel="false" />
   </Target>
 
   <ItemGroup>
