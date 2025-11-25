@@ -16,6 +16,8 @@
 # The optional end-of-line type ("lf", "crlf" or "mixed") can be specified using the git attribute "expected-eol"
 # Requires Powershell 7+ and Git
 
+$ErrorActionPreference = 'Stop'
+
 # Index of the working copy's <eolinfo> value in the output of git ls-files --eol
 $lsFilesEolinfoWorkingIndex = 1
 # Index of the file path in the output of git ls-files --eol

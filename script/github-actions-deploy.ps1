@@ -23,6 +23,8 @@ param (
     [Security.SecureString] $NuGetOrgApiKey
 )
 
+$ErrorActionPreference = 'Stop'
+
 $unstableCauses = @()
 if (!$Stable) { $unstableCauses += "Package failed stability test" }
 # Deploy

@@ -15,4 +15,6 @@
 # Performs stability tests in GitHub Actions
 # Requires Powershell 7+, the .NET Core CLI and Git
 
+$ErrorActionPreference = 'Stop'
+
 & $PSScriptRoot/integrate.ps1 -NoDeploy
