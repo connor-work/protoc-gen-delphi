@@ -1,0 +1,2 @@
+# Use Windows newlines for Delphi source code (RAD Studio requirement).
+*.pas expected-eol=crlf
