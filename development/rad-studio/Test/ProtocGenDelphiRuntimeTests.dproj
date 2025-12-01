@@ -969,7 +969,7 @@
             <UnitTesting>
                 <TestFramework>DUnit / Delphi Win32</TestFramework>
                 <TestRunner>Console</TestRunner>
-                <SourceProjectName>C:\work\protoc-gen-delphi\development\rad-studio\ProtocGenDelphiRuntime.dproj</SourceProjectName>
+                <SourceProjectName>..\ProtocGenDelphiRuntime.dproj</SourceProjectName>
             </UnitTesting>
         </BorlandProject>
         <ProjectFileVersion>12</ProjectFileVersion>
