@@ -1,5 +1,6 @@
 # Generated XML documentation
 /xml-doc/
+!/xml-doc/README.md
 
 # RAD Studio History Manager data
 __history/
