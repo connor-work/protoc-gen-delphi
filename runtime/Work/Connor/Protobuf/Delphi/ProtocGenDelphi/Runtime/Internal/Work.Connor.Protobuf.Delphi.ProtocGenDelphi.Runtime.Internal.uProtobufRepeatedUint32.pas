@@ -1,4 +1,5 @@
-/// Copyright 2020 Connor Roehricht (connor.work)
+/// Copyright 2025 Connor Erdmann (connor.work)
+/// Copyright 2020 Julien Scholz
 /// Copyright 2020 Sotax AG
 /// 
 /// Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,16 +29,33 @@ unit Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufRepea
 interface
 
 uses
-  // Runtime-internal support for the protobuf binary wire format
-  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uIProtobufWireCodec,
-  // RUNTIME-IMPL: Replace reference
-  // To provide the concrete class for repeated field values
-  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufRepeatedFieldValues;
+  // To extend TProtobufRepeatedVarintFieldValues<UInt32>
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufRepeatedVarintFieldValues,
+  // TProtobufVarintWireCodec for TProtobufRepeatedVarintFieldValues<UInt32> implementation
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufVarintWireCodec;
 
 type
-  // RUNTIME-IMPL: Replace ancestor class
-  TProtobufRepeatedUint32FieldValues = class(TProtobufRepeatedFieldValues<UInt32>);
+  /// <summary>
+  /// Concrete subclass of <see cref="T:TProtobufRepeatedVarintFieldValues"/> for protobuf repeated fields of the protobuf type <c>uint32</c>.
+  /// </summary>
+  TProtobufRepeatedUint32FieldValues = class(TProtobufRepeatedVarintFieldValues<UInt32>)
+    // TProtobufRepeatedVarintFieldValues<UInt32> implementation
+
+    protected
+      function GetVarintWireCodec: TProtobufVarintWireCodec<UInt32>; override;
+  end;
 
 implementation
+
+uses
+  // TProtobufUint32WireCodec as field codec
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufUint32;
+
+// TProtobufRepeatedVarintFieldValues<UInt32> implementation
+
+function TProtobufRepeatedUint32FieldValues.GetVarintWireCodec: TProtobufVarintWireCodec<UInt32>;
+begin
+  result := gProtobufWireCodecUint32 as TProtobufUint32WireCodec;
+end;
 
 end.

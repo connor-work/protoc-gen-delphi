@@ -1,4 +1,5 @@
-/// Copyright 2020 Connor Roehricht (connor.work)
+/// Copyright 2025 Connor Erdmann (connor.work)
+/// Copyright 2020 Julien Scholz
 /// Copyright 2020 Sotax AG
 /// 
 /// Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,9 +31,8 @@ interface
 uses
   // Runtime-internal support for the protobuf binary wire format
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uIProtobufWireCodec,
-  // RUNTIME-IMPL: Replace reference
-  // To provide the wire codec instance
-  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufWireCodec;
+  // To implement TProtobufVarintWireCodec<UInt32>
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufVarintWireCodec;
 
 var
   /// <summary>
@@ -41,12 +41,52 @@ var
   /// </summary>
   gProtobufWireCodecUint32: IProtobufWireCodec<UInt32>;
 
+type
+  /// <summary>
+  /// Runtime library implementation of <see cref="T:IProtobufWireCodec"/> for the protobuf type <c>uint32</c>.
+  /// </summary>
+  TProtobufUint32WireCodec = class(TProtobufVarintWireCodec<UInt32>)
+    // TProtobufVarintWireCodec<UInt32> implementation
+
+    public
+      function FromUInt64(aValue: UInt64): UInt32; override;
+      function ToUInt64(aValue: UInt32): UInt64; override;
+
+    // TProtobufWireCodec<UInt32> implementation
+    
+    public
+      function GetDefault: UInt32; override;
+  end;
+
 implementation
+
+uses
+  // For protobuf default values
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.uProtobuf;
+
+// TProtobufVarintWireCodec<UInt32> implementation
+
+function TProtobufUint32WireCodec.FromUInt64(aValue: UInt64): UInt32;
+begin
+  ValidateBounds(aValue, 32, False);
+  result := UInt32(aValue);
+end;
+
+function TProtobufUint32WireCodec.ToUInt64(aValue: UInt32): UInt64;
+begin
+  result := UInt64(aValue);
+end;
+
+// TProtobufWireCodec<UInt32> implementation
+
+function TProtobufUint32WireCodec.GetDefault: UInt32;
+begin
+  result := PROTOBUF_DEFAULT_VALUE_UINT32;
+end;
 
 initialization
 begin
-  // RUNTIME-IMPL: Replace constructed class
-  gProtobufWireCodecUint32 := TProtobufWireCodec<UInt32>.Create;
+  gProtobufWireCodecUint32 := TProtobufUint32WireCodec.Create;
 end;
 
 end.
