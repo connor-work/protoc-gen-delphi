@@ -1,4 +1,4 @@
-/// Copyright 2020 Connor Roehricht (connor.work)
+/// Copyright 2025 Connor Erdmann (connor.work)
 /// Copyright 2020 Sotax AG
 /// 
 /// Licensed under the Apache License, Version 2.0 (the "License");
@@ -33,10 +33,12 @@ interface
 uses
   // TStream for encoding and decoding of messages
 {$IFDEF WORK_CONNOR_DELPHI_COMPILER_UNIT_SCOPE_NAMES}
-  System.Classes;
+  System.Classes,
 {$ELSE}
-  Classes;
+  Classes,
 {$ENDIF}
+  // EDecodingSchemaError
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.uProtobuf;
 
 type
   /// <summary>

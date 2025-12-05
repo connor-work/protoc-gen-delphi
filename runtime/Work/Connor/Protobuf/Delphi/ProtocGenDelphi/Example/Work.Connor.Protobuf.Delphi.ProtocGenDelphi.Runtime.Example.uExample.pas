@@ -1,5 +1,4 @@
-/// Copyright 2020 Connor Roehricht (connor.work)
-/// Copyright 2020 Sotax AG
+/// Copyright 2025 Connor Erdmann (connor.work)
 /// 
 /// Licensed under the Apache License, Version 2.0 (the "License");
 /// you may not use this file except in compliance with the License.
@@ -14,9 +13,9 @@
 /// limitations under the License.
 
 /// <summary>
-/// Helper code used only by the stub runtime, not required for functional implementations of the runtime library for <c>protoc-gen-delphi</c>.
+/// Example for protoc-gen-delphi and its runtime library support code.
 /// </summary>
-unit Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uStubRuntime;
+unit Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Example.uExample;
 
 {$INCLUDE Work.Connor.Delphi.CompilerFeatures.inc}
 
@@ -26,24 +25,16 @@ unit Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uStubRuntime;
 
 interface
 
-uses
-  // To raise exceptions
-{$IFDEF WORK_CONNOR_DELPHI_COMPILER_UNIT_SCOPE_NAMES}
-  System.SysUtils;
-{$ELSE}
-  SysUtils;
-{$ENDIF}
-
 /// <summary>
-/// Creates an exception that signals that some functionality is not implemented in the stub runtime.
+/// Runs the example, writing documentation to stdout.
 /// </summary>
-function NotImplementedInStub: Exception;
+procedure RunExample();
 
 implementation
 
-function NotImplementedInStub: Exception;
+procedure RunExample();
 begin
-  result := Exception.Create('This functionality is not implemented by the stub runtime');
+  Writeln('Hello World2');
 end;
 
 end.
