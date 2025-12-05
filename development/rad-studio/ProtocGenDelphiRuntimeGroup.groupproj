@@ -1,0 +1,60 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{3842C330-6227-423C-BC66-915D39F109AC}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="ProtocGenDelphiRuntime.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Test\ProtocGenDelphiRuntimeTests.dproj">
+            <Dependencies>ProtocGenDelphiRuntime.dproj</Dependencies>
+        </Projects>
+        <Projects Include="example\ProtocGenDelphiRuntimeExample.dproj">
+            <Dependencies>ProtocGenDelphiRuntime.dproj</Dependencies>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="ProtocGenDelphiRuntime">
+        <MSBuild Projects="ProtocGenDelphiRuntime.dproj"/>
+    </Target>
+    <Target Name="ProtocGenDelphiRuntime:Clean">
+        <MSBuild Projects="ProtocGenDelphiRuntime.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="ProtocGenDelphiRuntime:Make">
+        <MSBuild Projects="ProtocGenDelphiRuntime.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="ProtocGenDelphiRuntimeTests" DependsOnTargets="ProtocGenDelphiRuntime">
+        <MSBuild Projects="Test\ProtocGenDelphiRuntimeTests.dproj"/>
+    </Target>
+    <Target Name="ProtocGenDelphiRuntimeTests:Clean" DependsOnTargets="ProtocGenDelphiRuntime:Clean">
+        <MSBuild Projects="Test\ProtocGenDelphiRuntimeTests.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="ProtocGenDelphiRuntimeTests:Make" DependsOnTargets="ProtocGenDelphiRuntime:Make">
+        <MSBuild Projects="Test\ProtocGenDelphiRuntimeTests.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="ProtocGenDelphiRuntimeExample" DependsOnTargets="ProtocGenDelphiRuntime">
+        <MSBuild Projects="example\ProtocGenDelphiRuntimeExample.dproj"/>
+    </Target>
+    <Target Name="ProtocGenDelphiRuntimeExample:Clean" DependsOnTargets="ProtocGenDelphiRuntime:Clean">
+        <MSBuild Projects="example\ProtocGenDelphiRuntimeExample.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="ProtocGenDelphiRuntimeExample:Make" DependsOnTargets="ProtocGenDelphiRuntime:Make">
+        <MSBuild Projects="example\ProtocGenDelphiRuntimeExample.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="ProtocGenDelphiRuntime;ProtocGenDelphiRuntimeTests;ProtocGenDelphiRuntimeExample"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="ProtocGenDelphiRuntime:Clean;ProtocGenDelphiRuntimeTests:Clean;ProtocGenDelphiRuntimeExample:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="ProtocGenDelphiRuntime:Make;ProtocGenDelphiRuntimeTests:Make;ProtocGenDelphiRuntimeExample:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>

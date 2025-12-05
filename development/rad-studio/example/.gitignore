@@ -1,6 +1,3 @@
-# Build results
-/output/
-
 # Generated XML documentation
 /xml-doc/
 !/xml-doc/README.md
@@ -14,9 +11,6 @@ __recovery/
 # RAD Studio user-specific project options
 *.dproj.local
 
-# RAD Studio user-specific project group options
-*.groupproj.local
-
 # RAD Studio refactoring information
 *.identcache
 
@@ -24,4 +18,4 @@ __recovery/
 /Win32/Debug/
 
 # Buildable RAD Studio resource file
-/ProtocGenDelphiRuntime.res
+/ProtocGenDelphiRuntimeExample.res
