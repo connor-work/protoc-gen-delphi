@@ -1,6 +1,7 @@
 # Use Windows line endings for RAD Studio projects.
 *.dproj expected-eol=crlf
 *.dpk expected-eol=crlf
+*.groupproj expected-eol=crlf
 
 # Use Windows newlines for Delphi source code (RAD Studio requirement).
 *.pas expected-eol=crlf
