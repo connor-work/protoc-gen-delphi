@@ -119,7 +119,8 @@ begin
       lStream.Seek(0, soBeginning);
       TProtobufTag.WithData(aField, wtLengthDelimited).Encode(aDest);
       EncodeVarint(lStream.Size, aDest);
-      aDest.CopyFrom(lStream, lStream.Size);
+      if (lStream.Size > 0) then
+        aDest.CopyFrom(lStream, lStream.Size);
     finally
       lStream.Free;
     end;

@@ -138,7 +138,8 @@ begin
         begin
           lVarint := DecodeVarint(aSource);
           EncodeVarint(lVarint, lTempStream);
-          lTempStream.CopyFrom(aSource, lVarint);
+          if (lVarint > 0) then
+            lTempStream.CopyFrom(aSource, lVarint);
         end;
       wt32Bit:
         lTempStream.CopyFrom(aSource, 4);
