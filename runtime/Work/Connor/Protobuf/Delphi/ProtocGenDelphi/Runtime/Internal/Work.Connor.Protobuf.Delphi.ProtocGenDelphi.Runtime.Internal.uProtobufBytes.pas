@@ -1,4 +1,5 @@
-/// Copyright 2020 Connor Roehricht (connor.work)
+/// Copyright 2025 Connor Erdmann (connor.work)
+/// Copyright 2020 Julien Scholz
 /// Copyright 2020 Sotax AG
 /// 
 /// Licensed under the Apache License, Version 2.0 (the "License");
@@ -38,9 +39,8 @@ uses
 {$ELSE}
   SysUtils,
 {$ENDIF}
-  // RUNTIME-IMPL: Replace reference
-  // To provide the wire codec instance
-  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufWireCodec;
+  // To implement TProtobufDelimitedWireCodec<TBytes>
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufDelimitedWireCodec;
 
 var
   /// <summary>
@@ -49,12 +49,57 @@ var
   /// </summary>
   gProtobufWireCodecBytes: IProtobufWireCodec<TBytes>;
 
+type
+  /// <summary>
+  /// Runtime library implementation of <see cref="T:IProtobufWireCodec"/> for the protobuf type <c>bytes</c>.
+  /// </summary>
+  TProtobufBytesWireCodec = class(TProtobufDelimitedWireCodec<TBytes>)
+    // TProtobufDelimitedWireCodec<TBytes> implementation
+
+    public
+      function FromBytes(aValue: TBytes): TBytes; override;
+      function ToBytes(aValue: TBytes): TBytes; override;
+
+    // TProtobufWireCodec<TBytes> implementation
+    
+    public
+      function GetDefault: TBytes; override;
+      function IsDefault(aValue: TBytes): Boolean; override;
+  end;
+
 implementation
+
+uses
+  // For protobuf default values
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.uProtobuf;
+
+// TProtobufDelimitedWireCodec<TBytes> implementation
+
+function TProtobufBytesWireCodec.FromBytes(aValue: TBytes): TBytes;
+begin
+  result := aValue;
+end;
+
+function TProtobufBytesWireCodec.ToBytes(aValue: TBytes): TBytes;
+begin
+  result := aValue;
+end;
+
+// TProtobufWireCodec<TBytes> implementation
+
+function TProtobufBytesWireCodec.GetDefault: TBytes;
+begin
+  result := PROTOBUF_DEFAULT_VALUE_BYTES;
+end;
+
+function TProtobufBytesWireCodec.IsDefault(aValue: TBytes): Boolean;
+begin
+  result := aValue = GetDefault;
+end;
 
 initialization
 begin
-  // RUNTIME-IMPL: Replace constructed class
-  gProtobufWireCodecBytes := TProtobufWireCodec<TBytes>.Create;
+  gProtobufWireCodecBytes := TProtobufBytesWireCodec.Create;
 end;
 
 end.
