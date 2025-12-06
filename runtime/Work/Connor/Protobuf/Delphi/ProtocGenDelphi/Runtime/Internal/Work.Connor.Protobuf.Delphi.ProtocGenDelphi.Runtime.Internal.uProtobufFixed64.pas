@@ -1,4 +1,5 @@
-/// Copyright 2020 Connor Roehricht (connor.work)
+/// Copyright 2025 Connor Erdmann (connor.work)
+/// Copyright 2020 Julien Scholz
 /// Copyright 2020 Sotax AG
 /// 
 /// Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,9 +31,16 @@ interface
 uses
   // Runtime-internal support for the protobuf binary wire format
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uIProtobufWireCodec,
-  // RUNTIME-IMPL: Replace reference
-  // To provide the wire codec instance
-  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufWireCodec;
+  // To implement TProtobufFixedWidthWireCodec<UInt64>
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufFixedWidthWireCodec,
+  // For wire type
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufTag,
+  // TStream for encoding of messages
+{$IFDEF WORK_CONNOR_DELPHI_COMPILER_UNIT_SCOPE_NAMES}
+  System.Classes;
+{$ELSE}
+  Classes;
+{$ENDIF}
 
 var
   /// <summary>
@@ -41,12 +49,63 @@ var
   /// </summary>
   gProtobufWireCodecFixed64: IProtobufWireCodec<UInt64>;
 
+type
+  /// <summary>
+  /// Runtime library implementation of <see cref="T:IProtobufWireCodec"/> for the protobuf type <c>fixed64</c>.
+  /// </summary>
+  TProtobufFixed64WireCodec = class(TProtobufFixedWidthWireCodec<UInt64>)
+    // TProtobufFixedWidthWireCodec<UInt64> implementation
+
+    public
+      function GetWireType: TProtobufWireType; override;
+      function DecodeValue(aSource: TStream): UInt64; override;
+      procedure EncodeValue(aValue: UInt64; aDest: TStream); override;
+
+    // TProtobufWireCodec<UInt64> implementation
+    
+    public
+      function GetDefault: UInt64; override;
+      function IsDefault(aValue: UInt64): Boolean; override;
+  end;
+
 implementation
+
+uses
+  // For protobuf default values
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.uProtobuf;
+
+// TProtobufFixedWidthWireCodec<UInt64> implementation
+
+function TProtobufFixed64WireCodec.GetWireType: TProtobufWireType;
+begin
+  result := wt64Bit;
+end;
+
+function TProtobufFixed64WireCodec.DecodeValue(aSource: TStream): UInt64;
+begin
+  aSource.Read(result, SizeOf(result));
+end;
+
+procedure TProtobufFixed64WireCodec.EncodeValue(aValue: UInt64; aDest: TStream);
+begin
+  aDest.Write(aValue, SizeOf(aValue));
+end;
+
+// TProtobufWireCodec<UInt64> implementation
+
+function TProtobufFixed64WireCodec.GetDefault: UInt64;
+begin
+  result := PROTOBUF_DEFAULT_VALUE_FIXED64;
+end;
+
+function TProtobufFixed64WireCodec.IsDefault(aValue: UInt64): Boolean;
+begin
+  result := aValue = GetDefault;
+end;
 
 initialization
 begin
-  // RUNTIME-IMPL: Replace constructed class
-  gProtobufWireCodecFixed64 := TProtobufWireCodec<UInt64>.Create;
+  gProtobufWireCodecFixed64 := TProtobufFixed64WireCodec.Create;
 end;
 
 end.
