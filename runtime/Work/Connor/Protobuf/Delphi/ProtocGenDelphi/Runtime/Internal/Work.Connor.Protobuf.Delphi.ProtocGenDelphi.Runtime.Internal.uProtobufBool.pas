@@ -1,4 +1,5 @@
-/// Copyright 2020 Connor Roehricht (connor.work)
+/// Copyright 2025 Connor Erdmann (connor.work)
+/// Copyright 2020 Julien Scholz
 /// Copyright 2020 Sotax AG
 /// 
 /// Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,9 +31,8 @@ interface
 uses
   // Runtime-internal support for the protobuf binary wire format
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uIProtobufWireCodec,
-  // RUNTIME-IMPL: Replace reference
-  // To provide the wire codec instance
-  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufWireCodec;
+  // To implement TProtobufVarintWireCodec<Boolean>
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufVarintWireCodec;
 
 var
   /// <summary>
@@ -41,12 +41,52 @@ var
   /// </summary>
   gProtobufWireCodecBool: IProtobufWireCodec<Boolean>;
 
+type
+  /// <summary>
+  /// Runtime library implementation of <see cref="T:IProtobufWireCodec"/> for the protobuf type <c>bool</c>.
+  /// </summary>
+  TProtobufBoolWireCodec = class(TProtobufVarintWireCodec<Boolean>)
+    // TProtobufVarintWireCodec<Boolean> implementation
+
+    public
+      function FromUInt64(aValue: UInt64): Boolean; override;
+      function ToUInt64(aValue: Boolean): UInt64; override;
+
+    // TProtobufWireCodec<Boolean> implementation
+    
+    public
+      function GetDefault: Boolean; override;
+  end;
+
 implementation
+
+uses
+  // For protobuf default values
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.uProtobuf;
+
+// TProtobufVarintWireCodec<Boolean> implementation
+
+function TProtobufBoolWireCodec.FromUInt64(aValue: UInt64): Boolean;
+begin
+  ValidateBounds(aValue, 1, False);
+  result := Boolean(aValue);
+end;
+
+function TProtobufBoolWireCodec.ToUInt64(aValue: Boolean): UInt64;
+begin
+  result := UInt64(aValue);
+end;
+
+// TProtobufWireCodec<Boolean> implementation
+
+function TProtobufBoolWireCodec.GetDefault: Boolean;
+begin
+  result := PROTOBUF_DEFAULT_VALUE_BOOL;
+end;
 
 initialization
 begin
-  // RUNTIME-IMPL: Replace constructed class
-  gProtobufWireCodecBool := TProtobufWireCodec<Boolean>.Create;
+  gProtobufWireCodecBool := TProtobufBoolWireCodec.Create;
 end;
 
 end.
