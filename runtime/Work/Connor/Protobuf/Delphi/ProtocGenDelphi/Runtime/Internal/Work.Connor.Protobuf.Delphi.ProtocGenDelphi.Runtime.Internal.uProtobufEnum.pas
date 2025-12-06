@@ -1,4 +1,5 @@
-/// Copyright 2020 Connor Roehricht (connor.work)
+/// Copyright 2025 Connor Erdmann (connor.work)
+/// Copyright 2020 Julien Scholz
 /// Copyright 2020 Sotax AG
 /// 
 /// Licensed under the Apache License, Version 2.0 (the "License");
@@ -32,9 +33,8 @@ uses
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uIProtobufWireCodec,
   // Definition of TProtobufEnumFieldValue
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.uProtobuf,
-  // RUNTIME-IMPL: Replace reference
-  // To provide the wire codec instance
-  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufWireCodec;
+  // To implement TProtobufVarintWireCodec<TProtobufEnumFieldValue>
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufVarintWireCodec;
 
 var
   /// <summary>
@@ -43,12 +43,51 @@ var
   /// </summary>
   gProtobufWireCodecEnum: IProtobufWireCodec<TProtobufEnumFieldValue>;
 
+type
+  /// <summary>
+  /// Runtime library implementation of <see cref="T:IProtobufWireCodec"/> for protobuf enum types.
+  /// </summary>
+  TProtobufEnumWireCodec = class(TProtobufVarintWireCodec<TProtobufEnumFieldValue>)
+    // TProtobufVarintWireCodec<TProtobufEnumFieldValue> implementation
+
+    public
+      function FromUInt64(aValue: UInt64): TProtobufEnumFieldValue; override;
+      function ToUInt64(aValue: TProtobufEnumFieldValue): UInt64; override;
+
+    // TProtobufWireCodec<T> implementation
+    
+    public
+      function GetDefault: TProtobufEnumFieldValue; override;
+  end;
+
 implementation
+
+// TProtobufVarintWireCodec<TProtobufEnumFieldValue> implementation
+
+function TProtobufEnumWireCodec.FromUInt64(aValue: UInt64): TProtobufEnumFieldValue;
+begin
+  // "Enumerator constants must be in the range of a 32-bit integer. Since enum values
+  // use varint encoding on the wire, negative values are inefficient and thus not recommended."
+  // See: https://developers.google.com/protocol-buffers/docs/proto3#enum
+  ValidateBounds(aValue, 32, True);
+  result := TProtobufEnumFieldValue(aValue);
+end;
+
+function TProtobufEnumWireCodec.ToUInt64(aValue: TProtobufEnumFieldValue): UInt64;
+begin
+  result := UInt64(aValue);
+end;
+
+// TProtobufWireCodec<T> implementation
+
+function TProtobufEnumWireCodec.GetDefault: TProtobufEnumFieldValue;
+begin
+  result := PROTOBUF_DEFAULT_VALUE_ENUM;
+end;
 
 initialization
 begin
-  // RUNTIME-IMPL: Replace constructed class
-  gProtobufWireCodecEnum := TProtobufWireCodec<TProtobufEnumFieldValue>.Create;
+  gProtobufWireCodecEnum := TProtobufEnumWireCodec.Create;
 end;
 
 end.
