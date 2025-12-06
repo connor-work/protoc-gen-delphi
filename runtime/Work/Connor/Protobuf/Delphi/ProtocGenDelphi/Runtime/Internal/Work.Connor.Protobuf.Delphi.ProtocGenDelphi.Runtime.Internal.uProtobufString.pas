@@ -1,4 +1,5 @@
-/// Copyright 2020 Connor Roehricht (connor.work)
+/// Copyright 2025 Connor Erdmann (connor.work)
+/// Copyright 2020 Julien Scholz
 /// Copyright 2020 Sotax AG
 /// 
 /// Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,9 +31,14 @@ interface
 uses
   // Runtime-internal support for the protobuf binary wire format
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uIProtobufWireCodec,
-  // RUNTIME-IMPL: Replace reference
-  // To provide the wire codec instance
-  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufWireCodec;
+  // To implement TProtobufDelimitedWireCodec<UnicodeString>
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufDelimitedWireCodec,
+  // TBytes for TProtobufDelimitedWireCodec<UnicodeString> implementation
+{$IFDEF WORK_CONNOR_DELPHI_COMPILER_UNIT_SCOPE_NAMES}
+  System.SysUtils;
+{$ELSE}
+  SysUtils;
+{$ENDIF}
 
 var
   /// <summary>
@@ -41,12 +47,57 @@ var
   /// </summary>
   gProtobufWireCodecString: IProtobufWireCodec<UnicodeString>;
 
+type
+  /// <summary>
+  /// Runtime library implementation of <see cref="T:IProtobufWireCodec"/> for the protobuf type <c>string</c>.
+  /// </summary>
+  TProtobufStringWireCodec = class(TProtobufDelimitedWireCodec<UnicodeString>)
+    // TProtobufDelimitedWireCodec<UnicodeString> implementation
+
+    public
+      function FromBytes(aValue: TBytes): UnicodeString; override;
+      function ToBytes(aValue: UnicodeString): TBytes; override;
+
+    // TProtobufWireCodec<UnicodeString> implementation
+    
+    public
+      function GetDefault: UnicodeString; override;
+      function IsDefault(aValue: UnicodeString): Boolean; override;
+  end;
+
 implementation
+
+uses
+  // For protobuf default values
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.uProtobuf;
+
+// TProtobufDelimitedWireCodec<UnicodeString> implementation
+
+function TProtobufStringWireCodec.FromBytes(aValue: TBytes): UnicodeString;
+begin
+  result := TEncoding.UTF8.GetString(aValue);
+end;
+
+function TProtobufStringWireCodec.ToBytes(aValue: UnicodeString): TBytes;
+begin
+  result := TEncoding.UTF8.GetBytes(aValue);
+end;
+
+// TProtobufWireCodec<UnicodeString> implementation
+
+function TProtobufStringWireCodec.GetDefault: UnicodeString;
+begin
+  result := PROTOBUF_DEFAULT_VALUE_STRING;
+end;
+
+function TProtobufStringWireCodec.IsDefault(aValue: UnicodeString): Boolean;
+begin
+  result := aValue = GetDefault;
+end;
 
 initialization
 begin
-  // RUNTIME-IMPL: Replace constructed class
-  gProtobufWireCodecString := TProtobufWireCodec<UnicodeString>.Create;
+  gProtobufWireCodecString := TProtobufStringWireCodec.Create;
 end;
 
 end.
