@@ -1,4 +1,5 @@
-/// Copyright 2020 Connor Roehricht (connor.work)
+/// Copyright 2025 Connor Erdmann (connor.work)
+/// Copyright 2020 Julien Scholz
 /// Copyright 2020 Sotax AG
 /// 
 /// Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,9 +31,16 @@ interface
 uses
   // Runtime-internal support for the protobuf binary wire format
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uIProtobufWireCodec,
-  // RUNTIME-IMPL: Replace reference
-  // To provide the wire codec instance
-  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufWireCodec;
+  // To implement TProtobufFixedWidthWireCodec<Single>
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufFixedWidthWireCodec,
+  // For wire type
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufTag,
+  // TStream for encoding of messages
+{$IFDEF WORK_CONNOR_DELPHI_COMPILER_UNIT_SCOPE_NAMES}
+  System.Classes;
+{$ELSE}
+  Classes;
+{$ENDIF}
 
 var
   /// <summary>
@@ -41,12 +49,63 @@ var
   /// </summary>
   gProtobufWireCodecFloat: IProtobufWireCodec<Single>;
 
+type
+  /// <summary>
+  /// Runtime library implementation of <see cref="T:IProtobufWireCodec"/> for the protobuf type <c>float</c>.
+  /// </summary>
+  TProtobufFloatWireCodec = class(TProtobufFixedWidthWireCodec<Single>)
+    // TProtobufFixedWidthWireCodec<Single> implementation
+
+    public
+      function GetWireType: TProtobufWireType; override;
+      function DecodeValue(aSource: TStream): Single; override;
+      procedure EncodeValue(aValue: Single; aDest: TStream); override;
+
+    // TProtobufWireCodec<Single> implementation
+    
+    public
+      function GetDefault: Single; override;
+      function IsDefault(aValue: Single): Boolean; override;
+  end;
+
 implementation
+
+uses
+  // For protobuf default values
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.uProtobuf;
+
+// TProtobufFixedWidthWireCodec<Single> implementation
+
+function TProtobufFloatWireCodec.GetWireType: TProtobufWireType;
+begin
+  result := wt32Bit;
+end;
+
+function TProtobufFloatWireCodec.DecodeValue(aSource: TStream): Single;
+begin
+  aSource.Read(result, SizeOf(result));
+end;
+
+procedure TProtobufFloatWireCodec.EncodeValue(aValue: Single; aDest: TStream);
+begin
+  aDest.Write(aValue, SizeOf(aValue));
+end;
+
+// TProtobufWireCodec<Single> implementation
+
+function TProtobufFloatWireCodec.GetDefault: Single;
+begin
+  result := PROTOBUF_DEFAULT_VALUE_FLOAT;
+end;
+
+function TProtobufFloatWireCodec.IsDefault(aValue: Single): Boolean;
+begin
+  result := aValue = GetDefault;
+end;
 
 initialization
 begin
-  // RUNTIME-IMPL: Replace constructed class
-  gProtobufWireCodecFloat := TProtobufWireCodec<Single>.Create;
+  gProtobufWireCodecFloat := TProtobufFloatWireCodec.Create;
 end;
 
 end.
