@@ -1,4 +1,5 @@
-/// Copyright 2020 Connor Roehricht (connor.work)
+/// Copyright 2025 Connor Erdmann (connor.work)
+/// Copyright 2020 Julien Scholz
 /// Copyright 2020 Sotax AG
 /// 
 /// Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,9 +31,8 @@ interface
 uses
   // Runtime-internal support for the protobuf binary wire format
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uIProtobufWireCodec,
-  // RUNTIME-IMPL: Replace reference
-  // To provide the wire codec instance
-  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufWireCodec;
+  // To implement TProtobufVarintWireCodec<Int32>
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufVarintWireCodec;
 
 var
   /// <summary>
@@ -41,12 +41,52 @@ var
   /// </summary>
   gProtobufWireCodecInt32: IProtobufWireCodec<Int32>;
 
+type
+  /// <summary>
+  /// Runtime library implementation of <see cref="T:IProtobufWireCodec"/> for the protobuf type <c>int32</c>.
+  /// </summary>
+  TProtobufInt32WireCodec = class(TProtobufVarintWireCodec<Int32>)
+    // TProtobufVarintWireCodec<Int32> implementation
+
+    public
+      function FromUInt64(aValue: UInt64): Int32; override;
+      function ToUInt64(aValue: Int32): UInt64; override;
+
+    // TProtobufWireCodec<Int32> implementation
+    
+    public
+      function GetDefault: Int32; override;
+  end;
+
 implementation
+
+uses
+  // For protobuf default values
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.uProtobuf;
+
+// TProtobufVarintWireCodec<Int32> implementation
+
+function TProtobufInt32WireCodec.FromUInt64(aValue: UInt64): Int32;
+begin
+  ValidateBounds(aValue, 32, True);
+  result := Int32(aValue);
+end;
+
+function TProtobufInt32WireCodec.ToUInt64(aValue: Int32): UInt64;
+begin
+  result := UInt64(aValue);
+end;
+
+// TProtobufWireCodec<Int32> implementation
+
+function TProtobufInt32WireCodec.GetDefault: Int32;
+begin
+  result := PROTOBUF_DEFAULT_VALUE_INT32;
+end;
 
 initialization
 begin
-  // RUNTIME-IMPL: Replace constructed class
-  gProtobufWireCodecInt32 := TProtobufWireCodec<Int32>.Create;
+  gProtobufWireCodecInt32 := TProtobufInt32WireCodec.Create;
 end;
 
 end.
