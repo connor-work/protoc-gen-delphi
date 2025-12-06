@@ -190,6 +190,7 @@ begin
         lStream.Free;
       end;
     end;
+    lContainer.UnparsedFields.Remove(aField);
   end;
 end;
 
