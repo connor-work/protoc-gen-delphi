@@ -15,12 +15,11 @@
 /// limitations under the License.
 
 /// <summary>
-/// Runtime-internal support for the protobuf type <c>uint32</c>.
+/// Runtime support for the Protobuf scalar value type <c>uint32</c>.
 /// </summary>
-/// <remarks>
-/// Generated code needs to reference this unit in order to operate on protobuf field values of this type.
-/// </remarks>
 unit Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufUint32;
+
+{$INCLUDE Work.Connor.Delphi.CompilerFeatures.inc}
 
 {$IFDEF FPC}
   {$MODE DELPHI}
@@ -29,64 +28,66 @@ unit Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufUint3
 interface
 
 uses
-  // Runtime-internal support for the protobuf binary wire format
-  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uIProtobufWireCodec,
-  // To implement TProtobufVarintWireCodec<UInt32>
-  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufVarintWireCodec;
+{$IFDEF WORK_CONNOR_DELPHI_COMPILER_UNIT_SCOPE_NAMES}
+  System.Classes,
+{$ELSE}
+  Classes,
+{$ENDIF}
+{$IFDEF WORK_CONNOR_DELPHI_COMPILER_UNIT_SCOPE_NAMES}
+  System.SysUtils,
+{$ELSE}
+  SysUtils,
+{$ENDIF}
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.uProtobuf,
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufWireFormat;
 
-var
-  /// <summary>
-  /// <i>Field codec</i> for <c>protoc-gen-delphi</c> that defines the encoding/decoding of
-  /// protobuf fields of type <c>uint32</c> from/to the protobuf binary wire format.
-  /// </summary>
-  gProtobufWireCodecUint32: IProtobufWireCodec<UInt32>;
+// TODO
+procedure EncodeProtobufUint32(aDest: TStream; aValue: UInt32);
 
-type
-  /// <summary>
-  /// Runtime library implementation of <see cref="T:IProtobufWireCodec"/> for the protobuf type <c>uint32</c>.
-  /// </summary>
-  TProtobufUint32WireCodec = class(TProtobufVarintWireCodec<UInt32>)
-    // TProtobufVarintWireCodec<UInt32> implementation
+// TODO
+procedure EncodeProtobufUint32Field(aDest: TStream; aFieldNumber: TProtobufFieldNumber; aValue: UInt32);
 
-    public
-      function FromUInt64(aValue: UInt64): UInt32; override;
-      function ToUInt64(aValue: UInt32): UInt64; override;
+// TODO
+function DecodeProtobufUint32(aSource: TStream; aRemainingLength: PUInt32): UInt32;
 
-    // TProtobufWireCodec<UInt32> implementation
-    
-    public
-      function GetDefault: UInt32; override;
-  end;
+// TODO
+function DecodeProtobufUint32Field(aSource: TStream; aWireType: TProtobufWireType; aRemainingLength: PUInt32): UInt32;
+
+// TODO
+function CalculateProtobufUint32FieldSize(aFieldNumber: TProtobufFieldNumber; aValue: UInt32): UInt32;
 
 implementation
 
-uses
-  // For protobuf default values
-  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.uProtobuf;
-
-// TProtobufVarintWireCodec<UInt32> implementation
-
-function TProtobufUint32WireCodec.FromUInt64(aValue: UInt64): UInt32;
+procedure EncodeProtobufUint32(aDest: TStream; aValue: UInt32);
 begin
-  ValidateBounds(aValue, 32, False);
-  result := UInt32(aValue);
+  EncodeProtobufVarint(aDest, UInt64(aValue));
 end;
 
-function TProtobufUint32WireCodec.ToUInt64(aValue: UInt32): UInt64;
+// TODO support explicit presence?
+procedure EncodeProtobufUint32Field(aDest: TStream; aFieldNumber: TProtobufFieldNumber; aValue: UInt32);
 begin
-  result := UInt64(aValue);
+  if (aValue = PROTOBUF_DEFAULT_VALUE_UINT32) then Exit;
+  TProtobufTag.WithData(aFieldNumber, TProtobufWireType.Varint).Encode(aDest);
+  EncodeProtobufUint32(aDest, aValue);
 end;
 
-// TProtobufWireCodec<UInt32> implementation
-
-function TProtobufUint32WireCodec.GetDefault: UInt32;
+function DecodeProtobufUint32(aSource: TStream; aRemainingLength: PUInt32): UInt32;
 begin
-  result := PROTOBUF_DEFAULT_VALUE_UINT32;
+  // TODO check range?
+  result := UInt32(DecodeProtobufVarint(aSource, aRemainingLength));
 end;
 
-initialization
+function DecodeProtobufUint32Field(aSource: TStream; aWireType: TProtobufWireType; aRemainingLength: PUInt32): UInt32;
 begin
-  gProtobufWireCodecUint32 := TProtobufUint32WireCodec.Create;
+  if (aWireType <> TProtobufWireType.Varint) then raise EProtobufSchemaViolation.Create('Protobuf uint32 field has unexpected wire type: ' + IntToStr(Ord(aWireType)));
+  result := DecodeProtobufUint32(aSource, aRemainingLength);
+end;
+
+// TODO support explicit presence?
+function CalculateProtobufUint32FieldSize(aFieldNumber: TProtobufFieldNumber; aValue: UInt32): UInt32;
+begin
+  if (aValue = PROTOBUF_DEFAULT_VALUE_UINT32) then Exit(0);
+  result := TProtobufTag.WithData(aFieldNumber, TProtobufWireType.Varint).CalculateSize + CalculateProtobufVarintSize(UInt64(aValue));
 end;
 
 end.

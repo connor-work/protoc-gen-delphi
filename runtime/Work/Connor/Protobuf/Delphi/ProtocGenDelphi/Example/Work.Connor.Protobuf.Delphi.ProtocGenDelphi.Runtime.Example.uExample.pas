@@ -26,21 +26,23 @@ unit Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Example.uExample;
 interface
 
 uses
-  // TStream for encoding and decoding of messages in the protobuf binary wire format
 {$IFDEF WORK_CONNOR_DELPHI_COMPILER_UNIT_SCOPE_NAMES}
   System.Classes,
 {$ELSE}
   Classes,
 {$ENDIF}
-  // TByteHelper to print bytes as their hexadecimal string representation
 {$IFDEF WORK_CONNOR_DELPHI_COMPILER_UNIT_SCOPE_NAMES}
   System.SysUtils,
 {$ELSE}
   SysUtils,
 {$ENDIF}
-  // TProtobufMessage for generically handling protobuf messages
-  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uProtobufMessage,
-  uExampleData;
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uAny,
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uDuration,
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uIProtobufMessage,
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufMessageBase;
+  // TODO // TProtobufMessage for generically handling protobuf messages
+  // TODO Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uProtobufMessage,
+  // TODO uExampleData;
 
 /// <summary>
 /// Runs the example, writing documentation to stdout.
@@ -63,7 +65,7 @@ begin
   Writeln;
 end;
 
-procedure WriteWireFormatMessage(aMessage: TProtobufMessage);
+procedure WriteWireFormatMessage(aMessage: IProtobufMessage);
 var
   lStream: TMemoryStream;
 begin
@@ -71,7 +73,28 @@ begin
   try
     aMessage.Encode(lStream);
     WriteStreamContent(lStream);
+  finally
+    lStream.Free;
+  end;
+end;
+
+// TODO clone method?
+
+procedure TestWireFormatRoundtrip(aMessage: IProtobufMessage);
+var
+  lStream: TMemoryStream;
+  lDecodedMessage: IProtobufMessage;
+begin
+  Writeln('The example message, encoded using the protobuf binary wire format:');
+  WriteWireFormatMessage(aMessage);
+  lStream := TMemoryStream.Create;
+  try
+    aMessage.Encode(lStream);
     lStream.Seek(0, soBeginning);
+    lDecodedMessage := TProtobufMessageBase(TProtobufMessageBase(aMessage).ClassType.Create);
+    lDecodedMessage.Decode(lStream);
+    Writeln('The example message, encoded using the protobuf binary wire format, after a wire format roundtrip:');
+    WriteWireFormatMessage(lDecodedMessage);
   finally
     lStream.Free;
   end;
@@ -79,31 +102,20 @@ end;
 
 procedure RunExample();
 var
-  lMessageX: TMessageX;
-  lStream: TMemoryStream;
+  lDuration: TDuration;
+  lAny: TAny;
 begin
-  lMessageX := TMessageX.Create;
   try
-    lMessageX.FieldX := 42;
-    lMessageX.FieldY := TMessageY.Create;
-    lMessageX.FieldZ.EmplaceAdd;
-    lMessageX.FieldZ.Add(21);
-    Writeln('The example message, encoded using the protobuf binary wire format:');
-    WriteWireFormatMessage(lMessageX);
-    lStream := TMemoryStream.Create;
-    try
-      lMessageX.Encode(lStream);
-      lStream.Seek(0, soBeginning);
-      FreeAndNil(lMessageX);
-      lMessageX := TMessageX.Create;
-      lMessageX.Decode(lStream);
-      Writeln('The example message, encoded using the protobuf binary wire format, after a wire format roundtrip:');
-      WriteWireFormatMessage(lMessageX);
-    finally
-      lStream.Free;
-    end;
+    lDuration := TDuration.Create;
+    lDuration.Seconds := 42;
+    lDuration.SubSecondNanoseconds := 123456789;
+    TestWireFormatRoundtrip(lDuration);
+    lAny := TAny.Create;
+    lAny.Message := lDuration;
+    TestWireFormatRoundtrip(lAny);
   finally
-    lMessageX.Free;
+    lAny.Free;
+    lDuration.Free;
   end;
 end;
 

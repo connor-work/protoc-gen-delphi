@@ -36,10 +36,18 @@ uses
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.uProtobuf,
   // TStream for encoding of messages
 {$IFDEF WORK_CONNOR_DELPHI_COMPILER_UNIT_SCOPE_NAMES}
-  System.Classes;
+  System.Classes,
 {$ELSE}
-  Classes;
+  Classes,
 {$ENDIF}
+  // TJSONCollectionBuilder for encoding of messages using the ProtoJSON format
+{$IFDEF WORK_CONNOR_DELPHI_COMPILER_UNIT_SCOPE_NAMES}
+  System.JSON.Builders,
+{$ELSE}
+  JSON.Builders,
+{$ENDIF}
+  // TProtoJsonEncodedFieldsMap to represent unparsed JSON fields
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtoJson;
 
 type
   /// <summary>
@@ -75,7 +83,7 @@ type
     /// Decodes a previously unknown protobuf singular field of a message, which is assumed to be present, using the protobuf binary wire format, and stores the value in this instance (<i>message field</i>).
     /// If the field is present, this embedded message is filled using <see cref="IProtobufMessage.Decode"/>.
     /// The field is then no longer considered unknown.
-    /// If the field is present multiple times, the message values are merged, see https://developers.google.com/protocol-buffers/docs/encoding#optional.
+    /// If the field is present multiple times, the message values are merged, see https://protobuf.dev/programming-guides/encoding/#last-one-wins.
     /// </summary>
     /// <param name="aContainer">Protobuf message containing the field</param>
     /// <param name="aField">Protobuf field number of the field</param>
@@ -88,6 +96,37 @@ type
     /// See also remarks on destruction of transitively owned objects on <see cref="IProtobufMessage.Decode"/>.
     /// </remarks>
     procedure DecodeAsUnknownSingularField(aContainer: IProtobufMessageInternal; aField: TProtobufFieldNumber);
+
+    /// <summary>
+    /// Encodes a protobuf singular field of a message, with this instance as value (<i>message field</i>), using the ProtoJSON format, and writes it to a <see cref="TJSONCollectionBuilder.TPairs"/>.
+    /// </summary>
+    /// <param name="aField">Protobuf field name of the field, in lowerCamelCase form</param>
+    /// <param name="aDest">The <see cref="TJSONCollectionBuilder.TPairs"/> that the encoded field is written to as a key-value pair</param>
+    /// <remarks>
+    /// For convenience, this method may be called on a <c>nil</c> value, since this is the representation for the default value of a protobuf message field.
+    /// This should be used within an implementation of <see cref="IProtobufMessage.EncodeJson"/>, after calling the ancestor class implementation.
+    /// </remarks>
+    procedure EncodeJsonAsSingularField(aField: String; aDest: TJSONCollectionBuilder.TPairs);
+
+    /// <summary>
+    /// Decodes a protobuf singular field of a message, which is assumed to be present, from an unparsed JSON value, using the ProtoJSON format, and stores the value in this instance (<i>message field</i>).
+    /// If the field is present, this embedded message is filled using <see cref="IProtobufMessage.DecodeJson"/>.
+    /// The field is then removed from the collection of unparsed values <paramref name="aContainerUnparsedFields"/>.
+    /// TODD merging?
+    /// If the field is present multiple times, the message values are merged, see https://protobuf.dev/programming-guides/encoding/#last-one-wins.
+    /// </summary>
+    /// <param name="aContainerUnparsedFields">Collection of unparsed fields of the message containing the field</param>
+    /// <param name="aField">Protobuf field name of the field, in lowerCamelCase form</param>
+    /// <exception cref="EDecodingSchemaError">If the field was absent</exception>
+    /// <exception cref="EDecodingSchemaError">If the format of the JSON value was not compatible with this message type</exception>
+    /// <remarks>
+    /// TODO ancestor?
+    /// This should be used within an implementation of <see cref="IProtobufMessage.DecodeJson"/>, after calling the ancestor class implementation.
+    /// This method is not idempotent. The state of <paramref name="aContainerUnparsedFields"/> is changed by the call, since decoding "consumes" the unknown field.
+    /// Ownership of this message must be held by the containing message (<i>embedded message</i>).
+    /// See also remarks on destruction of transitively owned objects on <see cref="IProtobufMessage.DecodeJson"/>.
+    /// </remarks>
+    procedure DecodeJsonAsSingularField(aContainerUnparsedFields: TProtoJsonEncodedFieldsMap; aField: String);
 
     /// <summary>
     /// Sets the owner of the message, which is responsible for freeing it. This might be a containing message or field value collection.

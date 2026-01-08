@@ -43,6 +43,20 @@ uses
 {$ELSE}
   Classes,
 {$ENDIF}
+  // TJSONObjectBuilder and TJSONCollectionBuilder for encoding of messages using the ProtoJSON format
+{$IFDEF WORK_CONNOR_DELPHI_COMPILER_UNIT_SCOPE_NAMES}
+  System.JSON.Builders,
+{$ELSE}
+  JSON.Builders,
+{$ENDIF}
+  // TJSONValue for decoding of messages using the ProtoJSON format
+{$IFDEF WORK_CONNOR_DELPHI_COMPILER_UNIT_SCOPE_NAMES}
+  System.JSON,
+{$ELSE}
+  JSON,
+{$ENDIF}
+  // TProtoJsonEncodedFieldsMap to represent unparsed JSON fields
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtoJson,
   // Stub runtime helper code
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uStubRuntime;
 
@@ -135,6 +149,17 @@ type
       /// </remarks>
       procedure DecodeDelimited(aSource: TStream);
 
+      // TODO comment
+      // TODO virtual only for well-known types
+      procedure EncodeJson(aPairs: TJSONCollectionBuilder.TPairs); overload; virtual;
+
+      // TODO comment
+      procedure EncodeJson(aBuilder: TJSONObjectBuilder); overload;
+
+      // TODO comment
+      // TODO virtual only for well-known types
+      procedure DecodeJson(aSource: TJSONValue); virtual;
+
       /// <summary>
       /// Merges the given message (source) into this one (destination).
       /// All singular present (non-default) scalar fields in the source replace those in the destination.
@@ -175,7 +200,7 @@ type
       /// Decodes a previously unknown protobuf singular field of a message, which is assumed to be present, using the protobuf binary wire format, and stores the value in this instance (<i>message field</i>).
       /// If the field is present, this embedded message is filled using <see cref="Decode"/>.
       /// The field is then no longer considered unknown.
-      /// If the field is present multiple times, the message values are merged, see https://developers.google.com/protocol-buffers/docs/encoding#optional.
+      /// If the field is present multiple times, the message values are merged, see https://protobuf.dev/programming-guides/encoding/#last-one-wins.
       /// </summary>
       /// <param name="aContainer">Protobuf message containing the field</param>
       /// <param name="aField">Protobuf field number of the field</param>
@@ -188,6 +213,12 @@ type
       /// See also remarks on destruction of transitively owned objects on <see cref="Decode"/>.
       /// </remarks>
       procedure DecodeAsUnknownSingularField(aContainer: IProtobufMessageInternal; aField: TProtobufFieldNumber);
+
+      // TODO comment
+      procedure EncodeJsonAsSingularField(aField: String; aDest: TJSONCollectionBuilder.TPairs);
+
+      // TODO comment
+      procedure DecodeJsonAsSingularField(aContainerUnparsedFields: TProtoJsonEncodedFieldsMap; aField: String);
 
       /// <summary>
       /// Sets the owner of the message, which is responsible for freeing it. This might be a containing message or field value collection.
@@ -252,6 +283,21 @@ begin
   raise NotImplementedInStub;
 end;
 
+procedure TProtobufMessage.EncodeJson(aPairs: TJSONCollectionBuilder.TPairs);
+begin
+  raise NotImplementedInStub;
+end;
+
+procedure TProtobufMessage.EncodeJson(aBuilder: TJSONObjectBuilder);
+begin
+  raise NotImplementedInStub;
+end;
+
+procedure TProtobufMessage.DecodeJson(aSource: TJSONValue);
+begin
+  raise NotImplementedInStub;
+end;
+
 procedure TProtobufMessage.MergeFrom(aSource: IProtobufMessage);
 begin
   raise NotImplementedInStub;
@@ -270,6 +316,16 @@ begin
 end;
 
 procedure TProtobufMessage.DecodeAsUnknownSingularField(aContainer: IProtobufMessageInternal; aField: TProtobufFieldNumber);
+begin
+  raise NotImplementedInStub;
+end;
+
+procedure TProtobufMessage.EncodeJsonAsSingularField(aField: String; aDest: TJSONCollectionBuilder.TPairs);
+begin
+  raise NotImplementedInStub;
+end;
+
+procedure TProtobufMessage.DecodeJsonAsSingularField(aContainerUnparsedFields: TProtoJsonEncodedFieldsMap; aField: String);
 begin
   raise NotImplementedInStub;
 end;

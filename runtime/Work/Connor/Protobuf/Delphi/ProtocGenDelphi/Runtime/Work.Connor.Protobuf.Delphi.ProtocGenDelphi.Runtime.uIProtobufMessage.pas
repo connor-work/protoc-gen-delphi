@@ -14,11 +14,10 @@
 /// limitations under the License.
 
 /// <summary>
-/// Runtime support interface for protobuf message types.
+/// Runtime support interface for Protobuf message types.
 /// </summary>
 /// <remarks>
-/// This unit defines the common interface of all generated classes representing protobuf message types, <see cref="IProtobufMessage"/>.
-/// Client code should reference it indirectly through <see cref="N:Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uProtobufMessage"/>.
+/// This unit defines the common interface of all classes representing Protobuf message types, <see cref="IProtobufMessage"/>.
 /// </remarks>
 unit Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uIProtobufMessage;
 
@@ -31,98 +30,122 @@ unit Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uIProtobufMessage;
 interface
 
 uses
-  // TStream for encoding and decoding of messages
 {$IFDEF WORK_CONNOR_DELPHI_COMPILER_UNIT_SCOPE_NAMES}
   System.Classes,
 {$ELSE}
   Classes,
 {$ENDIF}
-  // EDecodingSchemaError
+{$IFDEF WORK_CONNOR_DELPHI_COMPILER_UNIT_SCOPE_NAMES}
+  System.JSON,
+{$ELSE}
+  JSON,
+{$ENDIF}
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.uProtobuf;
 
 type
   /// <summary>
-  /// Common interface of all generated classes that represent protobuf message types.
+  /// Common interface of all classes that represent Protobuf message types.
   /// </summary>
   /// <remarks>
   /// Can be used directly to handle messages of unknown type.
-  /// The message instance carries transitive ownership of embedded objects in protobuf field values,
+  /// The message instance carries transitive ownership of embedded objects that represent Protobuf field values,
   /// and is responsible for their deallocation.
   /// </remarks>
   IProtobufMessage = interface(IInterface)
     ['{95678C3F-5E26-4B5D-AFAB-0311928C3BA7}']
-
     /// <summary>
-    /// Renders all protobuf fields absent by setting them to their default values.
+    /// Renders all Protobuf fields absent by setting them to their default values.
     /// </summary>
     /// <remarks>
     /// The resulting instance state is equivalent to a newly constructed empty message.
-    /// For more details, see the documentation of <see cref="M:Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uProtobufMessage.TProtobufMessage.Create"/>.
+    /// Protobuf's interpretation of the absence of a field may be counterintuitive for Delphi developers.
+    /// For a detailed explanation, see https://developers.google.com/protocol-buffers/docs/proto3#default.
     /// This procedure may cause the destruction of transitively owned objects.
     /// Developers must ensure that no shared ownership of current field values or further nested embedded objects is held.
     /// </remarks>
     procedure Clear;
 
     /// <summary>
-    /// Encodes the message using the protobuf binary wire format and writes it to a stream.
+    /// Encodes the message using the Protobuf binary wire format and writes it to a stream.
     /// </summary>
     /// <param name="aDest">The stream that the encoded message is written to</param>
     /// <remarks>
-    /// Since the protobuf binary wire format does not include length information for top-level messages,
-    /// the recipient may not be able to detect the end of the message when reading it from a stream.
+    /// Since the Protobuf binary wire format does not include length information for top-level messages,
+    /// the recipient may not be able to detect the end of the message when reading it from a stream (see Streaming Multiple Messages https://protobuf.dev/programming-guides/techniques/#streaming).
     /// If this is required, use <see cref="EncodeDelimited"/> instead.
     /// </remarks>
     procedure Encode(aDest: TStream);
 
     /// <summary>
-    /// Encodes the message using the protobuf binary wire format and writes it to a stream, prefixed with length information.
+    /// Encodes the message using the Protobuf binary wire format and writes it to a stream, prefixed with length information.
     /// </summary>
     /// <param name="aDest">The stream that the encoded message is written to</param>
     /// <remarks>
     /// Unlike <see cref="Encode"/>, this method enables the recipient to detect the end of the message by decoding it using
-    /// <see cref="DecodeDelimited"/>.
+    /// <see cref="DecodeDelimited"/> (see Streaming Multiple Messages https://protobuf.dev/programming-guides/techniques/#streaming).
+    /// The length information is encoded as a 4-byte little-endian unsigned integer equal to the number of bytes that encode the message.
     /// </remarks>
     procedure EncodeDelimited(aDest: TStream);
 
     /// <summary>
-    /// Fills the message's protobuf fields by decoding the message using the protobuf binary wire format from data that is read from a stream.
+    /// Fills the message's Protobuf fields by decoding the message using the Protobuf binary wire format from data that is read from a stream.
     /// Data is read until <see cref="TStream.Read"/> returns 0.
     /// </summary>
     /// <param name="aSource">The stream that the data is read from</param>
-    /// <exception cref="EDecodingSchemaError">If the message on the stream was not compatible with this message type</exception>
+    /// <exception cref="EProtobufFormatViolation">If the data on the stream did not encode a valid Protobuf message</exception>
+    /// <exception cref="EProtobufSchemaViolation">If the message on the stream was not compatible with this message type</exception>
     /// <remarks>
     /// Protobuf fields that are not present in the read data are rendered absent by setting them to their default values.
     /// This may cause the destruction of transitively owned objects (this is also the case when a present fields overwrites a previous value).
     /// Developers must ensure that no shared ownership of current field values or further nested embedded objects is held.
-    /// This method should not be used on streams where the actual size of their contents may not be known yet (this might result in data loss).
+    /// This method should not be used on a stream where the actual size of its contents may not be known yet (this might result in data loss, see Streaming Multiple Messages https://protobuf.dev/programming-guides/techniques/#streaming).
     /// If this is required, use <see cref="DecodeDelimited"/> instead.
     /// </remarks>
     procedure Decode(aSource: TStream);
 
     /// <summary>
-    /// Fills the message's protobuf fields by decoding the message using the protobuf binary wire format from data that is read from a stream.
+    /// Fills the message's protobuf fields by decoding the message using the Protobuf binary wire format from data that is read from a stream.
     /// The data must be prefixed with message length information, as implemented by <see cref="EncodeDelimited"/>.
     /// </summary>
     /// <param name="aSource">The stream that the data is read from</param>
-    /// <exception cref="EDecodingSchemaError">If the message on the stream was not compatible with this message type</exception>
+    /// <exception cref="EProtobufFormatViolation">If the data on the stream did not encode a valid combination of length information and a Protobuf message</exception>
+    /// <exception cref="EProtobufSchemaViolation">If the message on the stream was not compatible with this message type</exception>
     /// <remarks>
-    /// See remarks on <see cref="Decode">.
+    /// The length information is encoded as a 4-byte little-endian unsigned integer equal to the number of bytes that encode the message.
+    /// Protobuf fields that are not present in the read data are rendered absent by setting them to their default values.
+    /// This may cause the destruction of transitively owned objects (this is also the case when a present fields overwrites a previous value).
+    /// Developers must ensure that no shared ownership of current field values or further nested embedded objects is held.
     /// </remarks>
     procedure DecodeDelimited(aSource: TStream);
 
+    /// TODO
+    procedure MergeFrom(aSource: TStream; aRemainingLength: PUInt32);
+
     /// <summary>
-    /// Merges the given message (source) into this one (destination).
-    /// All singular present (non-default) scalar fields in the source replace those in the destination.
-    /// All singular embedded messages are merged recursively.
-    /// All repeated fields are concatenated, with the source field values being appended to the destination field.
-    /// If this causes a new message object to be added, a copy is created to preserve ownership.
+    /// Calculates the size of the message when encoded using the Protobuf binary wire format.
     /// </summary>
-    /// <param name="aSource">Message to merge into this one</param>
-    /// <remarks>
-    /// The source message must be a protobuf message of the same type.
-    /// This procedure does not cause the destruction of any transitively owned objects in this message instance (append-only).
-    /// </remarks>
-    procedure MergeFrom(aSource: IProtobufMessage);
+    /// <returns>The number of bytes that encode the message</return>
+    function CalculateSize: UInt32;
+
+    // TODO
+    function GetTypeUrl: TProtobufTypeUrl;
+
+    // TODO
+    property TypeUrl: TProtobufTypeUrl read GetTypeUrl;
+
+    /// <summary>
+    /// Encodes the message as a JSON value using the ProtoJSON format.
+    /// </summary>
+    /// <returns>The JSON value encoding the message</return>
+    function EncodeJson: TJSONValue;
+
+    /// <summary>
+    /// Decodes the message from a JSON value using the ProtoJSON format.
+    /// </summary>
+    /// <param name="aSource">The JSON value encoding the message</param>
+    /// <exception cref="EProtobufFormatViolation">If the JSON value did not encode a valid Protobuf message</exception>
+    /// <exception cref="EProtobufSchemaViolation">If the encoded message was not compatible with this message type</exception>
+    procedure DecodeJson(aSource: TJSONValue);
   end;
 
 implementation

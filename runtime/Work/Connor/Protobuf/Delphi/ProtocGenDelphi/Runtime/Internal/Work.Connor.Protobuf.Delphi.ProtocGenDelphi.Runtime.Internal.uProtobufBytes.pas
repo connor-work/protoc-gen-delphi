@@ -15,11 +15,8 @@
 /// limitations under the License.
 
 /// <summary>
-/// Runtime-internal support for the protobuf type <c>bytes</c>.
+/// Runtime support for the Protobuf scalar value type <c>bytes</c>.
 /// </summary>
-/// <remarks>
-/// Generated code needs to reference this unit in order to operate on protobuf field values of this type.
-/// </remarks>
 unit Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufBytes;
 
 {$INCLUDE Work.Connor.Delphi.CompilerFeatures.inc}
@@ -31,75 +28,67 @@ unit Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufBytes
 interface
 
 uses
-  // Runtime-internal support for the protobuf binary wire format
-  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uIProtobufWireCodec,
-  // To represent values as TBytes
+{$IFDEF WORK_CONNOR_DELPHI_COMPILER_UNIT_SCOPE_NAMES}
+  System.Classes,
+{$ELSE}
+  Classes,
+{$ENDIF}
 {$IFDEF WORK_CONNOR_DELPHI_COMPILER_UNIT_SCOPE_NAMES}
   System.SysUtils,
 {$ELSE}
   SysUtils,
 {$ENDIF}
-  // To implement TProtobufDelimitedWireCodec<TBytes>
-  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufDelimitedWireCodec;
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.uProtobuf,
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uIProtobufMessage,
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufWireFormat;
 
-var
-  /// <summary>
-  /// <i>Field codec</i> for <c>protoc-gen-delphi</c> that defines the encoding/decoding of
-  /// protobuf fields of type <c>bytes</c> from/to the protobuf binary wire format.
-  /// </summary>
-  gProtobufWireCodecBytes: IProtobufWireCodec<TBytes>;
+// TODO
+procedure EncodeProtobufBytesField(aDest: TStream; aFieldNumber: TProtobufFieldNumber; aValue: TBytesStream);
 
-type
-  /// <summary>
-  /// Runtime library implementation of <see cref="T:IProtobufWireCodec"/> for the protobuf type <c>bytes</c>.
-  /// </summary>
-  TProtobufBytesWireCodec = class(TProtobufDelimitedWireCodec<TBytes>)
-    // TProtobufDelimitedWireCodec<TBytes> implementation
+// TODO
+function DecodeProtobufBytesField(aSource: TStream; aWireType: TProtobufWireType; aRemainingLength: PUInt32): TBytes;
 
-    public
-      function FromBytes(aValue: TBytes): TBytes; override;
-      function ToBytes(aValue: TBytes): TBytes; override;
+// TODO
+function CalculateProtobufBytesFieldSize(aFieldNumber: TProtobufFieldNumber; aValue: TBytesStream): UInt32;
 
-    // TProtobufWireCodec<TBytes> implementation
-    
-    public
-      function GetDefault: TBytes; override;
-      function IsDefault(aValue: TBytes): Boolean; override;
-  end;
+// TODO
+function CalculateProtobufMessageBytesFieldSize(aFieldNumber: TProtobufFieldNumber; aMessage: IProtobufMessage): UInt32;
 
 implementation
 
-uses
-  // For protobuf default values
-  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.uProtobuf;
-
-// TProtobufDelimitedWireCodec<TBytes> implementation
-
-function TProtobufBytesWireCodec.FromBytes(aValue: TBytes): TBytes;
+// TODO support explicit presence?
+procedure EncodeProtobufBytesField(aDest: TStream; aFieldNumber: TProtobufFieldNumber; aValue: TBytesStream);
 begin
-  result := aValue;
+  if (aValue.Size = 0) then Exit;
+  TProtobufTag.WithData(aFieldNumber, TProtobufWireType.Len).Encode(aDest);
+  EncodeProtobufVarint(aDest, aValue.Size);
+  aDest.CopyFrom(aValue);
+  aValue.Position := 0;
 end;
 
-function TProtobufBytesWireCodec.ToBytes(aValue: TBytes): TBytes;
+function DecodeProtobufBytesField(aSource: TStream; aWireType: TProtobufWireType; aRemainingLength: PUInt32): TBytes;
+var
+  lLength: UInt32;
 begin
-  result := aValue;
+  if (aWireType <> TProtobufWireType.Len) then raise EProtobufSchemaViolation.Create('Protobuf bytes field has unexpected wire type: ' + IntToStr(Ord(aWireType)));
+  // TODO check range?
+  lLength := DecodeProtobufVarint(aSource, aRemainingLength);
+  SetLength(result, lLength);
+  if ((aRemainingLength <> nil) and (aRemainingLength^ < lLength)) then raise EProtobufFormatViolation.Create('TODO');
+  aSource.ReadBuffer(result[0], lLength);
+  if (aRemainingLength <> nil) then aRemainingLength^ := aRemainingLength^ - lLength;
 end;
 
-// TProtobufWireCodec<TBytes> implementation
-
-function TProtobufBytesWireCodec.GetDefault: TBytes;
+// TODO support explicit presence?
+function CalculateProtobufBytesFieldSize(aFieldNumber: TProtobufFieldNumber; aValue: TBytesStream): UInt32;
 begin
-  result := PROTOBUF_DEFAULT_VALUE_BYTES;
+  if (aValue.Size = 0) then Exit(0);
+  result := TProtobufTag.WithData(aFieldNumber, TProtobufWireType.Len).CalculateSize + CalculateProtobufVarintSize(aValue.Size) + aValue.Size;
 end;
 
-function TProtobufBytesWireCodec.IsDefault(aValue: TBytes): Boolean;
+function CalculateProtobufMessageBytesFieldSize(aFieldNumber: TProtobufFieldNumber; aMessage: IProtobufMessage): UInt32;
 begin
-  result := aValue = GetDefault;
-end;
-
-initialization
-begin
-  gProtobufWireCodecBytes := TProtobufBytesWireCodec.Create;
+  result := TProtobufTag.WithData(aFieldNumber, TProtobufWireType.Len).CalculateSize + CalculateProtobufVarintSize(aMessage.CalculateSize) + aMessage.CalculateSize;
 end;
 
 end.

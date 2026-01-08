@@ -108,60 +108,25 @@
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
         <DCCReference Include="rtl.dcp"/>
-        <DCCReference Include="..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uIProtobufMessage.pas"/>
-        <DCCReference Include="..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uProtobufMessage.pas"/>
-        <DCCReference Include="..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\StubRuntime\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufMessage.pas"/>
-        <DCCReference Include="..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\StubRuntime\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uStubRuntime.pas"/>
+        <DCCReference Include="..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime\Internal\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufWireFormat.pas"/>
         <DCCReference Include="..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.uProtobuf.pas"/>
-        <DCCReference Include="..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime\Internal\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufUint32.pas"/>
-        <DCCReference Include="..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime\Internal\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uIProtobufMessageInternal.pas"/>
-        <DCCReference Include="..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime\Internal\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uIProtobufWireCodec.pas"/>
-        <DCCReference Include="..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\StubRuntime\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufWireCodec.pas"/>
-        <DCCReference Include="..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uIProtobufRepeatedFieldValues.pas"/>
-        <DCCReference Include="..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime\Internal\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufRepeatedUint32.pas"/>
-        <DCCReference Include="..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime\Internal\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uIProtobufRepeatedFieldValuesInternal.pas"/>
-        <DCCReference Include="..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\StubRuntime\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufRepeatedFieldValues.pas"/>
-        <DCCReference Include="..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\StubRuntime\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufFieldAttribute.pas"/>
-        <DCCReference Include="..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uIProtobufFieldAttribute.pas"/>
-        <DCCReference Include="..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime\Internal\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufBool.pas"/>
+        <DCCReference Include="..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime\Internal\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtoJsonFormat.pas"/>
+        <DCCReference Include="..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uTimestamp.pas"/>
+        <DCCReference Include="..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uIProtobufWellKnownTypeMessage.pas"/>
+        <DCCReference Include="..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uIProtobufMessage.pas"/>
+        <DCCReference Include="..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uAny.pas"/>
+        <DCCReference Include="..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uDuration.pas"/>
+        <DCCReference Include="..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uEmpty.pas"/>
         <DCCReference Include="..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime\Internal\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufBytes.pas"/>
-        <DCCReference Include="..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime\Internal\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufDouble.pas"/>
+        <DCCReference Include="..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime\Internal\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufString.pas"/>
         <DCCReference Include="..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime\Internal\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufFixed32.pas"/>
-        <DCCReference Include="..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime\Internal\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufFixed64.pas"/>
-        <DCCReference Include="..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime\Internal\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufFloat.pas"/>
         <DCCReference Include="..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime\Internal\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufInt32.pas"/>
         <DCCReference Include="..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime\Internal\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufInt64.pas"/>
-        <DCCReference Include="..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime\Internal\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufRepeatedBool.pas"/>
-        <DCCReference Include="..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime\Internal\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufRepeatedBytes.pas"/>
-        <DCCReference Include="..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime\Internal\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufRepeatedDouble.pas"/>
-        <DCCReference Include="..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime\Internal\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufRepeatedFixed32.pas"/>
-        <DCCReference Include="..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime\Internal\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufRepeatedFixed64.pas"/>
-        <DCCReference Include="..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime\Internal\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufRepeatedFloat.pas"/>
-        <DCCReference Include="..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime\Internal\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufRepeatedInt32.pas"/>
-        <DCCReference Include="..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime\Internal\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufRepeatedInt64.pas"/>
-        <DCCReference Include="..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime\Internal\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufRepeatedSfixed32.pas"/>
-        <DCCReference Include="..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime\Internal\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufRepeatedSfixed64.pas"/>
-        <DCCReference Include="..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime\Internal\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufRepeatedSint32.pas"/>
-        <DCCReference Include="..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime\Internal\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufRepeatedSint64.pas"/>
-        <DCCReference Include="..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime\Internal\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufRepeatedString.pas"/>
-        <DCCReference Include="..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime\Internal\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufRepeatedUint64.pas"/>
-        <DCCReference Include="..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime\Internal\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufSfixed32.pas"/>
-        <DCCReference Include="..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime\Internal\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufSfixed64.pas"/>
-        <DCCReference Include="..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime\Internal\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufSint32.pas"/>
-        <DCCReference Include="..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime\Internal\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufSint64.pas"/>
-        <DCCReference Include="..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime\Internal\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufString.pas"/>
-        <DCCReference Include="..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime\Internal\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufUint64.pas"/>
-        <DCCReference Include="..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime\Internal\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufRepeatedMessage.pas"/>
-        <DCCReference Include="..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime\Internal\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufEnum.pas"/>
-        <DCCReference Include="..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime\Internal\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufRepeatedVarintFieldValues.pas"/>
-        <DCCReference Include="..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime\Internal\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufRepeatedPrimitiveFieldValues.pas"/>
-        <DCCReference Include="..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime\Internal\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufRepeatedFieldValues.pas"/>
-        <DCCReference Include="..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime\Internal\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufWireCodec.pas"/>
-        <DCCReference Include="..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime\Internal\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufVarintWireCodec.pas"/>
-        <DCCReference Include="..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime\Internal\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufEncodedField.pas"/>
-        <DCCReference Include="..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime\Internal\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufTag.pas"/>
-        <DCCReference Include="..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime\Internal\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufVarint.pas"/>
-        <DCCReference Include="..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime\Internal\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufFixedWidthWireCodec.pas"/>
+        <DCCReference Include="..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime\Internal\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufMessageBase.pas"/>
+        <DCCReference Include="..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uTypeRegistry.pas"/>
+        <DCCReference Include="..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime\Internal\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufUint32.pas"/>
+        <DCCReference Include="..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime\Internal\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufNotWellKnownTypeMessageBase.pas"/>
+        <DCCReference Include="..\..\runtime\Work\Connor\Protobuf\Delphi\ProtocGenDelphi\Runtime\Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uIProtobufNotWellKnownTypeMessage.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
@@ -201,7 +166,7 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="C:\Users\Public\Documents\Embarcadero\Studio\20.0\Bpl\ProtocGenDelphiRuntime.bpl" Configuration="Debug" Class="ProjectOutput"/>
-                <DeployFile LocalName="C:\Users\Public\Documents\Embarcadero\Studio\23.0\Bpl\ProtocGenDelphiRuntime.bpl" Configuration="Debug" Class="ProjectOutput">
+                <DeployFile LocalName="output\ProtocGenDelphiRuntime\ProtocGenDelphiRuntime290.bpl" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
                         <RemoteName>ProtocGenDelphiRuntime.bpl</RemoteName>
                         <Overwrite>true</Overwrite>

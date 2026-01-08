@@ -18,10 +18,9 @@
 /// Runtime support for protobuf message types.
 /// </summary>
 /// <remarks>
-/// This unit defines the common ancestor of all generated classes representing protobuf message types, <see cref="TProtobufMessage"/>.
-/// Client code may need to reference it in order to operate on generic protobuf messages.
+/// This unit defines the common ancestor of all classes representing protobuf message types, <see cref="TProtobufMessage"/>.
 /// </remarks>
-unit Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uProtobufMessage;
+unit Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufMessage;
 
 {$INCLUDE Work.Connor.Delphi.CompilerFeatures.inc}
 
@@ -31,59 +30,11 @@ unit Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uProtobufMessage;
 
 interface
 
-uses
-  // To implement IProtobufMessage
-  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uIProtobufMessage,
-  // To implement IProtobufMessageInternal
-  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uIProtobufMessageInternal,
-{$IFDEF WORK_CONNOR_DELPHI_COMPILER_UNIT_SCOPE_NAMES}
-  System.Classes,
-{$ELSE}
-  Classes,
-{$ENDIF}
-  // For handling protobuf encoded fields
-  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufEncodedField,
-  // TDictionary and TObjectList for storing unparsed fields
-{$IFDEF WORK_CONNOR_DELPHI_COMPILER_UNIT_SCOPE_NAMES}
-  System.Generics.Collections,
-{$ELSE}
-  Generics.Collections,
-{$ENDIF}
-  // TJSONObjectBuilder and TJSONCollectionBuilder for encoding of messages using the ProtoJSON format
-{$IFDEF WORK_CONNOR_DELPHI_COMPILER_UNIT_SCOPE_NAMES}
-  System.JSON.Builders,
-{$ELSE}
-  JSON.Builders,
-{$ENDIF}
-  // TJSONValue for decoding of messages using the ProtoJSON format
-{$IFDEF WORK_CONNOR_DELPHI_COMPILER_UNIT_SCOPE_NAMES}
-  System.JSON,
-{$ELSE}
-  JSON,
-{$ENDIF}
-  // TProtoJsonEncodedFieldsMap to represent unparsed JSON fields
-  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtoJson,
-{$IFDEF WORK_CONNOR_DELPHI_COMPILER_CUSTOM_ATTRIBUTES}
-  // RUNTIME-IMPL: Replace reference
-  // To expose TProtobufFieldAttribute
-  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.StubRuntime.uProtobufFieldAttribute,
-{$ENDIF}
-  // TProtobufFieldNumber for IProtobufMessageInternal implementation, EDecodingSchemaError
-  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.uProtobuf;
+// TODO first: Internal TProtobufMessage implementation, then add public TProtobufNotWellKnownTypeMessage, Any etc.
 
 type
   /// <summary>
-  /// Common interface of all generated classes that represent protobuf message types.
-  /// </summary>
-  /// <remarks>
-  /// Can be used directly to handle messages of unknown type.
-  /// The message instance carries transitive ownership of embedded objects in protobuf field values,
-  /// and is responsible for their deallocation.
-  /// </remarks>
-  IProtobufMessage = Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uIProtobufMessage.IProtobufMessage;
-
-  /// <summary>
-  /// Common ancestor of all generated classes that represent protobuf message types.
+  /// Common ancestor of all classes that represent protobuf message types.
   /// </summary>
   /// <remarks>
   /// Can be used directly to handle messages of unknown type.
@@ -91,6 +42,9 @@ type
   /// and is responsible for their deallocation.
   /// </remarks>
   TProtobufMessage = class(TInterfacedPersistent, IProtobufMessage, IProtobufMessageInternal)
+
+    // TODO do this like for JSON, create an own unit for TEncodedFieldsMap and do not pass the container into the inner decode methods. Maybe in uProtobufWireFormat?
+
     public
       /// <summary>
       /// Collection of all fields in a Protobuf message that are yet to be decoded (<i>unparsed</i>).
@@ -98,16 +52,17 @@ type
       /// </summary>
       type TEncodedFieldsMap = TDictionary<TProtobufFieldNumber, TObjectList<TProtobufEncodedField>>;
 
+    protected
+      /// <summary>
+      /// Unparsed fields in this message. See <see cref="TEncodedFieldsMap"/> for details.
+      /// </summary>
+      FUnparsedFields: TEncodedFieldsMap;
+
     private
       /// <summary>
       /// Owner of the message, which is responsible for freeing it. This might be a containing message or field value collection.
       /// </summary>
       FOwner: TPersistent;
-
-      /// <summary>
-      /// Unparsed fields in this message. See <see cref="TEncodedFieldsMap"/> for details.
-      /// </summary>
-      FUnparsedFields: TEncodedFieldsMap;
 
     public
       /// <summary>
@@ -193,18 +148,6 @@ type
       /// See remarks on <see cref="Decode">.
       /// </remarks>
       procedure DecodeDelimited(aSource: TStream);
-
-      /// <summary>
-      /// Encodes the message as a JSON object using the ProtoJSON format and writes the key-value pairs to a <see cref="TJSONCollectionBuilder.TPairs"/>.
-      /// </summary>
-      /// <param name="aPairs">The <see cref="TJSONCollectionBuilder.TPairs"/> that the encoded message's key-value pairs are written to</param>
-      procedure EncodeJson(aPairs: TJSONCollectionBuilder.TPairs); overload; virtual;
-
-      /// <summary>
-      /// Encodes the message as a JSON object using the ProtoJSON format and writes it to a <see cref="TJsonObjectBuilder"/>.
-      /// </summary>
-      /// <param name="aBuilder">The <see cref="TJsonObjectBuilder"/> that the encoded message is written to</param>
-      procedure EncodeJson(aBuilder: TJSONObjectBuilder); overload;
 
       /// <summary>
       /// Fills the message's protobuf fields by decoding the message from a JSON value, using the ProtoJSON format.

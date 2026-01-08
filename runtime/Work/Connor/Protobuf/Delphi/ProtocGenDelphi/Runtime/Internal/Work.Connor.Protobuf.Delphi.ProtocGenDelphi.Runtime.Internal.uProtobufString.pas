@@ -15,12 +15,11 @@
 /// limitations under the License.
 
 /// <summary>
-/// Runtime-internal support for the protobuf type <c>string</c>.
+/// Runtime support for the Protobuf scalar value type <c>string</c>.
 /// </summary>
-/// <remarks>
-/// Generated code needs to reference this unit in order to operate on protobuf field values of this type.
-/// </remarks>
 unit Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufString;
+
+{$INCLUDE Work.Connor.Delphi.CompilerFeatures.inc}
 
 {$IFDEF FPC}
   {$MODE DELPHI}
@@ -29,75 +28,62 @@ unit Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufStrin
 interface
 
 uses
-  // Runtime-internal support for the protobuf binary wire format
-  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uIProtobufWireCodec,
-  // To implement TProtobufDelimitedWireCodec<UnicodeString>
-  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufDelimitedWireCodec,
-  // TBytes for TProtobufDelimitedWireCodec<UnicodeString> implementation
 {$IFDEF WORK_CONNOR_DELPHI_COMPILER_UNIT_SCOPE_NAMES}
-  System.SysUtils;
+  System.Classes,
 {$ELSE}
-  SysUtils;
+  Classes,
 {$ENDIF}
+{$IFDEF WORK_CONNOR_DELPHI_COMPILER_UNIT_SCOPE_NAMES}
+  System.SysUtils,
+{$ELSE}
+  SysUtils,
+{$ENDIF}
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.uProtobuf,
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufWireFormat;
 
-var
-  /// <summary>
-  /// <i>Field codec</i> for <c>protoc-gen-delphi</c> that defines the encoding/decoding of
-  /// protobuf fields of type <c>string</c> from/to the protobuf binary wire format.
-  /// </summary>
-  gProtobufWireCodecString: IProtobufWireCodec<UnicodeString>;
+// TODO
+procedure EncodeProtobufStringField(aDest: TStream; aFieldNumber: TProtobufFieldNumber; aValue: UnicodeString);
 
-type
-  /// <summary>
-  /// Runtime library implementation of <see cref="T:IProtobufWireCodec"/> for the protobuf type <c>string</c>.
-  /// </summary>
-  TProtobufStringWireCodec = class(TProtobufDelimitedWireCodec<UnicodeString>)
-    // TProtobufDelimitedWireCodec<UnicodeString> implementation
+// TODO
+function DecodeProtobufStringField(aSource: TStream; aWireType: TProtobufWireType; aRemainingLength: PUInt32): UnicodeString;
 
-    public
-      function FromBytes(aValue: TBytes): UnicodeString; override;
-      function ToBytes(aValue: UnicodeString): TBytes; override;
-
-    // TProtobufWireCodec<UnicodeString> implementation
-    
-    public
-      function GetDefault: UnicodeString; override;
-      function IsDefault(aValue: UnicodeString): Boolean; override;
-  end;
+// TODO
+function CalculateProtobufStringFieldSize(aFieldNumber: TProtobufFieldNumber; aValue: UnicodeString): UInt32;
 
 implementation
 
-uses
-  // For protobuf default values
-  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.uProtobuf;
-
-// TProtobufDelimitedWireCodec<UnicodeString> implementation
-
-function TProtobufStringWireCodec.FromBytes(aValue: TBytes): UnicodeString;
+// TODO support explicit presence?
+procedure EncodeProtobufStringField(aDest: TStream; aFieldNumber: TProtobufFieldNumber; aValue: UnicodeString);
+var
+  lBytes: TBytes;
 begin
-  result := TEncoding.UTF8.GetString(aValue);
+  if (aValue = PROTOBUF_DEFAULT_VALUE_STRING) then Exit;
+  TProtobufTag.WithData(aFieldNumber, TProtobufWireType.Len).Encode(aDest);
+  lBytes := TEncoding.UTF8.GetBytes(aValue);
+  EncodeProtobufVarint(aDest, Length(lBytes));
+  aDest.WriteBuffer(lBytes[0], Length(lBytes));
 end;
 
-function TProtobufStringWireCodec.ToBytes(aValue: UnicodeString): TBytes;
+function DecodeProtobufStringField(aSource: TStream; aWireType: TProtobufWireType; aRemainingLength: PUInt32): UnicodeString;
+var
+  lLength: UInt32;
+  lBytes: TBytes;
 begin
-  result := TEncoding.UTF8.GetBytes(aValue);
+  if (aWireType <> TProtobufWireType.Len) then raise EProtobufSchemaViolation.Create('Protobuf bytes field has unexpected wire type: ' + IntToStr(Ord(aWireType)));
+  // TODO check range?
+  lLength := DecodeProtobufVarint(aSource, aRemainingLength);
+  SetLength(lBytes, lLength);
+  if ((aRemainingLength <> nil) and (aRemainingLength^ < lLength)) then raise EProtobufFormatViolation.Create('TODO');
+  aSource.ReadBuffer(lBytes[0], lLength);
+  if (aRemainingLength <> nil) then aRemainingLength^ := aRemainingLength^ - lLength;
+  result := TEncoding.UTF8.GetString(lBytes);
 end;
 
-// TProtobufWireCodec<UnicodeString> implementation
-
-function TProtobufStringWireCodec.GetDefault: UnicodeString;
+// TODO support explicit presence?
+function CalculateProtobufStringFieldSize(aFieldNumber: TProtobufFieldNumber; aValue: UnicodeString): UInt32;
 begin
-  result := PROTOBUF_DEFAULT_VALUE_STRING;
-end;
-
-function TProtobufStringWireCodec.IsDefault(aValue: UnicodeString): Boolean;
-begin
-  result := aValue = GetDefault;
-end;
-
-initialization
-begin
-  gProtobufWireCodecString := TProtobufStringWireCodec.Create;
+  if (aValue = PROTOBUF_DEFAULT_VALUE_STRING) then Exit(0);
+  result := TProtobufTag.WithData(aFieldNumber, TProtobufWireType.Len).CalculateSize + CalculateProtobufVarintSize(Length(aValue) * SizeOf(Char)) + Length(aValue) * SizeOf(Char);
 end;
 
 end.

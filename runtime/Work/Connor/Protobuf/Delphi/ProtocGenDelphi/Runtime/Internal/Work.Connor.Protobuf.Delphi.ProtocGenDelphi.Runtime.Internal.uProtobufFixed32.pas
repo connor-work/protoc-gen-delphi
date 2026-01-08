@@ -15,12 +15,11 @@
 /// limitations under the License.
 
 /// <summary>
-/// Runtime-internal support for the protobuf type <c>fixed32</c>.
+/// Runtime support for the Protobuf scalar value type <c>fixed32</c>.
 /// </summary>
-/// <remarks>
-/// Generated code needs to reference this unit in order to operate on protobuf field values of this type.
-/// </remarks>
 unit Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufFixed32;
+
+{$INCLUDE Work.Connor.Delphi.CompilerFeatures.inc}
 
 {$IFDEF FPC}
   {$MODE DELPHI}
@@ -29,83 +28,65 @@ unit Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufFixed
 interface
 
 uses
-  // Runtime-internal support for the protobuf binary wire format
-  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uIProtobufWireCodec,
-  // To implement TProtobufFixedWidthWireCodec<UInt32>
-  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufFixedWidthWireCodec,
-  // For wire type
-  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufTag,
-  // TStream for encoding of messages
 {$IFDEF WORK_CONNOR_DELPHI_COMPILER_UNIT_SCOPE_NAMES}
-  System.Classes;
+  System.Classes,
 {$ELSE}
-  Classes;
+  Classes,
 {$ENDIF}
+{$IFDEF WORK_CONNOR_DELPHI_COMPILER_UNIT_SCOPE_NAMES}
+  System.SysUtils,
+{$ELSE}
+  SysUtils,
+{$ENDIF}
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.uProtobuf,
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufWireFormat;
 
-var
-  /// <summary>
-  /// <i>Field codec</i> for <c>protoc-gen-delphi</c> that defines the encoding/decoding of
-  /// protobuf fields of type <c>fixed32</c> from/to the protobuf binary wire format.
-  /// </summary>
-  gProtobufWireCodecFixed32: IProtobufWireCodec<UInt32>;
+// TODO
+procedure EncodeProtobufFixed32(aDest: TStream; aValue: UInt32);
 
-type
-  /// <summary>
-  /// Runtime library implementation of <see cref="T:IProtobufWireCodec"/> for the protobuf type <c>fixed32</c>.
-  /// </summary>
-  TProtobufFixed32WireCodec = class(TProtobufFixedWidthWireCodec<UInt32>)
-    // TProtobufFixedWidthWireCodec<UInt32> implementation
+// TODO
+procedure EncodeProtobufFixed32Field(aDest: TStream; aFieldNumber: TProtobufFieldNumber; aValue: UInt32);
 
-    public
-      function GetWireType: TProtobufWireType; override;
-      function DecodeValue(aSource: TStream): UInt32; override;
-      procedure EncodeValue(aValue: UInt32; aDest: TStream); override;
+// TODO
+function DecodeProtobufFixed32(aSource: TStream; aRemainingLength: PUInt32): UInt32;
 
-    // TProtobufWireCodec<UInt32> implementation
-    
-    public
-      function GetDefault: UInt32; override;
-      function IsDefault(aValue: UInt32): Boolean; override;
-  end;
+// TODO
+function DecodeProtobufFixed32Field(aSource: TStream; aWireType: TProtobufWireType; aRemainingLength: PUInt32): UInt32;
+
+// TODO
+function CalculateProtobufFixed32FieldSize(aFieldNumber: TProtobufFieldNumber; aValue: UInt32): UInt32;
 
 implementation
 
-uses
-  // For protobuf default values
-  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.uProtobuf;
-
-// TProtobufFixedWidthWireCodec<UInt32> implementation
-
-function TProtobufFixed32WireCodec.GetWireType: TProtobufWireType;
+procedure EncodeProtobufFixed32(aDest: TStream; aValue: UInt32);
 begin
-  result := wt32Bit;
+  EncodeProtobufI32(aDest, aValue);
 end;
 
-function TProtobufFixed32WireCodec.DecodeValue(aSource: TStream): UInt32;
+// TODO support explicit presence?
+procedure EncodeProtobufFixed32Field(aDest: TStream; aFieldNumber: TProtobufFieldNumber; aValue: UInt32);
 begin
-  aSource.Read(result, SizeOf(result));
+  if (aValue = PROTOBUF_DEFAULT_VALUE_FIXED32) then Exit;
+  TProtobufTag.WithData(aFieldNumber, TProtobufWireType.I32).Encode(aDest);
+  EncodeProtobufFixed32(aDest, aValue);
 end;
 
-procedure TProtobufFixed32WireCodec.EncodeValue(aValue: UInt32; aDest: TStream);
+function DecodeProtobufFixed32(aSource: TStream; aRemainingLength: PUInt32): UInt32;
 begin
-  aDest.Write(aValue, SizeOf(aValue));
+  result := DecodeProtobufI32(aSource, aRemainingLength);
 end;
 
-// TProtobufWireCodec<UInt32> implementation
-
-function TProtobufFixed32WireCodec.GetDefault: UInt32;
+function DecodeProtobufFixed32Field(aSource: TStream; aWireType: TProtobufWireType; aRemainingLength: PUInt32): UInt32;
 begin
-  result := PROTOBUF_DEFAULT_VALUE_FIXED32;
+  if (aWireType <> TProtobufWireType.I32) then raise EProtobufSchemaViolation.Create('Protobuf fixed32 field has unexpected wire type: ' + IntToStr(Ord(aWireType)));
+  result := DecodeProtobufFixed32(aSource, aRemainingLength);
 end;
 
-function TProtobufFixed32WireCodec.IsDefault(aValue: UInt32): Boolean;
+// TODO support explicit presence?
+function CalculateProtobufFixed32FieldSize(aFieldNumber: TProtobufFieldNumber; aValue: UInt32): UInt32;
 begin
-  result := aValue = GetDefault;
-end;
-
-initialization
-begin
-  gProtobufWireCodecFixed32 := TProtobufFixed32WireCodec.Create;
+  if (aValue = PROTOBUF_DEFAULT_VALUE_FIXED32) then Exit(0);
+  result := TProtobufTag.WithData(aFieldNumber, TProtobufWireType.I32).CalculateSize + SizeOf(aValue);
 end;
 
 end.

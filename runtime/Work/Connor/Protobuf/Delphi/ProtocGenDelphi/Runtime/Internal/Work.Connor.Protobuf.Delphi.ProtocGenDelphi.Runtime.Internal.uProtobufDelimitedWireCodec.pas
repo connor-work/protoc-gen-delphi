@@ -129,7 +129,7 @@ begin
   lContainer.UnparsedFields.TryGetValue(aField, lFields);
   if (Assigned(lFields)) then
   begin
-    // https://developers.google.com/protocol-buffers/docs/encoding#optional:
+    // https://protobuf.dev/programming-guides/encoding/#last-one-wins:
     // For numeric types and strings, if the same field appears multiple times, the parser accepts the last value it sees.
     for lField in lFields do
     begin

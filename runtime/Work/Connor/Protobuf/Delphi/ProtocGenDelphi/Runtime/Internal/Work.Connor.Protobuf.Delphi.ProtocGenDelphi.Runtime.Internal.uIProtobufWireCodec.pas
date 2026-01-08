@@ -63,7 +63,7 @@ type
     /// <summary>
     /// Decodes a previously unknown protobuf singular field of a message, using the protobuf binary wire format.
     /// The field is then no longer considered unknown.
-    /// If the field is present multiple times, the last value is used, see https://developers.google.com/protocol-buffers/docs/encoding#optional.
+    /// If the field is present multiple times, the last value is used, see https://protobuf.dev/programming-guides/encoding/#last-one-wins.
     /// If the field is absent, the default value for the protobuf type is returned.
     /// </summary>
     /// <param name="aContainer">Protobuf message containing the field</param>
