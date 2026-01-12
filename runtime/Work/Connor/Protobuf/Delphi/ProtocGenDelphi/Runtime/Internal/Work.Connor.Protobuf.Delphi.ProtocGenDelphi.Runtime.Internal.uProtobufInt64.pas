@@ -56,6 +56,15 @@ function DecodeProtobufInt64Field(aSource: TStream; aWireType: TProtobufWireType
 // TODO
 function CalculateProtobufInt64FieldSize(aFieldNumber: TProtobufFieldNumber; aValue: Int64): UInt32;
 
+// TODO
+function EncodeJsonProtobufInt64(aValue: Int64): TJSONNumber;
+
+// TODO
+procedure EncodeJsonProtobufInt64Field(aDest: TJSONCollectionBuilder.TPairs; aFieldJsonName: UnicodeString; aValue: Int64);
+
+// TODO
+function DecodeJsonProtobufInt64(aSource: TJSONValue): Int64;
+
 implementation
 
 procedure EncodeProtobufInt64(aDest: TStream; aValue: Int64);
@@ -90,6 +99,27 @@ begin
   if (aValue = PROTOBUF_DEFAULT_VALUE_INT64) then Exit(0);
   // TODO correct sign handling?
   result := TProtobufTag.WithData(aFieldNumber, TProtobufWireType.Varint).CalculateSize + CalculateProtobufVarintSize(UInt64(aValue));
+end;
+
+function EncodeJsonProtobufInt64(aValue: Int64): TJSONNumber;
+begin
+  result := TJSONNumber.Create(aValue);
+end;
+
+// TODO support explicit presence?
+// TODO JSON option to emit default value?
+procedure EncodeJsonProtobufInt64Field(aDest: TJSONCollectionBuilder.TPairs; aFieldJsonName: UnicodeString; aValue: Int64);
+begin
+  if (aValue = PROTOBUF_DEFAULT_VALUE_INT64) then Exit;
+  aDest.Add(aFieldJsonName, EncodeJsonProtobufInt64(aValue));
+end;
+
+function DecodeJsonProtobufInt64(aSource: TJSONValue): Int64;
+begin
+  if (not (aSource is TJSONString)) then raise EProtobufSchemaViolation.Create('Protobuf int64 JSON field has unexpected type: ' + aSource.ClassName);
+  lSource := aSource as TJSONString;
+  // TODO support exponent notation
+  result := aSource.Value.ToInt64;
 end;
 
 end.

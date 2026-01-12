@@ -365,15 +365,15 @@ begin
   end;
 end;
 
-procedure TProtobufMessage.EncodeJson(aPairs: TJSONCollectionBuilder.TPairs);
+procedure TProtobufMessage.EncodeJson(aDest: TJSONCollectionBuilder.TPairs);
 begin
 end;
 
-procedure TProtobufMessage.EncodeJson(aBuilder: TJSONObjectBuilder);
+procedure TProtobufMessage.EncodeJson(aDest: TJSONObjectBuilder);
 var
   lPairs: TJSONCollectionBuilder.TPairs;
 begin
-  lPairs := aBuilder.BeginObject;
+  lPairs := aDest.BeginObject;
   EncodeJson(lPairs);
 end;
 

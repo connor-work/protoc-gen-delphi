@@ -69,8 +69,8 @@ type
     /// <summary>
     /// Encodes the message as a JSON object using the ProtoJSON format and writes the key-value pairs to a <see cref="TJSONCollectionBuilder.TPairs"/>.
     /// </summary>
-    /// <param name="aPairs">The <see cref="TJSONCollectionBuilder.TPairs"/> that the encoded message's key-value pairs are written to</param>
-    procedure EncodeJson(aPairs: TJSONCollectionBuilder.TPairs); override; final;
+    /// <param name="aDest">The <see cref="TJSONCollectionBuilder.TPairs"/> that the encoded message's key-value pairs are written to</param>
+    procedure EncodeJson(aDest: TJSONCollectionBuilder.TPairs); override; final;
 
     // TODO
     function MergeFieldFromJson(aSource: TJSONPair): Boolean; override; final;
@@ -217,8 +217,8 @@ type
       /// <summary>
       /// Encodes the message as a JSON object using the ProtoJSON format and writes the key-value pairs to a <see cref="TJSONCollectionBuilder.TPairs"/>.
       /// </summary>
-      /// <param name="aPairs">The <see cref="TJSONCollectionBuilder.TPairs"/> that the encoded message's key-value pairs are written to</param>
-      procedure EncodeJson(aPairs: TJSONCollectionBuilder.TPairs); override; final;
+      /// <param name="aDest">The <see cref="TJSONCollectionBuilder.TPairs"/> that the encoded message's key-value pairs are written to</param>
+      procedure EncodeJson(aDest: TJSONCollectionBuilder.TPairs); override; final;
 
       // TODO
       function MergeFieldFromJson(aSource: TJSONPair): Boolean; override; final;
@@ -258,7 +258,7 @@ begin
   result := PROTOBUF_TYPE_URL;
 end;
 
-procedure TMessageY.EncodeJson(aPairs: TJSONCollectionBuilder.TPairs);
+procedure TMessageY.EncodeJson(aDest: TJSONCollectionBuilder.TPairs);
 begin
 end;
 
@@ -343,24 +343,22 @@ begin
   result := PROTOBUF_TYPE_URL;
 end;
 
-procedure TMessageX.EncodeJson(aPairs: TJSONCollectionBuilder.TPairs);
+procedure TMessageX.EncodeJson(aDest: TJSONCollectionBuilder.TPairs);
 begin
-  // TODO encode FFieldX
-  // TODO encode FFieldY
-  // TODO encode FFieldZ
+  EncodeJsonProtobufUint32Field(aDest, PROTOBUF_FIELD_JSON_NAME_FIELD_X, FFieldX);
+  EncodeJsonProtobufMessageField(aDest, PROTOBUF_FIELD_JSON_NAME_FIELD_Y, FFieldY);
+//  EncodeJsonProtobufRepeatedUint32Field(aDest, PROTOBUF_FIELD_JSON_NAME_FIELD_Z, FFieldZ);
 end;
 
 function TMessageX.MergeFieldFromJson(aSource: TJSONPair): Boolean;
 begin
-  // TODO is this the correct merge behavior?
-  if ((aSource.JsonString.Value = PROTOBUF_FIELD_NAME_FIELD_X) or (aSource.JSONString.Value = PROTOBUF_FIELD_JSON_NAME_FIELD_X)) then
-  begin
-    // TODO DecodeProtobufJsonUint32(aSource.JSONValue) in uProtoJsonFormat
-  end
+  if ((aSource.JsonString.Value = PROTOBUF_FIELD_NAME_FIELD_X) or (aSource.JSONString.Value = PROTOBUF_FIELD_JSON_NAME_FIELD_X)) then FFieldX := DecodeJsonProtobufUint32(aSource.JSONValue);
   else if ((aSource.JsonString.Value = PROTOBUF_FIELD_NAME_FIELD_Y) or (aSource.JSONString.Value = PROTOBUF_FIELD_JSON_NAME_FIELD_Y)) then
   begin
-    // TODO
-  end
+    FFieldY.Free;
+    FFieldY := TMessageY.Create;
+    FFieldY.DecodeJson(aSource.JSONValue);
+  end;
 //  else if ((aSource.JsonString.Value = PROTOBUF_FIELD_NAME_FIELD_Z) or (aSource.JSONString.Value = PROTOBUF_FIELD_JSON_NAME_FIELD_Z)) then
 //  begin
 //    // TODO

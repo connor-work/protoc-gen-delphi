@@ -56,14 +56,14 @@ type
     /// <summary>
     /// Encodes the message as a JSON object using the ProtoJSON format and writes the key-value pairs to a <see cref="TJSONCollectionBuilder.TPairs"/>.
     /// </summary>
-    /// <param name="aPairs">The <see cref="TJSONCollectionBuilder.TPairs"/> that the encoded message's key-value pairs are written to</param>
-    procedure EncodeJson(aPairs: TJSONCollectionBuilder.TPairs); overload;
+    /// <param name="aDest">The <see cref="TJSONCollectionBuilder.TPairs"/> that the encoded message's key-value pairs are written to</param>
+    procedure EncodeJson(aDest: TJSONCollectionBuilder.TPairs); overload;
 
     /// <summary>
     /// Encodes the message as a JSON object using the ProtoJSON format and writes it to a <see cref="TJSONObjectBuilder"/>.
     /// </summary>
-    /// <param name="aBuilder">The <see cref="TJSONObjectBuilder"/> that the encoded message is written to</param>
-    procedure EncodeJson(aBuilder: TJSONObjectBuilder); overload;
+    /// <param name="aDest">The <see cref="TJSONObjectBuilder"/> that the encoded message is written to</param>
+    procedure EncodeJson(aDest: TJSONObjectBuilder); overload;
 
     /// <summary>
     /// Fills the message's Protobuf fields by decoding the message from a JSON object, using the ProtoJSON format.

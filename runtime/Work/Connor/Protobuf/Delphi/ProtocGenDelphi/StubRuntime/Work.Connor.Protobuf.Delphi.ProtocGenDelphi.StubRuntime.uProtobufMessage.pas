@@ -151,10 +151,10 @@ type
 
       // TODO comment
       // TODO virtual only for well-known types
-      procedure EncodeJson(aPairs: TJSONCollectionBuilder.TPairs); overload; virtual;
+      procedure EncodeJson(aDest: TJSONCollectionBuilder.TPairs); overload; virtual;
 
       // TODO comment
-      procedure EncodeJson(aBuilder: TJSONObjectBuilder); overload;
+      procedure EncodeJson(aDest: TJSONObjectBuilder); overload;
 
       // TODO comment
       // TODO virtual only for well-known types
@@ -283,12 +283,12 @@ begin
   raise NotImplementedInStub;
 end;
 
-procedure TProtobufMessage.EncodeJson(aPairs: TJSONCollectionBuilder.TPairs);
+procedure TProtobufMessage.EncodeJson(aDest: TJSONCollectionBuilder.TPairs);
 begin
   raise NotImplementedInStub;
 end;
 
-procedure TProtobufMessage.EncodeJson(aBuilder: TJSONObjectBuilder);
+procedure TProtobufMessage.EncodeJson(aDest: TJSONObjectBuilder);
 begin
   raise NotImplementedInStub;
 end;

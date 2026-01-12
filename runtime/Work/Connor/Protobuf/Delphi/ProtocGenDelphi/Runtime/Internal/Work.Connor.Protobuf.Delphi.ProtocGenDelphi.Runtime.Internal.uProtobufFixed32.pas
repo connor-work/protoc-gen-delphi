@@ -56,6 +56,15 @@ function DecodeProtobufFixed32Field(aSource: TStream; aWireType: TProtobufWireTy
 // TODO
 function CalculateProtobufFixed32FieldSize(aFieldNumber: TProtobufFieldNumber; aValue: UInt32): UInt32;
 
+// TODO
+function EncodeJsonProtobufFixed32(aValue: UInt32): TJSONNumber;
+
+// TODO
+procedure EncodeJsonProtobufFixed32Field(aDest: TJSONCollectionBuilder.TPairs; aFieldJsonName: UnicodeString; aValue: UInt32);
+
+// TODO
+function DecodeJsonProtobufFixed32(aSource: TJSONValue): UInt32;
+
 implementation
 
 procedure EncodeProtobufFixed32(aDest: TStream; aValue: UInt32);
@@ -87,6 +96,28 @@ function CalculateProtobufFixed32FieldSize(aFieldNumber: TProtobufFieldNumber; a
 begin
   if (aValue = PROTOBUF_DEFAULT_VALUE_FIXED32) then Exit(0);
   result := TProtobufTag.WithData(aFieldNumber, TProtobufWireType.I32).CalculateSize + SizeOf(aValue);
+end;
+
+function EncodeJsonProtobufFixed32(aValue: UInt32): TJSONNumber;
+begin
+  result := TJSONNumber.Create(Int64(aValue));
+end;
+
+// TODO support explicit presence?
+// TODO JSON option to emit default value?
+procedure EncodeJsonProtobufFixed32Field(aDest: TJSONCollectionBuilder.TPairs; aFieldJsonName: UnicodeString; aValue: UInt32);
+begin
+  if (aValue = PROTOBUF_DEFAULT_VALUE_FIXED32) then Exit;
+  aDest.Add(aFieldJsonName, EncodeJsonProtobufFixed32(aValue));
+end;
+
+function DecodeJsonProtobufFixed32(aSource: TJSONValue): UInt32;
+begin
+  if (not (aSource is TJSONString)) then raise EProtobufSchemaViolation.Create('Protobuf fixed32 JSON field has unexpected type: ' + aSource.ClassName);
+  lSource := aSource as TJSONString;
+  // TODO support exponent notation
+  // TODO check range?
+  result := UInt32(aSource.Value.ToInt64);
 end;
 
 end.

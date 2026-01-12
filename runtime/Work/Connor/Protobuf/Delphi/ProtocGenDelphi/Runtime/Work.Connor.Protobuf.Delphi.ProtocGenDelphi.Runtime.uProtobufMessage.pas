@@ -197,14 +197,14 @@ type
       /// <summary>
       /// Encodes the message as a JSON object using the ProtoJSON format and writes the key-value pairs to a <see cref="TJSONCollectionBuilder.TPairs"/>.
       /// </summary>
-      /// <param name="aPairs">The <see cref="TJSONCollectionBuilder.TPairs"/> that the encoded message's key-value pairs are written to</param>
-      procedure EncodeJson(aPairs: TJSONCollectionBuilder.TPairs); overload; virtual;
+      /// <param name="aDest">The <see cref="TJSONCollectionBuilder.TPairs"/> that the encoded message's key-value pairs are written to</param>
+      procedure EncodeJson(aDest: TJSONCollectionBuilder.TPairs); overload; virtual;
 
       /// <summary>
       /// Encodes the message as a JSON object using the ProtoJSON format and writes it to a <see cref="TJsonObjectBuilder"/>.
       /// </summary>
-      /// <param name="aBuilder">The <see cref="TJsonObjectBuilder"/> that the encoded message is written to</param>
-      procedure EncodeJson(aBuilder: TJSONObjectBuilder); overload;
+      /// <param name="aDest">The <see cref="TJsonObjectBuilder"/> that the encoded message is written to</param>
+      procedure EncodeJson(aDest: TJSONObjectBuilder); overload;
 
       /// <summary>
       /// Fills the message's protobuf fields by decoding the message from a JSON value, using the ProtoJSON format.
@@ -422,15 +422,15 @@ begin
   end;
 end;
 
-procedure TProtobufMessage.EncodeJson(aPairs: TJSONCollectionBuilder.TPairs);
+procedure TProtobufMessage.EncodeJson(aDest: TJSONCollectionBuilder.TPairs);
 begin
 end;
 
-procedure TProtobufMessage.EncodeJson(aBuilder: TJSONObjectBuilder);
+procedure TProtobufMessage.EncodeJson(aDest: TJSONObjectBuilder);
 var
   lPairs: TJSONCollectionBuilder.TPairs;
 begin
-  lPairs := aBuilder.BeginObject;
+  lPairs := aDest.BeginObject;
   EncodeJson(lPairs);
 end;
 
