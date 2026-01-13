@@ -32,11 +32,6 @@ uses
   Classes,
 {$ENDIF}
 {$IFDEF WORK_CONNOR_DELPHI_COMPILER_UNIT_SCOPE_NAMES}
-  System.Generics.Collections,
-{$ELSE}
-  Generics.Collections,
-{$ENDIF}
-{$IFDEF WORK_CONNOR_DELPHI_COMPILER_UNIT_SCOPE_NAMES}
   System.JSON,
 {$ELSE}
   JSON,
@@ -48,7 +43,6 @@ uses
 {$ENDIF}
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.uProtobuf,
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uIProtobufWellKnownTypeMessage,
-  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufFixed32,
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufMessageBase,
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufWireFormat;
 
@@ -58,7 +52,7 @@ type
   /// Represents a point in time independent of any time zone or calendar, represented as seconds and fractions of seconds at nanosecond resolution in UTC Epoch time.
   /// </summary>
   /// <remarks>
-  /// TODO
+  /// TODO contract
   /// The message instance carries transitive ownership of embedded objects in protobuf field values,
   /// and is responsible for their deallocation.
   /// </remarks>
@@ -74,13 +68,13 @@ type
       /// </summary>
       FSubMilliNanoseconds: UInt32;
 
-      // TODO
+      // TODO contract
       procedure SetRtlTimestamp(aValue: System.SysUtils.TTimestamp);
 
-      // TODO
+      // TODO contract
       function GetDateTime: TDateTime;
 
-      // TODO
+      // TODO contract
       procedure SetDateTime(aValue: TDateTime);
 
     public
@@ -110,7 +104,7 @@ type
         /// </summary>
         PROTOBUF_FIELD_NAME_NANOS = 'nanos';
 
-      // TODO
+      // TODO contract
       property RtlTimestamp: System.SysUtils.TTimestamp read FRtlTimestamp write SetRtlTimestamp;
 
       /// <summary>
@@ -118,27 +112,27 @@ type
       /// </summary>
       property SubMilliNanoseconds: UInt32 read FSubMilliNanoseconds write FSubMilliNanoseconds;
 
-      // TODO
+      // TODO contract
       property DateTime: TDateTime read GetDateTime write SetDateTime;
 
     // TProtobufMessageBase implementation
     public
-      // TODO
+      // TODO contract
       function AssignOwnFields(aSource: TProtobufMessageBase): Boolean; override; final;
 
-      // TODO
+      // TODO contract
       procedure ClearOwnFields; override; final;
 
-      // TODO
+      // TODO contract
       procedure EncodeOwnFields(aDest: TStream); override; final;
 
-      // TODO
+      // TODO contract
       procedure MergeFieldFrom(aSource: TStream; aTag: TProtobufTag; aRemainingLength: PUInt32); override; final;
 
-      // TODO
+      // TODO contract
       function CalculateOwnFieldsSize: UInt32; override; final;
 
-      // TODO
+      // TODO contract
       function GetTypeUrl: TProtobufTypeUrl; override; final;
 
       /// <summary>
@@ -182,9 +176,9 @@ function TTimestamp.AssignOwnFields(aSource: TProtobufMessageBase): Boolean;
 var
   lSource: TTimestamp;
 begin
-  if (not (aSource is TTimestamp)) then Exit(False);
+  lSource := aSource as TTimestamp;
+  if (not Assigned(lSource)) then Exit(False);
   result := True;
-  lSource := TTimestamp(aSource);
   FRtlTimestamp := lSource.FRtlTimestamp;
   FSubMilliNanoseconds := lSource.FSubMilliNanoseconds;
 end;
@@ -196,7 +190,7 @@ end;
 
 procedure TTimestamp.EncodeOwnFields(aDest: TStream);
 begin
-  // TODO
+  // TODO implementation
 end;
 
 procedure TTimestamp.MergeFieldFrom(aSource: TStream; aTag: TProtobufTag; aRemainingLength: PUInt32);
@@ -205,11 +199,11 @@ begin
   case aTag.FieldNumber of
     PROTOBUF_FIELD_NUMBER_SECONDS:
     begin
-      // TODO
+      // TODO implementation
     end;
     PROTOBUF_FIELD_NUMBER_NANOS:
     begin
-      // TODO
+      // TODO implementation
     end;
     else MergeUnknownFieldFrom(aSource, aTag, aRemainingLength);
   end;
@@ -217,7 +211,7 @@ end;
 
 function TTimestamp.CalculateOwnFieldsSize: UInt32;
 begin
-  // TODO
+  // TODO implementation
 end;
 
 function TTimestamp.GetTypeUrl: TProtobufTypeUrl;
@@ -227,12 +221,12 @@ end;
 
 function TTimestamp.EncodeJson: TJSONValue;
 begin
-  // TODO
+  // TODO implementation
 end;
 
 procedure TTimestamp.DecodeJson(aSource: TJSONValue);
 begin
-  // TODO
+  // TODO implementation
 end;
 
 end.

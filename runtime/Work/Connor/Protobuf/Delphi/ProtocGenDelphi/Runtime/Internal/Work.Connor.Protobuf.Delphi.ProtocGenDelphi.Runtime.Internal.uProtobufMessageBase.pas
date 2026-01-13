@@ -48,17 +48,15 @@ uses
 {$ENDIF}
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.uProtobuf,
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uIProtobufMessage,
-  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uIProtobufWellKnownTypeMessage,
-  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufBytes,
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufFixed32,
-  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufString,
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufWireFormat;
 
 type
-  // TODO
+  // TODO contract
   TProtobufMessageBase = class abstract(TInterfacedPersistent, IProtobufMessage)
     private
       /// <summary>
+      /// TODO contract
       /// TODO absent if no unknown fields
       /// </summary>
       FUnknownFields: TProtobufEncodedFieldsMap;
@@ -66,26 +64,26 @@ type
     protected
       // TODO free own fields? (nested messages, repeated fields) create own fields? (repeated fields)
 
-      // TODO
+      // TODO contract
       function AssignOwnFields(aSource: TProtobufMessageBase): Boolean; virtual; abstract;
 
-      // TODO
+      // TODO contract
       procedure ClearOwnFields; virtual; abstract;
 
-      // TODO
+      // TODO contract
       procedure EncodeOwnFields(aDest: TStream); virtual; abstract;
 
-      // TODO
+      // TODO contract
       procedure MergeFieldFrom(aSource: TStream; aTag: TProtobufTag; aRemainingLength: PUInt32); virtual; abstract;
 
-      // TODO
+      // TODO contract
       procedure MergeUnknownFieldFrom(aSource: TStream; aTag: TProtobufTag; aRemainingLength: PUInt32);
 
-      // TODO
+      // TODO contract
       function CalculateOwnFieldsSize: UInt32; virtual; abstract;
 
     public
-      // TODO
+      // TODO contract
       destructor Destroy; override;
 
     // TPersistent implementation
@@ -168,7 +166,7 @@ type
       /// </remarks>
       procedure DecodeDelimited(aSource: TStream);
 
-      /// TODO
+      // TODO contract
       procedure MergeFrom(aSource: TStream; aRemainingLength: PUInt32);
 
       /// <summary>
@@ -177,7 +175,7 @@ type
       /// <returns>The number of bytes that encode the message</return>
       function CalculateSize: UInt32;
 
-      // TODO
+      // TODO contract
       function GetTypeUrl: TProtobufTypeUrl; virtual; abstract;
 
       /// <summary>
@@ -212,7 +210,7 @@ begin
   if (not Assigned(FUnknownFields)) then FUnknownFields := TProtobufEncodedFieldsMap.Create([doOwnsValues]);
   lUnknownField := TProtobufEncodedField.Create;
   lUnknownField.DecodePayload(aSource, aTag, aRemainingLength);
-  if (not FUnknownFields.ContainsKey(aTag.FieldNumber)) then FUnknownFields[aTag.FieldNumber] := TObjectList<TProtobufEncodedField>.Create;
+  if (not FUnknownFields.ContainsKey(aTag.FieldNumber)) then FUnknownFields.Add(aTag.FieldNumber, TObjectList<TProtobufEncodedField>.Create);
   FUnknownFields[aTag.FieldNumber].Add(lUnknownField);
 end;
 
@@ -225,12 +223,12 @@ var
   lSourceUnknownFieldRecord: TProtobufEncodedField;
   lUnknownFieldRecord: TProtobufEncodedField;
 begin
-  if (not (aSource is TProtobufMessageBase)) then
+  lSource := aSource as TProtobufMessageBase;
+  if (not Assigned(lSource)) then
   begin
     inherited;
     Exit;
   end;
-  lSource := TProtobufMessageBase(aSource);
   if (not AssignOwnFields(lSource)) then begin
     inherited;
     Exit;
@@ -248,7 +246,7 @@ begin
         lUnknownFieldRecord.Assign(lSourceUnknownFieldRecord);
         lUnknownFieldRecords.Add(lUnknownFieldRecord);
       end;
-      FUnknownFields[lSourceUnknownField.Key] := lUnknownFieldRecords;
+      FUnknownFields.Add(lSourceUnknownField.Key, lUnknownFieldRecords);
     end;
   end
   else FUnknownFields := nil;

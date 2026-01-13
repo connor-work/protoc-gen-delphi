@@ -54,7 +54,7 @@ type
   /// </summary>
   TProtobufEnumFieldValue = System.Int32;
 
-  // TODO
+  // TODO contract
   TProtobufTypeUrl = UnicodeString;
 
   /// <summary>

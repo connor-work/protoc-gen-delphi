@@ -12,7 +12,7 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
-// TODO
+// TODO contract
 unit Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uTypeRegistry;
 
 {$INCLUDE Work.Connor.Delphi.CompilerFeatures.inc}
@@ -43,35 +43,35 @@ uses
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufMessageBase;
 
 type
-  // TODO
+  // TODO contract
   TProtobufMessageType = class of TProtobufMessageBase;
 
-  // TODO
+  // TODO contract
   TProtobufTypeRegistry = class sealed(TPersistent)
     private
-      // TODO
+      // TODO contract
       FNotWellKnownTypes: TDictionary<TProtobufTypeUrl, TProtobufMessageType>;
 
-      // TODO
+      // TODO contract
       class var FGlobal: TProtobufTypeRegistry;
 
-      // TODO
+      // TODO contract
       class function GetGlobal: TProtobufTypeRegistry; static;
 
     public
-      // TODO
+      // TODO contract
       class property Global: TProtobufTypeRegistry read GetGlobal;
 
-      // TODO
+      // TODO contract
       constructor Create;
 
-      // TODO
+      // TODO contract
       destructor Destroy; override; final;
 
-      // TODO
+      // TODO contract
       function GetType(aTypeUrl: TProtobufTypeUrl): TProtobufMessageType;
 
-      // TODO
+      // TODO contract
       procedure RegisterNotWellKnownType(aTypeUrl: TProtobufTypeUrl; aType: TProtobufMessageType);
 
     // TPersistent implementation
@@ -82,7 +82,7 @@ type
       /// <param name="aSource">Object to copy from</param>
       /// <remarks>
       /// The object must be another <see cref="TProtobufTypeRegistry"/>.
-      /// TODO This performs a deep copy; hence, no ownership is shared.
+      /// TODO contract This performs a deep copy; hence, no ownership is shared.
       /// This causes the destruction of <see cref="Payload"/>; developers must ensure that no shared ownership is held.
       /// </remarks>
       procedure Assign(aSource: TPersistent); override; final;
@@ -135,7 +135,7 @@ begin
   begin
     if (lExistingType <> aType) then raise Exception.Create('Duplicate registration of different types for type URL: ' + aTypeUrl);
   end
-  else FNotWellKnownTypes[aTypeUrl] := aType;
+  else FNotWellKnownTypes.Add(aTypeUrl, aType);
 end;
 
 // TPersistent implementation of TProtobufTypeRegistry
@@ -145,12 +145,12 @@ var
   lSource: TProtobufTypeRegistry;
   lSourceNotWellKnownType: TPair<TProtobufTypeUrl, TProtobufMessageType>;
 begin
-  if (not (aSource is TProtobufMessageBase)) then
+  lSource := aSource as TProtobufTypeRegistry;
+  if (not Assigned(lSource)) then
   begin
     inherited;
     Exit;
   end;
-  lSource := TProtobufTypeRegistry(aSource);
   FNotWellKnownTypes.Free;
   FNotWellKnownTypes := TDictionary<TProtobufTypeUrl, TProtobufMessageType>.Create(lSource.FNotWellKnownTypes);
 end;

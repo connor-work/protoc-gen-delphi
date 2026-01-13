@@ -219,10 +219,10 @@ var
   lSourceUnknownFieldRecord: TProtobufEncodedField;
   lUnknownFieldRecord: TProtobufEncodedField;
 begin
+  lSource := aSource as TEmpty;
   if (not(aSource is TEmpty)) then inherited
   else
   begin
-    lSource := TEmpty(aSource);
     // Assign FUnknownFields.
     FUnknownFields.Free;
     if (Assigned(lSource.FUnknownFields)) then

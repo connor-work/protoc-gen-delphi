@@ -32,6 +32,11 @@ uses
   Classes,
 {$ENDIF}
 {$IFDEF WORK_CONNOR_DELPHI_COMPILER_UNIT_SCOPE_NAMES}
+  System.JSON,
+{$ELSE}
+  JSON,
+{$ENDIF}
+{$IFDEF WORK_CONNOR_DELPHI_COMPILER_UNIT_SCOPE_NAMES}
   System.SysUtils,
 {$ELSE}
   SysUtils,
@@ -39,15 +44,15 @@ uses
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uAny,
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uDuration,
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uIProtobufMessage,
-  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufMessageBase;
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufMessageBase,
   // TODO // TProtobufMessage for generically handling protobuf messages
   // TODO Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uProtobufMessage,
-  // TODO uExampleData;
+  uExampleData;
 
 /// <summary>
 /// Runs the example, writing documentation to stdout.
 /// </summary>
-procedure RunExample();
+procedure RunExample;
 
 implementation
 
@@ -65,6 +70,12 @@ begin
   Writeln;
 end;
 
+procedure WriteJsonValue(aJsonValue: TJSONValue);
+begin
+  Write(aJsonValue.Format);
+  Writeln;
+end;
+
 procedure WriteWireFormatMessage(aMessage: IProtobufMessage);
 var
   lStream: TMemoryStream;
@@ -78,6 +89,18 @@ begin
   end;
 end;
 
+procedure WriteProtoJsonMessage(aMessage: IProtobufMessage);
+var
+  lJsonValue: TJSONValue;
+begin
+  lJsonValue := aMessage.EncodeJson;
+  try
+    WriteJsonValue(lJsonValue);
+  finally
+    lJsonValue.Free;
+  end;
+end;
+
 // TODO clone method?
 
 procedure TestWireFormatRoundtrip(aMessage: IProtobufMessage);
@@ -85,7 +108,7 @@ var
   lStream: TMemoryStream;
   lDecodedMessage: IProtobufMessage;
 begin
-  Writeln('The example message, encoded using the protobuf binary wire format:');
+  Writeln('The example message, encoded using the Protobuf binary wire format:');
   WriteWireFormatMessage(aMessage);
   lStream := TMemoryStream.Create;
   try
@@ -93,29 +116,73 @@ begin
     lStream.Seek(0, soBeginning);
     lDecodedMessage := TProtobufMessageBase(TProtobufMessageBase(aMessage).ClassType.Create);
     lDecodedMessage.Decode(lStream);
-    Writeln('The example message, encoded using the protobuf binary wire format, after a wire format roundtrip:');
+    Writeln('The example message, encoded using the Protobuf binary wire format, after a wire format roundtrip:');
     WriteWireFormatMessage(lDecodedMessage);
   finally
     lStream.Free;
   end;
 end;
 
-procedure RunExample();
+procedure TestProtoJsonRoundtrip(aMessage: IProtobufMessage);
 var
-  lDuration: TDuration;
+  lJsonValue: TJSONValue;
+  lDecodedMessage: IProtobufMessage;
+begin
+  Writeln('The example message, encoded using the ProtoJSON format:');
+  WriteProtoJsonMessage(aMessage);
+  lJsonValue := aMessage.EncodeJson;
+  try
+    lDecodedMessage := TProtobufMessageBase(TProtobufMessageBase(aMessage).ClassType.Create);
+    lDecodedMessage.DecodeJson(lJsonValue);
+    Writeln('The example message, encoded using the ProtoJSON format, after a ProtoJSON roundtrip:');
+    WriteProtoJsonMessage(lDecodedMessage);
+  finally
+    lJsonValue.Free;
+  end;
+end;
+
+procedure RunRoundtripExample(aMessage: IProtobufMessage);
+var
   lAny: TAny;
 begin
+  TestWireFormatRoundtrip(aMessage);
+  TestProtoJsonRoundtrip(aMessage);
+  lAny := TAny.Create;
   try
-    lDuration := TDuration.Create;
-    lDuration.Seconds := 42;
-    lDuration.SubSecondNanoseconds := 123456789;
-    TestWireFormatRoundtrip(lDuration);
-    lAny := TAny.Create;
-    lAny.Message := lDuration;
+    // TODO ownership of the message? clone it?
+    lAny.Message := aMessage;
     TestWireFormatRoundtrip(lAny);
+    TestProtoJsonRoundtrip(lAny);
   finally
     lAny.Free;
+  end;
+end;
+
+procedure RunDurationExample;
+var
+  lDuration: TDuration;
+begin
+  lDuration := TDuration.Create;
+  try
+    lDuration.Seconds := 42;
+    lDuration.SubSecondNanoseconds := 123456789;
+    RunRoundtripExample(lDuration);
+  finally
     lDuration.Free;
+  end;
+end;
+
+procedure RunExample;
+var
+  lMessageX: TMessageX;
+begin
+  lMessageX := TMessageX.Create;
+  try
+    lMessageX.FieldX := 42;
+    lMessageX.FieldY := TMessageY.Create;
+    RunRoundtripExample(lMessageX);
+  finally
+    lMessageX.Free;
   end;
 end;
 

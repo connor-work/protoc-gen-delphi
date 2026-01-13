@@ -36,11 +36,9 @@ uses
 {$ELSE}
   JSON,
 {$ENDIF}
-{$IFDEF WORK_CONNOR_DELPHI_COMPILER_UNIT_SCOPE_NAMES}
-  System.JSON.Builders;
-{$ELSE}
-  JSON.Builders;
-{$ENDIF}
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtoJsonFormat,
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uIProtobufMessage,
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uIProtobufWellKnownTypeMessage;
 
 type
   /// <summary>
@@ -51,31 +49,8 @@ type
   /// The message instance carries transitive ownership of embedded objects in Protobuf field values,
   /// and is responsible for their deallocation.
   /// </remarks>
-  IProtobufNotWellKnownTypeMessage = interface(IInterface)
+  IProtobufNotWellKnownTypeMessage = interface(IProtobufMessage, IProtobuf)
     ['{60876367-A0DF-4D03-A439-0C94845DBAA3}']
-    /// <summary>
-    /// Encodes the message as a JSON object using the ProtoJSON format and writes the key-value pairs to a <see cref="TJSONCollectionBuilder.TPairs"/>.
-    /// </summary>
-    /// <param name="aDest">The <see cref="TJSONCollectionBuilder.TPairs"/> that the encoded message's key-value pairs are written to</param>
-    procedure EncodeJson(aDest: TJSONCollectionBuilder.TPairs); overload;
-
-    /// <summary>
-    /// Encodes the message as a JSON object using the ProtoJSON format and writes it to a <see cref="TJSONObjectBuilder"/>.
-    /// </summary>
-    /// <param name="aDest">The <see cref="TJSONObjectBuilder"/> that the encoded message is written to</param>
-    procedure EncodeJson(aDest: TJSONObjectBuilder); overload;
-
-    /// <summary>
-    /// Fills the message's Protobuf fields by decoding the message from a JSON object, using the ProtoJSON format.
-    /// </summary>
-    /// <param name="aSource">The JSON object that the message is decoded from</param>
-    /// <exception cref="EDecodingSchemaError">If the format of the JSON object was not compatible with this message type</exception>
-    /// <remarks>
-    /// Protobuf fields that are not present in the JSON object are rendered absent by setting them to their default values.
-    /// This may cause the destruction of transitively owned objects (this is also the case when a present field overwrites a previous value).
-    /// Developers must ensure that no shared ownership of current field values or further nested embedded objects is held.
-    /// </remarks>
-    procedure DecodeJson(aSource: TJSONObject);
   end;
 
 implementation

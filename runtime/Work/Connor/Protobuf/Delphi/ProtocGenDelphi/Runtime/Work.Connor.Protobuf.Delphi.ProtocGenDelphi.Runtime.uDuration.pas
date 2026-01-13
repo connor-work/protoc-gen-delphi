@@ -32,23 +32,12 @@ uses
   Classes,
 {$ENDIF}
 {$IFDEF WORK_CONNOR_DELPHI_COMPILER_UNIT_SCOPE_NAMES}
-  System.Generics.Collections,
-{$ELSE}
-  Generics.Collections,
-{$ENDIF}
-{$IFDEF WORK_CONNOR_DELPHI_COMPILER_UNIT_SCOPE_NAMES}
   System.JSON,
 {$ELSE}
   JSON,
 {$ENDIF}
-{$IFDEF WORK_CONNOR_DELPHI_COMPILER_UNIT_SCOPE_NAMES}
-  System.SysUtils,
-{$ELSE}
-  SysUtils,
-{$ENDIF}
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.uProtobuf,
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uIProtobufWellKnownTypeMessage,
-  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufFixed32,
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufInt32,
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufInt64,
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufMessageBase,
@@ -61,7 +50,7 @@ type
   /// independent of any calendar and concepts like "day" or "month".
   /// </summary>
   /// <remarks>
-  /// TODO
+  /// TODO contract
   /// The message instance carries transitive ownership of embedded objects in protobuf field values,
   /// and is responsible for their deallocation.
   /// </remarks>
@@ -116,22 +105,22 @@ type
 
     // TProtobufMessageBase implementation
     public
-      // TODO
+      // TODO contract
       function AssignOwnFields(aSource: TProtobufMessageBase): Boolean; override; final;
 
-      // TODO
+      // TODO contract
       procedure ClearOwnFields; override; final;
 
-      // TODO
+      // TODO contract
       procedure EncodeOwnFields(aDest: TStream); override; final;
 
-      // TODO
+      // TODO contract
       procedure MergeFieldFrom(aSource: TStream; aTag: TProtobufTag; aRemainingLength: PUInt32); override; final;
 
-      // TODO
+      // TODO contract
       function CalculateOwnFieldsSize: UInt32; override; final;
 
-      // TODO
+      // TODO contract
       function GetTypeUrl: TProtobufTypeUrl; override; final;
 
       /// <summary>
@@ -157,9 +146,9 @@ function TDuration.AssignOwnFields(aSource: TProtobufMessageBase): Boolean;
 var
   lSource: TDuration;
 begin
-  if (not (aSource is TDuration)) then Exit(False);
+  lSource := aSource as TDuration;
+  if (not Assigned(lSource)) then Exit(False);
   result := True;
-  lSource := TDuration(aSource);
   FSeconds := lSource.FSeconds;
   FSubSecondNanoseconds := lSource.FSubSecondNanoseconds;
 end;
@@ -197,12 +186,12 @@ end;
 
 function TDuration.EncodeJson: TJSONValue;
 begin
-  // TODO
+  // TODO implementation
 end;
 
 procedure TDuration.DecodeJson(aSource: TJSONValue);
 begin
-  // TODO
+  // TODO implementation
 end;
 
 end.

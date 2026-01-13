@@ -29,14 +29,15 @@ uses
 {$ENDIF}
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.uProtobuf,
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uIProtobufMessage,
-  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uIProtobufWellKnownTypeMessage,
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uTypeRegistry,
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufBytes,
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufFixed32,
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufMessageBase,
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufNotWellKnownTypeMessageBase,
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufString,
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufUint32,
-  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufWireFormat;
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufWireFormat,
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtoJsonFormat;
 
 type
   /// <remarks>
@@ -67,10 +68,10 @@ type
     function GetTypeUrl: TProtobufTypeUrl; override; final;
 
     /// <summary>
-    /// Encodes the message as a JSON object using the ProtoJSON format and writes the key-value pairs to a <see cref="TJSONCollectionBuilder.TPairs"/>.
+    /// Encodes the message as a JSON object using the ProtoJSON format and writes it to a <see cref="TJSONObject"/>.
     /// </summary>
-    /// <param name="aDest">The <see cref="TJSONCollectionBuilder.TPairs"/> that the encoded message's key-value pairs are written to</param>
-    procedure EncodeJson(aDest: TJSONCollectionBuilder.TPairs); override; final;
+    /// <param name="aDest">The <see cref="TJSONObject"/> that the encoded message is written to</param>
+    procedure EncodeJson(aDest: TJSONObject); override; final;
 
     // TODO
     function MergeFieldFromJson(aSource: TJSONPair): Boolean; override; final;
@@ -215,10 +216,10 @@ type
       function GetTypeUrl: TProtobufTypeUrl; override; final;
 
       /// <summary>
-      /// Encodes the message as a JSON object using the ProtoJSON format and writes the key-value pairs to a <see cref="TJSONCollectionBuilder.TPairs"/>.
+      /// Encodes the message as a JSON object using the ProtoJSON format and writes it to a <see cref="TJSONObject"/>.
       /// </summary>
-      /// <param name="aDest">The <see cref="TJSONCollectionBuilder.TPairs"/> that the encoded message's key-value pairs are written to</param>
-      procedure EncodeJson(aDest: TJSONCollectionBuilder.TPairs); override; final;
+      /// <param name="aDest">The <see cref="TJSONObject"/> that the encoded message is written to</param>
+      procedure EncodeJson(aDest: TJSONObject); override; final;
 
       // TODO
       function MergeFieldFromJson(aSource: TJSONPair): Boolean; override; final;
@@ -227,12 +228,8 @@ type
 implementation
 
 function TMessageY.AssignOwnFields(aSource: TProtobufMessageBase): Boolean;
-var
-  lSource: TMessageY;
 begin
-  if (not (aSource is TMessageY)) then Exit(False);
-  result := True;
-  lSource := TMessageY(aSource);
+  result := aSource is TMessageY;
 end;
 
 procedure TMessageY.ClearOwnFields;
@@ -258,13 +255,13 @@ begin
   result := PROTOBUF_TYPE_URL;
 end;
 
-procedure TMessageY.EncodeJson(aDest: TJSONCollectionBuilder.TPairs);
+procedure TMessageY.EncodeJson(aDest: TJSONObject);
 begin
 end;
 
 function TMessageY.MergeFieldFromJson(aSource: TJSONPair): Boolean;
 begin
-  // TODO
+  result := False;
 end;
 
 procedure TMessageX.SetFieldY(aValue: TMessageY);
@@ -289,9 +286,9 @@ function TMessageX.AssignOwnFields(aSource: TProtobufMessageBase): Boolean;
 var
   lSource: TMessageX;
 begin
-  if (not (aSource is TMessageX)) then Exit(False);
+  lSource := aSource as TMessageX;
+  if (not Assigned(lSource)) then Exit(False);
   result := True;
-  lSource := TMessageX(aSource);
   FFieldX := lSource.FFieldX;
   FFieldY.Free;
   FFieldY := TMessageY.Create;
@@ -323,7 +320,7 @@ begin
     begin
       FFieldY.Free;
       FFieldY := TMessageY.Create;
-      FFieldY.MergeFrom(aSource, aRemainingLength);
+      MergeFromProtobufMessageField(aSource, FFieldY, aTag.WireType, aRemainingLength);
     end;
 //    PROTOBUF_FIELD_NUMBER_FIELD_Z: TODO
     else MergeUnknownFieldFrom(aSource, aTag, aRemainingLength);
@@ -343,7 +340,7 @@ begin
   result := PROTOBUF_TYPE_URL;
 end;
 
-procedure TMessageX.EncodeJson(aDest: TJSONCollectionBuilder.TPairs);
+procedure TMessageX.EncodeJson(aDest: TJSONObject);
 begin
   EncodeJsonProtobufUint32Field(aDest, PROTOBUF_FIELD_JSON_NAME_FIELD_X, FFieldX);
   EncodeJsonProtobufMessageField(aDest, PROTOBUF_FIELD_JSON_NAME_FIELD_Y, FFieldY);
@@ -352,13 +349,13 @@ end;
 
 function TMessageX.MergeFieldFromJson(aSource: TJSONPair): Boolean;
 begin
-  if ((aSource.JsonString.Value = PROTOBUF_FIELD_NAME_FIELD_X) or (aSource.JSONString.Value = PROTOBUF_FIELD_JSON_NAME_FIELD_X)) then FFieldX := DecodeJsonProtobufUint32(aSource.JSONValue);
+  if ((aSource.JsonString.Value = PROTOBUF_FIELD_NAME_FIELD_X) or (aSource.JSONString.Value = PROTOBUF_FIELD_JSON_NAME_FIELD_X)) then FFieldX := DecodeJsonProtobufUint32(aSource.JSONValue)
   else if ((aSource.JsonString.Value = PROTOBUF_FIELD_NAME_FIELD_Y) or (aSource.JSONString.Value = PROTOBUF_FIELD_JSON_NAME_FIELD_Y)) then
   begin
     FFieldY.Free;
     FFieldY := TMessageY.Create;
     FFieldY.DecodeJson(aSource.JSONValue);
-  end;
+  end
 //  else if ((aSource.JsonString.Value = PROTOBUF_FIELD_NAME_FIELD_Z) or (aSource.JSONString.Value = PROTOBUF_FIELD_JSON_NAME_FIELD_Z)) then
 //  begin
 //    // TODO
@@ -366,5 +363,10 @@ begin
   else Exit(False);
   result := True;
 end;
+
+initialization
+
+TProtobufTypeRegistry.Global.RegisterNotWellKnownType(TMessageY.PROTOBUF_TYPE_URL, TMessageY);
+TProtobufTypeRegistry.Global.RegisterNotWellKnownType(TMessageX.PROTOBUF_TYPE_URL, TMessageX);
 
 end.

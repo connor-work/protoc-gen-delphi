@@ -27,41 +27,18 @@ interface
 
 uses
 {$IFDEF WORK_CONNOR_DELPHI_COMPILER_UNIT_SCOPE_NAMES}
-  System.Classes,
-{$ELSE}
-  Classes,
-{$ENDIF}
-{$IFDEF WORK_CONNOR_DELPHI_COMPILER_UNIT_SCOPE_NAMES}
-  System.Generics.Collections,
-{$ELSE}
-  Generics.Collections,
-{$ENDIF}
-{$IFDEF WORK_CONNOR_DELPHI_COMPILER_UNIT_SCOPE_NAMES}
   System.JSON,
 {$ELSE}
   JSON,
 {$ENDIF}
-{$IFDEF WORK_CONNOR_DELPHI_COMPILER_UNIT_SCOPE_NAMES}
-  System.JSON.Builders,
-{$ELSE}
-  JSON.Builders,
-{$ENDIF}
-{$IFDEF WORK_CONNOR_DELPHI_COMPILER_UNIT_SCOPE_NAMES}
-  System.SysUtils,
-{$ELSE}
-  SysUtils,
-{$ENDIF}
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.uProtobuf,
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uIProtobufMessage,
-  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uIProtobufNotWellKnownTypeMessage,
-  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufBytes,
-  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufFixed32,
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufMessageBase,
-  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufWireFormat;
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtoJsonFormat;
 
 type
-  // TODO
-  TProtobufNotWellKnownTypeMessageBase = class abstract(TProtobufMessageBase, IProtobufNotWellKnownTypeMessage)
+  // TODO contract
+  TProtobufNotWellKnownTypeMessageBase = class abstract(TProtobufMessageBase, IProtobufMessageWithGenericJsonRepresentation)
     protected
       // TODO free own fields? (nested messages, repeated fields) create own fields? (repeated fields)
 
@@ -81,33 +58,34 @@ type
       /// <exception cref="EProtobufSchemaViolation">If the encoded message was not compatible with this message type</exception>
       procedure DecodeJson(aSource: TJSONValue); overload; override; final;
 
-    // IProtobufNotWellKnownTypeMessage implementation
+    // IProtobufMessageWithGenericJsonRepresentation implementation
     public
       /// <summary>
-      /// Encodes the message as a JSON object using the ProtoJSON format and writes the key-value pairs to a <see cref="TJSONCollectionBuilder.TPairs"/>.
+      /// Encodes the message as a JSON object using the ProtoJSON format.
       /// </summary>
-      /// <param name="aDest">The <see cref="TJSONCollectionBuilder.TPairs"/> that the encoded message's key-value pairs are written to</param>
-      procedure EncodeJson(aDest: TJSONCollectionBuilder.TPairs); overload; virtual; abstract;
+      /// <returns>TODO contract</returns>
+      function EncodeJsonObject: TJSONObject;
 
       /// <summary>
-      /// Encodes the message as a JSON object using the ProtoJSON format and writes it to a <see cref="TJSONObjectBuilder"/>.
+      /// Encodes the message as a JSON object using the ProtoJSON format and writes it to a <see cref="TJSONObject"/>.
       /// </summary>
-      /// <param name="aDest">The <see cref="TJSONObjectBuilder"/> that the encoded message is written to</param>
-      procedure EncodeJson(aDest: TJSONObjectBuilder); overload;
+      /// <param name="aDest">The <see cref="TJSONObject"/> that the encoded message is written to</param>
+      procedure EncodeJson(aDest: TJSONObject); overload; virtual; abstract;
 
       /// <summary>
       /// Fills the message's Protobuf fields by decoding the message from a JSON object, using the ProtoJSON format.
       /// </summary>
       /// <param name="aSource">The JSON object that the message is decoded from</param>
+      /// <param name="aSkipType">TODO contract</param>
       /// <exception cref="EDecodingSchemaError">If the format of the JSON object was not compatible with this message type</exception>
       /// <remarks>
       /// Protobuf fields that are not present in the JSON object are rendered absent by setting them to their default values.
       /// This may cause the destruction of transitively owned objects (this is also the case when a present field overwrites a previous value).
       /// Developers must ensure that no shared ownership of current field values or further nested embedded objects is held.
       /// </remarks>
-      procedure DecodeJson(aSource: TJSONObject); overload;
+      procedure DecodeJson(aSource: TJSONObject; aSkipType: Boolean = False); overload;
 
-      // TODO
+      // TODO contract
       function MergeFieldFromJson(aSource: TJSONPair): Boolean; virtual; abstract;
   end;
 
@@ -116,41 +94,35 @@ implementation
 // TProtobufMessageBase implementation of TProtobufNotWellKnownTypeMessageBase
 
 function TProtobufNotWellKnownTypeMessageBase.EncodeJson: TJSONValue;
-var
-  lBuilder: TJSONObjectBuilder;
-  lPairs: TJSONCollectionBuilder.TPairs;
 begin
-  try
-    lBuilder.Create;
-    EncodeJson(lBuilder);
-  finally
-    lBuilder.Free;
-  end;
+  result := EncodeJsonObject;
 end;
 
 procedure TProtobufNotWellKnownTypeMessageBase.DecodeJson(aSource: TJSONValue);
 var
-  lJsonObject: TJsonObject;
-  lPair: TJSONPair;
+  lSource: TJSONObject;
 begin
-  if (not (aSource is TJSONObject)) then raise EProtobufSchemaViolation.Create('TODO');
-  DecodeJson(aSource as TJSONObject);
+  lSource := aSource as TJSONObject; 
+  if (not Assigned(lSource)) then raise EProtobufSchemaViolation.Create('TODO');
+  DecodeJson(lSource);
 end;
 
-// IProtobufNotWellKnownTypeMessage implementation of TProtobufNotWellKnownTypeMessageBase
+// IProtobufMessageWithGenericJsonRepresentation implementation of TProtobufNotWellKnownTypeMessageBase
 
-procedure TProtobufNotWellKnownTypeMessageBase.EncodeJson(aDest: TJSONObjectBuilder);
+function TProtobufNotWellKnownTypeMessageBase.EncodeJsonObject: TJSONObject;
 begin
-  EncodeJson(aDest.BeginObject);
+  result := TJSONObject.Create;
+  EncodeJson(result);
 end;
 
-procedure TProtobufNotWellKnownTypeMessageBase.DecodeJson(aSource: TJSONObject);
+procedure TProtobufNotWellKnownTypeMessageBase.DecodeJson(aSource: TJSONObject; aSkipType: Boolean = False);
 var
   lPair: TJSONPair;
 begin
   for lPair in aSource do
   begin
-    // TODO support unknown fields?
+    if (aSkipType and (lPair.JsonString.Value = '@type')) then Continue;
+    // TODO support JSON unknown fields
     if (not MergeFieldFromJson(lPair)) then raise EProtobufSchemaViolation.Create('TODO');
   end;
 end;

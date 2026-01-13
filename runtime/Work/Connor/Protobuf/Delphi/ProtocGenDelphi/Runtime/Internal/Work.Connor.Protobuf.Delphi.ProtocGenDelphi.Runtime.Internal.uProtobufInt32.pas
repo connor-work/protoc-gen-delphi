@@ -34,6 +34,11 @@ uses
   Classes,
 {$ENDIF}
 {$IFDEF WORK_CONNOR_DELPHI_COMPILER_UNIT_SCOPE_NAMES}
+  System.JSON,
+{$ELSE}
+  JSON,
+{$ENDIF}
+{$IFDEF WORK_CONNOR_DELPHI_COMPILER_UNIT_SCOPE_NAMES}
   System.SysUtils,
 {$ELSE}
   SysUtils,
@@ -41,39 +46,39 @@ uses
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.uProtobuf,
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufWireFormat;
 
-// TODO
+// TODO contract
 procedure EncodeProtobufInt32(aDest: TStream; aValue: Int32);
 
-// TODO
+// TODO contract
 procedure EncodeProtobufInt32Field(aDest: TStream; aFieldNumber: TProtobufFieldNumber; aValue: Int32);
 
-// TODO
+// TODO contract
 function DecodeProtobufInt32(aSource: TStream; aRemainingLength: PUInt32): Int32;
 
-// TODO
+// TODO contract
 function DecodeProtobufInt32Field(aSource: TStream; aWireType: TProtobufWireType; aRemainingLength: PUInt32): Int32;
 
-// TODO
+// TODO contract
 function CalculateProtobufInt32FieldSize(aFieldNumber: TProtobufFieldNumber; aValue: Int32): UInt32;
 
-// TODO
+// TODO contract
 function EncodeJsonProtobufInt32(aValue: Int32): TJSONNumber;
 
-// TODO
-procedure EncodeJsonProtobufInt32Field(aDest: TJSONCollectionBuilder.TPairs; aFieldJsonName: UnicodeString; aValue: Int32);
+// TODO contract
+procedure EncodeJsonProtobufInt32Field(aDest: TJSONObject; aFieldJsonName: UnicodeString; aValue: Int32);
 
-// TODO
+// TODO contract
 function DecodeJsonProtobufInt32(aSource: TJSONValue): Int32;
 
 implementation
 
 procedure EncodeProtobufInt32(aDest: TStream; aValue: Int32);
 begin
-  // TODO correct sign handling?
+  // TODO correct sign handling
   EncodeProtobufVarint(aDest, UInt64(aValue));
 end;
 
-// TODO support explicit presence?
+// TODO explicit presence support
 procedure EncodeProtobufInt32Field(aDest: TStream; aFieldNumber: TProtobufFieldNumber; aValue: Int32);
 begin
   if (aValue = PROTOBUF_DEFAULT_VALUE_INT32) then Exit;
@@ -83,7 +88,7 @@ end;
 
 function DecodeProtobufInt32(aSource: TStream; aRemainingLength: PUInt32): Int32;
 begin
-  // TODO check range?
+  // TODO range check
   result := Int32(DecodeProtobufVarint(aSource, aRemainingLength));
 end;
 
@@ -93,7 +98,7 @@ begin
   result := DecodeProtobufInt32(aSource, aRemainingLength);
 end;
 
-// TODO support explicit presence?
+// TODO explicit presence support
 function CalculateProtobufInt32FieldSize(aFieldNumber: TProtobufFieldNumber; aValue: Int32): UInt32;
 begin
   if (aValue = PROTOBUF_DEFAULT_VALUE_INT32) then Exit(0);
@@ -107,20 +112,22 @@ begin
   result := TJSONNumber.Create(aValue);
 end;
 
-// TODO support explicit presence?
-// TODO JSON option to emit default value?
-procedure EncodeJsonProtobufInt32Field(aDest: TJSONCollectionBuilder.TPairs; aFieldJsonName: UnicodeString; aValue: Int32);
+// TODO explicit presence support
+// TODO emit JSON default values
+procedure EncodeJsonProtobufInt32Field(aDest: TJSONObject; aFieldJsonName: UnicodeString; aValue: Int32);
 begin
   if (aValue = PROTOBUF_DEFAULT_VALUE_INT32) then Exit;
-  aDest.Add(aFieldJsonName, EncodeJsonProtobufInt32(aValue));
+  aDest.AddPair(aFieldJsonName, EncodeJsonProtobufInt32(aValue));
 end;
 
 function DecodeJsonProtobufInt32(aSource: TJSONValue): Int32;
+var
+  lSource: TJSONString;
 begin
-  if (not (aSource is TJSONString)) then raise EProtobufSchemaViolation.Create('Protobuf int32 JSON field has unexpected type: ' + aSource.ClassName);
   lSource := aSource as TJSONString;
-  // TODO support exponent notation
-  // TODO check range?
+  if (not Assigned(lSource)) then raise EProtobufSchemaViolation.Create('Protobuf int32 JSON field has unexpected type: ' + aSource.ClassName);
+  // TODO exponent notation support
+  // TODO range check
   result := Int32(aSource.Value.ToInt64);
 end;
 

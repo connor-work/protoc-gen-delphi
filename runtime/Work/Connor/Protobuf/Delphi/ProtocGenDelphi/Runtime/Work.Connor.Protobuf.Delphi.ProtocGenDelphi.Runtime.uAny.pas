@@ -32,11 +32,6 @@ uses
   Classes,
 {$ENDIF}
 {$IFDEF WORK_CONNOR_DELPHI_COMPILER_UNIT_SCOPE_NAMES}
-  System.Generics.Collections,
-{$ELSE}
-  Generics.Collections,
-{$ENDIF}
-{$IFDEF WORK_CONNOR_DELPHI_COMPILER_UNIT_SCOPE_NAMES}
   System.JSON,
 {$ELSE}
   JSON,
@@ -50,10 +45,10 @@ uses
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uIProtobufMessage,
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uIProtobufWellKnownTypeMessage,
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufBytes,
-  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufFixed32,
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufMessageBase,
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufString,
-  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufWireFormat;
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufWireFormat,
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtoJsonFormat;
 
 type
   /// <summary>
@@ -61,53 +56,53 @@ type
   /// Contains an arbitrary serialized message along with a URL that describes the type of the serialized message.
   /// </summary>
   /// <remarks>
-  /// TODO
+  /// TODO contract
   /// The message instance carries transitive ownership of embedded objects in protobuf field values,
   /// and is responsible for their deallocation.
   /// </remarks>
   TAny = class sealed(TProtobufMessageBase, IProtobufWellKnownTypeMessage)
     private
       /// <summary>
-      /// TODO
+      /// TODO contract
       /// </summary>
       FInnerTypeUrl: TProtobufTypeUrl;
 
       /// <summary>
-      /// TODO
+      /// TODO contract
+      /// TODO position always at 0
       /// </summary>
-      ///   TODO position always at 0
       FValue: TBytesStream;
 
       /// <summary>
-      /// TODO
+      /// TODO contract
       /// </summary>
       FMessage: IProtobufMessage;
 
-      // TODO
+      // TODO contract
       function GetInnerTypeUrl: TProtobufTypeUrl;
 
-      // TODO
+      // TODO contract
       procedure SetInnerTypeUrl(aValue: TProtobufTypeUrl);
 
-      // TODO
+      // TODO contract
       function GetValue: TBytes;
 
-      // TODO
+      // TODO contract
       procedure SetValue(aValue: TBytes);
 
-      // TODO
+      // TODO contract
       function GetMessage: IProtobufMessage;
 
-      // TODO
+      // TODO contract
       procedure SetMessage(aValue: IProtobufMessage);
 
-      // TODO
+      // TODO contract
       procedure PackTypeUrl;
 
-      // TODO
+      // TODO contract
       procedure PackValue;
 
-      // TODO
+      // TODO contract
       procedure UnpackMessage;
 
     public
@@ -137,35 +132,35 @@ type
         /// </summary>
         PROTOBUF_FIELD_NAME_VALUE = 'value';
 
-      // TODO
+      // TODO contract
       property InnerTypeUrl: TProtobufTypeUrl read GetInnerTypeUrl write SetInnerTypeUrl;
 
-      // TODO
+      // TODO contract
       property Value: TBytes read GetValue write SetValue;
 
-      // TODO
+      // TODO contract
       property Message: IProtobufMessage read GetMessage write SetMessage;
 
       // TODO unpacking with type parameter
 
     // TProtobufMessageBase implementation
     public
-      // TODO
+      // TODO contract
       function AssignOwnFields(aSource: TProtobufMessageBase): Boolean; override; final;
 
-      // TODO
+      // TODO contract
       procedure ClearOwnFields; override; final;
 
-      // TODO
+      // TODO contract
       procedure EncodeOwnFields(aDest: TStream); override; final;
 
-      // TODO
+      // TODO contract
       procedure MergeFieldFrom(aSource: TStream; aTag: TProtobufTag; aRemainingLength: PUInt32); override; final;
 
-      // TODO
+      // TODO contract
       function CalculateOwnFieldsSize: UInt32; override; final;
 
-      // TODO
+      // TODO contract
       function GetTypeUrl: TProtobufTypeUrl; override; final;
 
       /// <summary>
@@ -270,9 +265,9 @@ function TAny.AssignOwnFields(aSource: TProtobufMessageBase): Boolean;
 var
   lSource: TAny;
 begin
-  if (not (aSource is TAny)) then Exit(False);
+  lSource := aSource as TAny;
+  if (not Assigned(lSource)) then Exit(False);
   result := True;
-  lSource := TAny(aSource);
   // Assign FInnerTypeUrl.
   FInnerTypeUrl := lSource.FInnerTypeUrl;
   // Assign FValue.
@@ -334,14 +329,46 @@ begin
   result := PROTOBUF_TYPE_URL;
 end;
 
+// TODO document that handling Anys with unknown type URL as JSON is not supported? It is the same for C#, might not be that useful to support it
+// TODO generally: Make sure we dont leak object allocations when we throw a checked exception
 function TAny.EncodeJson: TJSONValue;
+var
+  lJsonObject: TJSONObject;
+  lMessageWithGenericJsonRepresentation: IProtobufMessageWithGenericJsonRepresentation;
 begin
-  // TODO
+  if (not Assigned(FMessage)) then UnpackMessage;
+  lJsonObject := TJSONObject.Create;
+  lJsonObject.AddPair('@type', FMessage.TypeUrl);
+  lMessageWithGenericJsonRepresentation := FMessage as IProtobufMessageWithGenericJsonRepresentation;
+  if (Assigned(lMessageWithGenericJsonRepresentation)) then lMessageWithGenericJsonRepresentation.EncodeJson(lJsonObject)
+  else lJsonObject.AddPair('value', FMessage.EncodeJson);
+  result := lJsonObject;
 end;
 
 procedure TAny.DecodeJson(aSource: TJSONValue);
+var
+  lSource: TJSONObject;
+  lTypeUrl: TJSONString;
+  lMessageClass: TProtobufMessageType;
+  lMessageWithGenericJsonRepresentation: IProtobufMessageWithGenericJsonRepresentation;
+  lValue: TJSONValue;
 begin
-  // TODO
+  lSource := aSource as TJSONObject;
+  if (not Assigned(lSource)) then raise EProtobufSchemaViolation.Create('TODO');
+  lTypeUrl := lSource.GetValue('@type') as TJSONString;
+  if (not Assigned(lTypeUrl)) then raise EProtobufSchemaViolation.Create('TODO');
+  FInnerTypeUrl := lTypeUrl.Value;
+  lMessageClass := TProtobufTypeRegistry.Global.GetType(FInnerTypeUrl);
+  if (not Assigned(lMessageClass)) then raise EProtobufUnknownMessageType.Create('Unknown message type: ' + FInnerTypeUrl);
+  FMessage := lMessageClass.Create as IProtobufMessage;
+  lMessageWithGenericJsonRepresentation := FMessage as IProtobufMessageWithGenericJsonRepresentation;
+  if (Assigned(lMessageWithGenericJsonRepresentation)) then lMessageWithGenericJsonRepresentation.DecodeJson(lSource, True)
+  else
+  begin
+    lValue := lSource.GetValue('value');
+    if (not Assigned(lValue)) then raise EProtobufSchemaViolation.Create('TODO');
+    FMessage.DecodeJson(lValue);
+  end;
 end;
 
 end.

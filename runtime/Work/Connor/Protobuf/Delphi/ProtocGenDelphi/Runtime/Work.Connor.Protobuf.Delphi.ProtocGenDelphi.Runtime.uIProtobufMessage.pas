@@ -118,7 +118,7 @@ type
     /// </remarks>
     procedure DecodeDelimited(aSource: TStream);
 
-    /// TODO
+    // TODO contract
     procedure MergeFrom(aSource: TStream; aRemainingLength: PUInt32);
 
     /// <summary>
@@ -127,10 +127,10 @@ type
     /// <returns>The number of bytes that encode the message</return>
     function CalculateSize: UInt32;
 
-    // TODO
+    // TODO contract
     function GetTypeUrl: TProtobufTypeUrl;
 
-    // TODO
+    // TODO contract
     property TypeUrl: TProtobufTypeUrl read GetTypeUrl;
 
     /// <summary>

@@ -41,18 +41,18 @@ uses
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.uProtobuf,
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufWireFormat;
 
-// TODO
+// TODO contract
 procedure EncodeProtobufStringField(aDest: TStream; aFieldNumber: TProtobufFieldNumber; aValue: UnicodeString);
 
-// TODO
+// TODO contract
 function DecodeProtobufStringField(aSource: TStream; aWireType: TProtobufWireType; aRemainingLength: PUInt32): UnicodeString;
 
-// TODO
+// TODO contract
 function CalculateProtobufStringFieldSize(aFieldNumber: TProtobufFieldNumber; aValue: UnicodeString): UInt32;
 
 implementation
 
-// TODO support explicit presence?
+// TODO explicit presence support
 procedure EncodeProtobufStringField(aDest: TStream; aFieldNumber: TProtobufFieldNumber; aValue: UnicodeString);
 var
   lBytes: TBytes;
@@ -70,7 +70,7 @@ var
   lBytes: TBytes;
 begin
   if (aWireType <> TProtobufWireType.Len) then raise EProtobufSchemaViolation.Create('Protobuf bytes field has unexpected wire type: ' + IntToStr(Ord(aWireType)));
-  // TODO check range?
+  // TODO range check
   lLength := DecodeProtobufVarint(aSource, aRemainingLength);
   SetLength(lBytes, lLength);
   if ((aRemainingLength <> nil) and (aRemainingLength^ < lLength)) then raise EProtobufFormatViolation.Create('TODO');
@@ -79,7 +79,7 @@ begin
   result := TEncoding.UTF8.GetString(lBytes);
 end;
 
-// TODO support explicit presence?
+// TODO explicit presence support
 function CalculateProtobufStringFieldSize(aFieldNumber: TProtobufFieldNumber; aValue: UnicodeString): UInt32;
 begin
   if (aValue = PROTOBUF_DEFAULT_VALUE_STRING) then Exit(0);

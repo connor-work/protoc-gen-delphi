@@ -88,12 +88,12 @@ type
     Len = 2,
 
     /// <summary>
-    /// TODO
+    /// TODO contract
     /// </summary>
     Sgroup = 3,
 
     /// <summary>
-    /// TODO
+    /// TODO contract
     /// </summary>
     Egroup = 4,
 
@@ -124,10 +124,10 @@ type
       /// </summary>
       FWireType: TProtobufWireType;
 
-      /// TODO
+      // TODO contract
       function EncodeToVarint: UInt64;
 
-      /// TODO
+      // TODO contract
       class function DecodeFromVarint(aVarint: UInt64): TProtobufTag; static;
 
     public
@@ -162,11 +162,11 @@ type
       /// <returns>The decoded tag</returns>
       class function Decode(aSource: TStream): TProtobufTag; static;
 
-      // TODO
+      // TODO contract
       function CalculateSize: UInt32;
   end;
 
-  // TODO
+  // TODO contract
   TProtobufEncodedFieldValue = record
     case WireType: TProtobufWireType of
       TProtobufWireType.Varint: (VarintValue: UInt64);
@@ -209,7 +209,7 @@ type
       /// <param name="aValue">The record's value</param>
       constructor CreateWithData(aFieldNumber: TProtobufFieldNumber; aValue: TProtobufEncodedFieldValue);
 
-      // TODO
+      // TODO contract
       destructor Destroy; override; final;
 
       /// <summary>
@@ -227,10 +227,10 @@ type
       /// </remarks>
       procedure Decode(aSource: TStream);
 
-      // TODO
+      // TODO contract
       procedure DecodePayload(aSource: TStream; aTag: TProtobufTag; aRemainingLength: PUInt32);
 
-      // TODO
+      // TODO contract
       function CalculateSize: UInt32;
 
     // TPersistent implementation
@@ -254,43 +254,46 @@ type
   /// </summary>
   TProtobufEncodedFieldsMap = TObjectDictionary<TProtobufFieldNumber, TObjectList<TProtobufEncodedField>>;
 
-// TODO
+// TODO contract
 procedure EncodeProtobufVarint(aDest: TStream; aVarint: UInt64);
 
-// TODO
+// TODO contract
 function DecodeProtobufVarint(aSource: TStream; aRemainingLength: PUInt32): UInt64;
 
-// TODO
+// TODO contract
 function TryDecodeProtobufVarint(aSource: TStream; out aVarint: UInt64; aRemainingLength: PUInt32): Boolean;
 
-// TODO
+// TODO contract
 function CalculateProtobufVarintSize(aVarint: UInt64): UInt32;
 
-// TODO
+// TODO contract
 procedure EncodeProtobufI64(aDest: TStream; aI64: UInt64);
 
-// TODO
+// TODO contract
 function DecodeProtobufI64(aSource: TStream; aRemainingLength: PUInt32): UInt64;
 
-// TODO
+// TODO contract
 procedure EncodeProtobufI32(aDest: TStream; aI32: UInt32);
 
-// TODO
+// TODO contract
 function DecodeProtobufI32(aSource: TStream; aRemainingLength: PUInt32): UInt32;
 
-// TODO
+// TODO contract
 function TryDecodeProtobufTag(aSource: TStream; out aTag: TProtobufTag; aRemainingLength: PUInt32): Boolean;
 
-// TODO
+// TODO contract
 procedure EncodeProtobufMessageField(aDest: TStream; aFieldNumber: TProtobufFieldNumber; aValue: IProtobufMessage);
 
-// TODO
+// TODO contract
+procedure MergeFromProtobufMessageField(aSource: TStream; aMessage: IProtobufMessage; aWireType: TProtobufWireType; aRemainingLength: PUInt32 = nil);
+
+// TODO contract
 function CalculateProtobufMessageFieldSize(aFieldNumber: TProtobufFieldNumber; aValue: IProtobufMessage): UInt32;
 
-// TODO
+// TODO contract
 procedure EncodeProtobufFields(aDest: TStream; aFields: TProtobufEncodedFieldsMap);
 
-// TODO
+// TODO contract
 function CalculateProtobufFieldsSize(aFields: TProtobufEncodedFieldsMap): UInt32;
 
 implementation
@@ -306,7 +309,7 @@ class function TProtobufTag.DecodeFromVarint(aVarint: UInt64): TProtobufTag;
 begin
   result.FFieldNumber := aVarint shr 3;
   result.FWireType := TProtobufWireType(aVarint and $7);
-  // TODO check valid wire type?
+  // TODO valid wire type check
 end;
 
 class function TProtobufTag.WithData(aFieldNumber: TProtobufFieldNumber; aWireType: TProtobufWireType): TProtobufTag;
@@ -343,7 +346,7 @@ begin
   if (FValue.WireType = TProtobufWireType.Len) then FValue.LenValue.Free;
 end;
 
-// TODO default values?
+// TODO correct handling of default values
 procedure TProtobufEncodedField.Encode(aDest: TStream);
 begin
   TProtobufTag.WithData(FFieldNumber, FValue.WireType).Encode(aDest);
@@ -411,12 +414,12 @@ procedure TProtobufEncodedField.Assign(aSource: TPersistent);
 var
   lSource: TProtobufEncodedField;
 begin
-  if (not (aSource is TProtobufEncodedField)) then
+  lSource := aSource as TProtobufEncodedField;
+  if (not Assigned(lSource)) then
   begin
     inherited;
     Exit;
   end;
-  lSource := aSource as TProtobufEncodedField;
   FFieldNumber := lSource.FFieldNumber;
   if (FValue.WireType = TProtobufWireType.Len) then FValue.LenValue.Free;
   FValue := lSource.FValue;
@@ -544,13 +547,28 @@ begin
   aValue.Encode(aDest);
 end;
 
+procedure MergeFromProtobufMessageField(aSource: TStream; aMessage: IProtobufMessage; aWireType: TProtobufWireType; aRemainingLength: PUInt32);
+var
+  lLength: UInt32;
+  lRemainingMessageLength: UInt32;
+begin
+  if (aWireType <> TProtobufWireType.Len) then raise EProtobufSchemaViolation.Create('Protobuf message field has unexpected wire type: ' + IntToStr(Ord(aWireType)));
+  // TODO range check
+  lLength := DecodeProtobufVarint(aSource, aRemainingLength);
+  if ((aRemainingLength <> nil) and (aRemainingLength^ < lLength)) then raise EProtobufFormatViolation.Create('TODO');
+  lRemainingMessageLength := lLength;
+  aMessage.MergeFrom(aSource, @lRemainingMessageLength);
+  if (lRemainingMessageLength <> 0) then raise EProtobufSchemaViolation.Create('TODO');
+  if (aRemainingLength <> nil) then aRemainingLength^ := aRemainingLength^ - lLength;
+end;
+
 function CalculateProtobufMessageFieldSize(aFieldNumber: TProtobufFieldNumber; aValue: IProtobufMessage): UInt32;
 begin
   if (aValue = PROTOBUF_DEFAULT_VALUE_MESSAGE) then Exit(0);
   result := TProtobufTag.WithData(aFieldNumber, TProtobufWireType.Len).CalculateSize + CalculateProtobufVarintSize(aValue.CalculateSize) + aValue.CalculateSize;
 end;
 
-// TODO default values?
+// TODO correct handling of default values
 procedure EncodeProtobufFields(aDest: TStream; aFields: TProtobufEncodedFieldsMap);
 var
   lRecords: TObjectList<TProtobufEncodedField>;

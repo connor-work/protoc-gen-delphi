@@ -42,21 +42,21 @@ uses
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uIProtobufMessage,
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufWireFormat;
 
-// TODO
+// TODO contract
 procedure EncodeProtobufBytesField(aDest: TStream; aFieldNumber: TProtobufFieldNumber; aValue: TBytesStream);
 
-// TODO
+// TODO contract
 function DecodeProtobufBytesField(aSource: TStream; aWireType: TProtobufWireType; aRemainingLength: PUInt32): TBytes;
 
-// TODO
+// TODO contract
 function CalculateProtobufBytesFieldSize(aFieldNumber: TProtobufFieldNumber; aValue: TBytesStream): UInt32;
 
-// TODO
+// TODO contract
 function CalculateProtobufMessageBytesFieldSize(aFieldNumber: TProtobufFieldNumber; aMessage: IProtobufMessage): UInt32;
 
 implementation
 
-// TODO support explicit presence?
+// TODO explicit presence support
 procedure EncodeProtobufBytesField(aDest: TStream; aFieldNumber: TProtobufFieldNumber; aValue: TBytesStream);
 begin
   if (aValue.Size = 0) then Exit;
@@ -71,7 +71,7 @@ var
   lLength: UInt32;
 begin
   if (aWireType <> TProtobufWireType.Len) then raise EProtobufSchemaViolation.Create('Protobuf bytes field has unexpected wire type: ' + IntToStr(Ord(aWireType)));
-  // TODO check range?
+  // TODO range check
   lLength := DecodeProtobufVarint(aSource, aRemainingLength);
   SetLength(result, lLength);
   if ((aRemainingLength <> nil) and (aRemainingLength^ < lLength)) then raise EProtobufFormatViolation.Create('TODO');
@@ -79,7 +79,7 @@ begin
   if (aRemainingLength <> nil) then aRemainingLength^ := aRemainingLength^ - lLength;
 end;
 
-// TODO support explicit presence?
+// TODO explicit presence support
 function CalculateProtobufBytesFieldSize(aFieldNumber: TProtobufFieldNumber; aValue: TBytesStream): UInt32;
 begin
   if (aValue.Size = 0) then Exit(0);
