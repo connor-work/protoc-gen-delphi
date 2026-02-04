@@ -13,12 +13,13 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
+using Google.Protobuf.Reflection;
 using System.Collections.Generic;
 using System.Linq;
-using Google.Protobuf.Reflection;
+using System.Reflection.Metadata;
 using Work.Connor.Delphi;
-using Visibility = Work.Connor.Delphi.Visibility;
 using Binding = Work.Connor.Delphi.MethodInterfaceDeclaration.Types.Binding;
+using Visibility = Work.Connor.Delphi.Visibility;
 
 namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
 {
@@ -28,12 +29,43 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
     /// <remarks>
     /// The protobuf message type is mapped to a Delphi class (<i>message class</i>).
     /// </remarks>
-    internal class MessageTypeSourceCode : TypeSourceCode
+    internal sealed partial class MessageTypeSourceCode : TypeSourceCode
     {
-        /// <summary>
-        /// Required unit reference for using Delphi classes
-        /// </summary>
-        private static UnitReference ClassesReference => new() { Unit = new() { Unit = "Classes", Namespace = { "System" } } };
+		/// <summary>
+		/// Name of the constant that contains the Protobuf type URL of the message type.
+		/// </summary>
+		private static string TypeUrlConstantName => "PROTOBUF_TYPE_URL";
+
+		/// <summary>
+		/// Name of the constant that contains the default prefix of Protobuf type URLs.
+		/// </summary>
+		private static string TypeUrlDefaultPrefixConstantName => "PROTOBUF_TYPE_URL_DEFAULT_PREFIX";
+
+		/// <summary>
+		/// Declaration of the constant that contains the Protobuf type URL of the message type.
+		/// </summary>
+		private TrueConstDeclaration TypeUrlConstant => new()
+        {
+            Identifier = TypeUrlConstantName,
+            Value = $"{TypeUrlDefaultPrefixConstantName} + {TypeName}",
+            Comment = """
+                <summary>
+                Protobuf type URL of this message type.
+                </summary>
+                """.AnnotationComment(),
+        };
+        
+        // TODO fields
+
+
+
+
+
+
+		/// <summary>
+		/// Required unit reference for using Delphi classes
+		/// </summary>
+		private static UnitReference ClassesReference => new() { Unit = new() { Unit = "Classes", Namespace = { "System" } } };
 
         /// <summary>
         /// Name of the Delphi root base class of all generated Delphi classes for protobuf messages
@@ -138,6 +170,7 @@ This class corresponds to the protobuf message type <c>{TypeName}</c>.
         {
             get
             {
+                yield return TypeUrlConstant.InClass(Visibility.Public);
                 foreach (TypeSourceCode nestedType in NestedEnums.Concat<TypeSourceCode>(NestedMessageTypes)) yield return new()
                 {
                     Visibility = Visibility.Public,
@@ -845,5 +878,21 @@ Copies those protobuf fields that belong to <see cref=""{DelphiTypeName}""/> (i.
                 foreach (string statement in Fields.SelectMany(field => field.AssignOwnFieldsStatements)) yield return statement;
             }
         }
-    }
+
+
+		/// <summary>
+		/// Source code lines of the generated <c>MergeFieldFromJson(TJSONPair)</c> instance method's statement block.
+		/// </summary>
+		private static IEnumerable<string> GetTypeUrlStatements
+			=>
+			"""
+            result := PROTOBUF_TYPE_URL;
+            """.Lines();
+
+		/// <summary>
+		/// Source code lines of the generated <c>MergeFieldFromJson(TJSONPair)</c> instance method's statement block.
+		/// </summary>
+		private IEnumerable<string> MergeFieldFromJsonStatements
+            => throw new System.NotImplementedException();
+	}
 }

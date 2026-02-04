@@ -13,6 +13,7 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
+using Google.Protobuf.WellKnownTypes;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -90,6 +91,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.RuntimeTests
             if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) return name;
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) return name;
             throw new NotImplementedException("Unsupported OS");
+            Duration
         }
 
         /// <summary>

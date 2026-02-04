@@ -44,7 +44,8 @@ uses
   SysUtils,
 {$ENDIF}
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.uProtobuf,
-  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uIProtobufMessage;
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uIProtobufMessage,
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uIProtobufRepeatedFieldValues;
 
 const
   /// <summary>
@@ -414,12 +415,12 @@ procedure TProtobufEncodedField.Assign(aSource: TPersistent);
 var
   lSource: TProtobufEncodedField;
 begin
-  lSource := aSource as TProtobufEncodedField;
-  if (not Assigned(lSource)) then
+  if (not (aSource is TProtobufEncodedField)) then
   begin
     inherited;
     Exit;
   end;
+  lSource := TProtobufEncodedField(aSource);
   FFieldNumber := lSource.FFieldNumber;
   if (FValue.WireType = TProtobufWireType.Len) then FValue.LenValue.Free;
   FValue := lSource.FValue;
@@ -500,11 +501,14 @@ begin
 end;
 
 function CalculateProtobufVarintSize(aVarint: UInt64): UInt32;
+var
+ lTodo: UInt64;
 begin
   result := 0;
   repeat
     result := result + 1;
-  until ((aVarint shr (result * 7)) = 0);
+  // NOTE The first check is necessary because shr with number of bits > 64 produces unexpected results.
+  until ((result > 9) or ((aVarint shr (result * 7)) = 0));
 end;
 
 procedure EncodeProtobufI64(aDest: TStream; aI64: UInt64);

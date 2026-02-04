@@ -54,6 +54,21 @@ uses
 /// </summary>
 procedure RunExample;
 
+type
+  ITestInterface1 = interface(IInterface)
+    ['{EEE81F48-0172-4128-85EC-4274242DDE21}']
+  end;
+
+  TTestClass1 = class(TInterfacedPersistent, ITestInterface1)
+    public destructor Destroy();
+  end;
+
+  TTestClass2 = class(TPersistent)
+    var FClass1: ITestInterface1;
+
+    public constructor Create();
+  end;
+
 implementation
 
 procedure WriteStreamContent(aStream: TMemoryStream);
@@ -114,7 +129,7 @@ begin
   try
     aMessage.Encode(lStream);
     lStream.Seek(0, soBeginning);
-    lDecodedMessage := TProtobufMessageBase(TProtobufMessageBase(aMessage).ClassType.Create);
+    lDecodedMessage := TProtobufMessageBase(TProtobufMessageType(TProtobufMessageBase(aMessage).ClassType).Create);
     lDecodedMessage.Decode(lStream);
     Writeln('The example message, encoded using the Protobuf binary wire format, after a wire format roundtrip:');
     WriteWireFormatMessage(lDecodedMessage);
@@ -149,7 +164,6 @@ begin
   TestProtoJsonRoundtrip(aMessage);
   lAny := TAny.Create;
   try
-    // TODO ownership of the message? clone it?
     lAny.Message := aMessage;
     TestWireFormatRoundtrip(lAny);
     TestProtoJsonRoundtrip(lAny);
@@ -164,7 +178,7 @@ var
 begin
   lDuration := TDuration.Create;
   try
-    lDuration.Seconds := 42;
+    lDuration.Seconds := -42;
     lDuration.SubSecondNanoseconds := 123456789;
     RunRoundtripExample(lDuration);
   finally
@@ -172,15 +186,38 @@ begin
   end;
 end;
 
+constructor TTestClass2.Create;
+begin
+  FClass1 := TTestClass1.Create;
+end;
+
+destructor TTestClass1.Destroy;
+begin
+  // TODO
+end;
+
 procedure RunExample;
 var
   lMessageX: TMessageX;
+  lTest: UInt64;
+  lInterface1: ITestInterface1;
+  lClass2: TTestClass2;
 begin
+  lInterface1 := TTestClass1.Create;
+  lClass2 := TTestClass2.Create;
+  lClass2.Free;
+  lTest := 18446744073709551574;
+  //lTest := lTest shr 63;
+  lTest := (lTest shr 63) shr 7;
+  lTest := 1 shr 7;
+  lTest := 1 shr 1;
   lMessageX := TMessageX.Create;
   try
     lMessageX.FieldX := 42;
     lMessageX.FieldY := TMessageY.Create;
+    // TODO encode empty message!
     RunRoundtripExample(lMessageX);
+    RunDurationExample;
   finally
     lMessageX.Free;
   end;

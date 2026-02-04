@@ -33,6 +33,16 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
     public class ProtocGenDelphi
     {
         /// <summary>
+        /// Name of the Delphi class that is the ancestor of all generated Delphi interfaces that represent Protobuf message types.
+        /// </summary>
+        public static string MessageTypeDelphiAncestorInterfaceName => "IProtobufNotWellKnownTypeMessage";
+
+        /// <summary>
+        /// Name of the Delphi class that is the ancestor of all generated Delphi classes that represent Protobuf message types.
+        /// </summary>
+        public static string MessageTypeDelphiAncestorClassName => "TProtobufNotWellKnownTypeMessageBase";
+
+        /// <summary>
         /// Mapping of protobuf type names to identifiers for Delphi types
         /// </summary>
         private static IdentifierGenerator<string> TypeIdentifier => new IdentifierTemplate<string>("type", x => x, "_ProtobufType", IdentifierCase.Pascal, "T", caseSensitive: false);

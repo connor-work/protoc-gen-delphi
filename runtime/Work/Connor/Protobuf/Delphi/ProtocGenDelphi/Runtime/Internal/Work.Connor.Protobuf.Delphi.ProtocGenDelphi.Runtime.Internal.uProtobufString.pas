@@ -34,6 +34,11 @@ uses
   Classes,
 {$ENDIF}
 {$IFDEF WORK_CONNOR_DELPHI_COMPILER_UNIT_SCOPE_NAMES}
+  System.JSON,
+{$ELSE}
+  JSON,
+{$ENDIF}
+{$IFDEF WORK_CONNOR_DELPHI_COMPILER_UNIT_SCOPE_NAMES}
   System.SysUtils,
 {$ELSE}
   SysUtils,
@@ -49,6 +54,15 @@ function DecodeProtobufStringField(aSource: TStream; aWireType: TProtobufWireTyp
 
 // TODO contract
 function CalculateProtobufStringFieldSize(aFieldNumber: TProtobufFieldNumber; aValue: UnicodeString): UInt32;
+
+// TODO contract
+function EncodeJsonProtobufString(aValue: UnicodeString): TJSONString;
+
+// TODO contract
+procedure EncodeJsonProtobufStringField(aDest: TJSONString; aFieldJsonName: UnicodeString; aValue: UnicodeString);
+
+// TODO contract
+function DecodeJsonProtobufString(aSource: TJSONString): UnicodeString;
 
 implementation
 
@@ -84,6 +98,23 @@ function CalculateProtobufStringFieldSize(aFieldNumber: TProtobufFieldNumber; aV
 begin
   if (aValue = PROTOBUF_DEFAULT_VALUE_STRING) then Exit(0);
   result := TProtobufTag.WithData(aFieldNumber, TProtobufWireType.Len).CalculateSize + CalculateProtobufVarintSize(Length(aValue) * SizeOf(Char)) + Length(aValue) * SizeOf(Char);
+end;
+
+function EncodeJsonProtobufString(aValue: UnicodeString): TJSONString;
+begin
+  // TODO implementation
+end;
+
+// TODO explicit presence support
+// TODO emit JSON default values
+procedure EncodeJsonProtobufStringField(aDest: TJSONString; aFieldJsonName: UnicodeString; aValue: UnicodeString);
+begin
+  // TODO implementation
+end;
+
+function DecodeJsonProtobufString(aSource: TJSONString): UnicodeString;
+begin
+  // TODO implementation
 end;
 
 end.

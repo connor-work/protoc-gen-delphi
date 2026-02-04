@@ -29,6 +29,7 @@ uses
 {$ENDIF}
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.uProtobuf,
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uIProtobufMessage,
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uIProtobufRepeatedFieldValues,
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uTypeRegistry,
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufBytes,
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufFixed32,
@@ -48,6 +49,9 @@ type
     /// Protobuf type URL of this message type.
     /// </summary>
     const PROTOBUF_TYPE_URL = PROTOBUF_TYPE_URL_DEFAULT_PREFIX + 'MessageY';
+
+    // TODO contract
+    public constructor Create; override; final;
 
     // TODO
     function AssignOwnFields(aSource: TProtobufMessageBase): Boolean; override; final;
@@ -148,84 +152,82 @@ type
 {$ENDIF}
     public property FieldY: TMessageY read FFieldY write SetFieldY;
 
-//    /// <summary>
-//    /// Protobuf field number of the Protobuf field <c>fieldZ</c>.
-//    /// </summary>
-//    const PROTOBUF_FIELD_NUMBER_FIELD_Z = 3;
-//
-//    /// <summary>
-//    /// Protobuf field name of the Protobuf field <c>fieldZ</c>.
-//    /// </summary>
-//    const PROTOBUF_FIELD_NAME_FIELD_Z = 'fieldZ';
-//
-//    /// <summary>
-//    /// JSON object key used to encode the Protobuf field <c>fieldZ</c> using the ProtoJSON format.
-//    /// </summary>
-//    const PROTOBUF_FIELD_JSON_NAME_FIELD_Z = 'fieldZ';
-//
-//    /// <summary>
-//    /// Holds the decoded values of the Protobuf field <c>fieldZ</c>.
-//    /// </summary>
-//    private var FFieldZ: TProtobufRepeatedUint32FieldValues;
-//
-//    /// <summary>
-//    /// Getter for <see cref="FieldZ"/>.
-//    /// </summary>
-//    /// <returns>The values of the Protobuf field <c>fieldZ</c></returns>
-//    /// <remarks>
-//    /// The returned collection is still owned by the message.
-//    /// Developers must ensure that a resulting shared ownership does not lead to unexpected behavior.
-//    /// </remarks>
-//    private function GetFieldZ: IProtobufRepeatedFieldValues<UInt32>;
-//
-//    /// <summary>
-//    /// Setter for <see cref="FieldZ"/>.
-//    /// </summary>
-//    /// <param name="aValues">The new values of the protobuf field <c>fieldZ</c></param>
-//    /// <remarks>
-//    /// Ownership of the inserted field value collection is transferred to the containing message.
-//    /// </remarks>
-//    private procedure SetFieldZ(aValues: IProtobufRepeatedFieldValues<UInt32>);
-//
-//    /// <remarks>
-//    /// This property corresponds to the Protobuf field <c>fieldZ</c>.
-//    /// The collection is always owned by the message.
-//    /// Developers must ensure that a resulting shared ownership does not lead to unexpected behavior.
-//    /// </remarks>
-//{$IFDEF WORK_CONNOR_DELPHI_COMPILER_CUSTOM_ATTRIBUTES}
-//    [ProtobufField(PROTOBUF_FIELD_NAME_FIELD_Z, PROTOBUF_FIELD_NUMBER_FIELD_Z)]
-//{$ENDIF}
-//    public property FieldZ: IProtobufRepeatedFieldValues<UInt32> read GetFieldZ write SetFieldZ;
+    /// <summary>
+    /// Protobuf field number of the Protobuf field <c>fieldZ</c>.
+    /// </summary>
+    const PROTOBUF_FIELD_NUMBER_FIELD_Z = 3;
 
-      // TODO
-      function AssignOwnFields(aSource: TProtobufMessageBase): Boolean; override; final;
+    /// <summary>
+    /// Protobuf field name of the Protobuf field <c>fieldZ</c>.
+    /// </summary>
+    const PROTOBUF_FIELD_NAME_FIELD_Z = 'fieldZ';
 
-      // TODO
-      procedure ClearOwnFields; override; final;
+    /// <summary>
+    /// JSON object key used to encode the Protobuf field <c>fieldZ</c> using the ProtoJSON format.
+    /// </summary>
+    const PROTOBUF_FIELD_JSON_NAME_FIELD_Z = 'fieldZ';
 
-      // TODO
-      procedure EncodeOwnFields(aDest: TStream); override; final;
+    /// <summary>
+    /// Holds the decoded values of the Protobuf field <c>fieldZ</c>.
+    /// </summary>
+    private var FFieldZ: TProtobufRepeatedUint32FieldValues;
 
-      // TODO
-      procedure MergeFieldFrom(aSource: TStream; aTag: TProtobufTag; aRemainingLength: PUInt32); override; final;
+    /// <summary>
+    /// Getter for <see cref="FieldZ"/>.
+    /// </summary>
+    /// <returns>The values of the Protobuf field <c>fieldZ</c></returns>
+    /// <remarks>
+    /// The returned collection is still owned by the message.
+    /// Developers must ensure that a resulting shared ownership does not lead to unexpected behavior.
+    /// </remarks>
+    private function GetFieldZ: IProtobufRepeatedFieldValues<UInt32>;
 
-      // TODO
-      function CalculateOwnFieldsSize: UInt32; override; final;
+    /// <remarks>
+    /// This property corresponds to the Protobuf field <c>fieldZ</c>.
+    /// The collection is always owned by the message.
+    /// Developers must ensure that a resulting shared ownership does not lead to unexpected behavior.
+    /// </remarks>
+{$IFDEF WORK_CONNOR_DELPHI_COMPILER_CUSTOM_ATTRIBUTES}
+    [ProtobufField(PROTOBUF_FIELD_NAME_FIELD_Z, PROTOBUF_FIELD_NUMBER_FIELD_Z)]
+{$ENDIF}
+    public property FieldZ: IProtobufRepeatedFieldValues<UInt32> read GetFieldZ;
 
-      // TODO
-      function GetTypeUrl: TProtobufTypeUrl; override; final;
+    // TODO contract
+    public constructor Create; override; final;
 
-      /// <summary>
-      /// Encodes the message as a JSON object using the ProtoJSON format and writes it to a <see cref="TJSONObject"/>.
-      /// </summary>
-      /// <param name="aDest">The <see cref="TJSONObject"/> that the encoded message is written to</param>
-      procedure EncodeJson(aDest: TJSONObject); override; final;
+    // TODO
+    function AssignOwnFields(aSource: TProtobufMessageBase): Boolean; override; final;
 
-      // TODO
-      function MergeFieldFromJson(aSource: TJSONPair): Boolean; override; final;
+    // TODO
+    procedure ClearOwnFields; override; final;
+
+    // TODO
+    procedure EncodeOwnFields(aDest: TStream); override; final;
+
+    // TODO
+    procedure MergeFieldFrom(aSource: TStream; aTag: TProtobufTag; aRemainingLength: PUInt32); override; final;
+
+    // TODO
+    function CalculateOwnFieldsSize: UInt32; override; final;
+
+    // TODO
+    function GetTypeUrl: TProtobufTypeUrl; override; final;
+
+    /// <summary>
+    /// Encodes the message as a JSON object using the ProtoJSON format and writes it to a <see cref="TJSONObject"/>.
+    /// </summary>
+    /// <param name="aDest">The <see cref="TJSONObject"/> that the encoded message is written to</param>
+    procedure EncodeJson(aDest: TJSONObject); override; final;
+
+    // TODO
+    function MergeFieldFromJson(aSource: TJSONPair): Boolean; override; final;
   end;
 
 implementation
+
+constructor TMessageY.Create;
+begin
+end;
 
 function TMessageY.AssignOwnFields(aSource: TProtobufMessageBase): Boolean;
 begin
@@ -264,23 +266,21 @@ begin
   result := False;
 end;
 
+constructor TMessageX.Create;
+begin
+  FFieldZ := TProtobufRepeatedUint32FieldValues.Create;
+end;
+
 procedure TMessageX.SetFieldY(aValue: TMessageY);
 begin
   FFieldY.Free;
   FFieldY := aValue;
 end;
 
-//function TMessageX.GetFieldZ: IProtobufRepeatedFieldValues<UInt32>;
-//begin
-//  result := FFieldZ;
-//end;
-//
-//procedure TMessageX.SetFieldZ(aValues: IProtobufRepeatedFieldValues<UInt32>);
-//begin
-//  FFieldZ.Free;
-//  FFieldZ := aValues as TProtobufRepeatedUint32FieldValues;
-//  FFieldZ.SetOwner(self);
-//end;
+function TMessageX.GetFieldZ: IProtobufRepeatedFieldValues<UInt32>;
+begin
+  result := FFieldZ;
+end;
 
 function TMessageX.AssignOwnFields(aSource: TProtobufMessageBase): Boolean;
 var
@@ -293,7 +293,7 @@ begin
   FFieldY.Free;
   FFieldY := TMessageY.Create;
   FFieldY.Assign(lSource.FFieldY);
-//  (FieldZ as TInterfacedPersistent).Assign(aSource.FieldZ as TInterfacedPersistent);
+  FFieldZ.Assign(lSource.FFieldZ);
 end;
 
 procedure TMessageX.ClearOwnFields;
@@ -301,14 +301,14 @@ begin
   FFieldX := PROTOBUF_DEFAULT_VALUE_UINT32;
   FFieldY.Free;
   FFieldY := PROTOBUF_DEFAULT_VALUE_MESSAGE;
-//  FFieldZ.Clear;
+  FFieldZ.Clear;
 end;
 
 procedure TMessageX.EncodeOwnFields(aDest: TStream);
 begin
   EncodeProtobufUint32Field(aDest, PROTOBUF_FIELD_NUMBER_FIELD_X, FFieldX);
   EncodeProtobufMessageField(aDest, PROTOBUF_FIELD_NUMBER_FIELD_Y, FFieldY);
-//  EncodeProtobufRepeatedUint32Field(aDest, PROTOBUF_FIELD_NUMBER_Z, FFieldZ);
+  FFieldZ.EncodeField(aDest, PROTOBUF_FIELD_NUMBER_FIELD_Z);
 end;
 
 procedure TMessageX.MergeFieldFrom(aSource: TStream; aTag: TProtobufTag; aRemainingLength: PUInt32);
@@ -322,7 +322,7 @@ begin
       FFieldY := TMessageY.Create;
       MergeFromProtobufMessageField(aSource, FFieldY, aTag.WireType, aRemainingLength);
     end;
-//    PROTOBUF_FIELD_NUMBER_FIELD_Z: TODO
+    PROTOBUF_FIELD_NUMBER_FIELD_Z: FFieldZ.MergeFromField(aSource, aTag.WireType, aRemainingLength);
     else MergeUnknownFieldFrom(aSource, aTag, aRemainingLength);
   end;
 end;

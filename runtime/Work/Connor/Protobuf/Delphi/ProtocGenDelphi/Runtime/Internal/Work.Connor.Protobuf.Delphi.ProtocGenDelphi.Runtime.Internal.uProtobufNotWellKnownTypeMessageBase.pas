@@ -102,8 +102,8 @@ procedure TProtobufNotWellKnownTypeMessageBase.DecodeJson(aSource: TJSONValue);
 var
   lSource: TJSONObject;
 begin
-  lSource := aSource as TJSONObject; 
-  if (not Assigned(lSource)) then raise EProtobufSchemaViolation.Create('TODO');
+  if (not (aSource is TJSONObject)) then raise EProtobufSchemaViolation.Create('TODO');
+  lSource := TJSONObject(aSource); 
   DecodeJson(lSource);
 end;
 

@@ -123,8 +123,9 @@ function DecodeJsonProtobufInt64(aSource: TJSONValue): Int64;
 var
   lSource: TJSONString;
 begin
-  lSource := aSource as TJSONString;
-  if (not Assigned(lSource)) then raise EProtobufSchemaViolation.Create('Protobuf int64 JSON field has unexpected type: ' + aSource.ClassName);
+  // "JSON value will be a decimal string. Either numbers or strings are accepted."
+  if (not (aSource is TJSONString)) then raise EProtobufSchemaViolation.Create('Protobuf int64 JSON field has unexpected type: ' + aSource.ClassName);
+  lSource := TJSONString(aSource);
   // TODO exponent notation support
   result := aSource.Value.ToInt64;
 end;

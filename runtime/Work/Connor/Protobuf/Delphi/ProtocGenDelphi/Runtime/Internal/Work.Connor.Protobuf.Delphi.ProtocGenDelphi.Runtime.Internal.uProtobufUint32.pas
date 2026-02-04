@@ -44,6 +44,7 @@ uses
   SysUtils,
 {$ENDIF}
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.uProtobuf,
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufRepeatedPrimitiveFieldValuesBase,
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufWireFormat;
 
 // TODO contract
@@ -69,6 +70,27 @@ procedure EncodeJsonProtobufUint32Field(aDest: TJSONObject; aFieldJsonName: Unic
 
 // TODO contract
 function DecodeJsonProtobufUint32(aSource: TJSONValue): UInt32;
+
+type
+  // TODO contract
+  TProtobufRepeatedUint32FieldValues = class sealed(TProtobufRepeatedPrimitiveFieldValuesBase<Uint32>)
+    // TProtobufRepeatedFieldValuesBase<T> implementation
+    protected
+      /// <summary>
+      /// Constructs a new default field value for insertion into the backing storage.
+      /// </summary>
+      /// <returns>The new field value</returns>
+      /// <remarks>
+      /// The default value for a non-message field type is the Protobuf default value for the type.
+      /// </remarks>
+      function ConstructElement: Uint32; override; final;
+
+      // TODO contract
+      procedure EncodeSingularField(aDest: TStream; aFieldNumber: TProtobufFieldNumber; aValue: UInt32); override; final;
+
+      // TODO contract
+      function DecodeSingularField(aSource: TStream; aWireType: TProtobufWireType; aRemainingLength: PUInt32): UInt32; override; final;
+  end;
 
 implementation
 
@@ -121,11 +143,29 @@ function DecodeJsonProtobufUint32(aSource: TJSONValue): UInt32;
 var
   lSource: TJSONString;
 begin
-  lSource := aSource as TJSONString;
-  if (not Assigned(lSource)) then raise EProtobufSchemaViolation.Create('Protobuf uint32 JSON field has unexpected type: ' + aSource.ClassName);
+  // "JSON value will be a decimal string. Either numbers or strings are accepted."
+  if (not (aSource is TJSONString)) then raise EProtobufSchemaViolation.Create('Protobuf uint32 JSON field has unexpected type: ' + aSource.ClassName);
+  lSource := TJSONString(aSource);
   // TODO exponent notation support
   // TODO range check
   result := UInt32(aSource.Value.ToInt64);
+end;
+
+// TProtobufRepeatedFieldValuesBase<T> implementation of TProtobufRepeatedUint32FieldValues
+
+function TProtobufRepeatedUint32FieldValues.ConstructElement: Uint32;
+begin
+  result := PROTOBUF_DEFAULT_VALUE_UINT32;
+end;
+
+procedure TProtobufRepeatedUint32FieldValues.EncodeSingularField(aDest: TStream; aFieldNumber: TProtobufFieldNumber; aValue: UInt32);
+begin
+  EncodeProtobufUint32Field(aDest, aFieldNumber, aValue);
+end;
+
+function TProtobufRepeatedUint32FieldValues.DecodeSingularField(aSource: TStream; aWireType: TProtobufWireType; aRemainingLength: PUInt32): UInt32;
+begin
+  result := DecodeProtobufUint32Field(aSource, aWireType, aRemainingLength);
 end;
 
 end.

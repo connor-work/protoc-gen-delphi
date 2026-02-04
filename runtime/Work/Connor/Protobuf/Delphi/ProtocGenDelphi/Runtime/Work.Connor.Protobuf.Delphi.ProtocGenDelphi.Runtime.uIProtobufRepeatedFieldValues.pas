@@ -1,4 +1,4 @@
-/// Copyright 2020 Connor Roehricht (connor.work)
+/// Copyright 2025 Connor Erdmann (connor.work)
 /// Copyright 2020 Sotax AG
 /// 
 /// Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,12 +13,7 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
-/// <summary>
-/// Runtime support for protobuf repeated field values.
-/// </summary>
-/// <remarks>
-/// Client code may need to reference this unit in order to operate on protobuf repeated fields.
-/// </remarks>
+// TODO contract
 unit Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uIProtobufRepeatedFieldValues;
 
 {$INCLUDE Work.Connor.Delphi.CompilerFeatures.inc}
@@ -30,7 +25,6 @@ unit Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uIProtobufRepeatedField
 interface
 
 uses
-  // To provide a TEnumerator
 {$IFDEF WORK_CONNOR_DELPHI_COMPILER_UNIT_SCOPE_NAMES}
   System.Generics.Collections;
 {$ELSE}
@@ -39,15 +33,15 @@ uses
 
 type
   /// <summary>
-  /// Ordered collection of protobuf field values that can be stored in a protobuf repeated field.
+  /// Ordered collection of Protobuf field values stored in a Protobuf repeated field.
   /// </summary>
-  /// <typeparam name="T">Delphi type representing the field values</typeparam>
-  IProtobufRepeatedFieldValues<T> = interface(IInterface)
+  /// <typeparam name="T">Delphi type representing a field value</typeparam>
+  IProtobufRepeatedFieldValues<TValue> = interface(IInterface)
     /// <summary>
-    /// Returns an enumerator for the protobuf field values, which enables usage of <c>for..in</c> loops.
+    /// Returns an enumerator for the Protobuf field values, which enables usage of <c>for..in</c> loops.
     /// </summary>
-    /// <returns>Enumerator for the protobuf field values, in order</returns>
-    function GetEnumerator: TEnumerator<T>;
+    /// <returns>Enumerator for the Protobuf field values, in order</returns>
+    function GetEnumerator: TEnumerator<TValue>;
 
     /// <summary>
     /// Getter for <see cref="Count"/>.
@@ -62,7 +56,7 @@ type
     procedure SetCount(aCount: Integer);
 
     /// <summary>
-    /// Gets or sets the actual number of protobuf field values in the repeated field.
+    /// Gets or sets the actual number of Protobuf field values in the repeated field.
     /// </summary>
     /// <remarks>
     /// If increased, new field values are appended to the repeated field, set to a default value (cf. <see cref="EmplaceAdd"/>).
@@ -76,14 +70,14 @@ type
     /// </summary>
     /// <param name="aIndex">The index to read from</param>
     /// <returns>The field value at the specified index</returns>
-    function GetValue(aIndex: Integer): T;
+    function GetValue(aIndex: Integer): TValue;
 
     /// <summary>
     /// Indexed setter for <see cref="Values"/>.
     /// </summary>
     /// <param name="aIndex">The index to write to</param>
     /// <param name="aValue">The new field value at the specified index</param>
-    procedure SetValue(aIndex: Integer; aValue: T);
+    procedure SetValue(aIndex: Integer; aValue: TValue);
 
     /// <summary>
     /// Gets or sets a field value at a specified index.
@@ -94,7 +88,7 @@ type
     /// Developers must ensure that no shared ownership of the destroyed field value or further nested embedded objects is held.
     /// </remarks>
     /// <param name="aIndex">The index to access</param>
-    property Values[aIndex: Integer]: T read GetValue write SetValue; default;
+    property Values[aIndex: Integer]: TValue read GetValue write SetValue; default;
 
     /// <summary>
     /// Adds a field value to the end of the sequence.
@@ -104,17 +98,17 @@ type
     /// <remarks>
     /// This operation transfers ownership of the added field value to the repeated field.
     /// </remarks>
-    function Add(const aValue: T): Integer;
+    function Add(const aValue: TValue): Integer;
 
     /// <summary>
     /// Adds a default field value to the end of the sequence.
     /// </summary>
     /// <returns>The new field value</return>
     /// <remarks>
-    /// The default value for a non-message field type is the protobuf default value for the type.
+    /// The default value for a non-message field type is the Protobuf default value for the type.
     /// The default value for a message field type is an empty instance of the message type.
     /// </remarks>
-    function EmplaceAdd: T;
+    function EmplaceAdd: TValue;
 
     /// <summary>
     /// Removes all field values.
@@ -141,18 +135,7 @@ type
     /// Unlike <see cref="Delete"/>, this method does not destroy the value. The caller is reponsible for managing (and eventually releasing)
     /// all resources held by the value.
     /// </remarks>
-    function ExtractAt(aIndex: Integer): T;
-
-    /// <summary>
-    /// Merges the given field value collection (source) into this one (destination).
-    /// The source field values are appended to the destination collection.
-    /// If this causes a new message object to be added, a copy is created to preserve ownership.
-    /// </summary>
-    /// <param name="aSource">Field value collection to merge into this one</param>
-    /// <remarks>
-    /// The source collection must be a collection of protobuf field values of the same type.
-    /// </remarks>
-    procedure MergeFrom(aSource: IProtobufRepeatedFieldValues<T>);
+    function ExtractAt(aIndex: Integer): TValue;
   end;
 
 implementation

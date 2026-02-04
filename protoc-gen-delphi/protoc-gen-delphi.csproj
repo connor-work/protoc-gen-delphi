@@ -5,7 +5,7 @@
     <OutputType>Exe</OutputType>
     <SnapshotVersion>true</SnapshotVersion>
     <TargetFramework>net10.0</TargetFramework>
-    <LangVersion>9.0</LangVersion>
+    <LangVersion>14.0</LangVersion>
     <RootNamespace>Work.Connor.Protobuf.Delphi.ProtocGenDelphi</RootNamespace>
     <Nullable>enable</Nullable>
     <PackAsTool>true</PackAsTool>
@@ -62,7 +62,7 @@
   <ItemGroup>
     <PackageReference Include="Google.Protobuf" Version="[3.33.1]" />
     <PackageReference Include="Grpc.Tools" Version="[2.76.0]" PrivateAssets="all" />
-    <PackageReference Include="SonarAnalyzer.CSharp" Version="8.15.0.24505">
+    <PackageReference Include="SonarAnalyzer.CSharp" Version="10.18.0.131500">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>

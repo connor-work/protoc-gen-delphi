@@ -72,7 +72,7 @@ implementation
 
 procedure EncodeJsonProtobufMessageField(aDest: TJSONObject; aFieldJsonName: UnicodeString; aValue: IProtobufMessage);
 begin
-  // TODO implementation
+  aDest.AddPair(aFieldJsonName, aValue.EncodeJson);
 end;
 
 end.

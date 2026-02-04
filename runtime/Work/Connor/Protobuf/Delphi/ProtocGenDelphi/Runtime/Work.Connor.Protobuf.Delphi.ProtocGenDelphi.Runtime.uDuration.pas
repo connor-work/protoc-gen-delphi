@@ -36,6 +36,16 @@ uses
 {$ELSE}
   JSON,
 {$ENDIF}
+{$IFDEF WORK_CONNOR_DELPHI_COMPILER_UNIT_SCOPE_NAMES}
+  System.RegularExpressions,
+{$ELSE}
+  RegularExpressions,
+{$ENDIF}
+{$IFDEF WORK_CONNOR_DELPHI_COMPILER_UNIT_SCOPE_NAMES}
+  System.SysUtils,
+{$ELSE}
+  SysUtils,
+{$ENDIF}
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.uProtobuf,
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uIProtobufWellKnownTypeMessage,
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufInt32,
@@ -65,6 +75,9 @@ type
       /// The remaining signed duration to add to <see cref="FSeconds"/> to arrive at the exact duration, in nanoseconds.
       /// </summary>
       FSubSecondNanoseconds: Int32;
+
+      // TODO contract
+      class var JsonRegex: TRegEx;
 
     public
       const
@@ -146,8 +159,8 @@ function TDuration.AssignOwnFields(aSource: TProtobufMessageBase): Boolean;
 var
   lSource: TDuration;
 begin
-  lSource := aSource as TDuration;
-  if (not Assigned(lSource)) then Exit(False);
+  if (not (aSource is TDuration)) then Exit(False);
+  lSource := TDuration(aSource);
   result := True;
   FSeconds := lSource.FSeconds;
   FSubSecondNanoseconds := lSource.FSubSecondNanoseconds;
@@ -185,14 +198,53 @@ begin
 end;
 
 function TDuration.EncodeJson: TJSONValue;
+var
+  lStringBuilder: TStringBuilder;
+  lAbsoluteNanoSeconds: Int64;
 begin
-  // TODO implementation
+  lStringBuilder := TStringBuilder.Create(24);
+  if ((FSeconds = 0) and (FSubSecondNanoseconds < 0)) then lStringBuilder.Append('-');
+  lStringBuilder.Append(FSeconds);
+  // "Generated output always contains 0, 3, 6, or 9 fractional digits, depending on required precision, [...]"
+  if (FSubSecondNanoseconds <> 0) then
+  begin
+    lAbsoluteNanoSeconds := Abs(FSubSecondNanoseconds);
+    lStringBuilder.Append('.');
+    if (lAbsoluteNanoSeconds mod 1000000 = 0) then lStringBuilder.AppendFormat('%.3d', [lAbsoluteNanoSeconds div 1000000])
+    else if (lAbsoluteNanoSeconds mod 1000 = 0) then lStringBuilder.AppendFormat('%.6d', [lAbsoluteNanoSeconds div 1000])
+    else lStringBuilder.AppendFormat('%.9d', [lAbsoluteNanoSeconds]);
+  end;
+  // "[...] followed by the suffix 's'."
+  lStringBuilder.Append('s');
+  result := TJSONString.Create(lStringBuilder.ToString);
+  lStringBuilder.Free;
 end;
 
 procedure TDuration.DecodeJson(aSource: TJSONValue);
+var
+  lSource: TJSONString;
+  lRegexMatch: TMatch;
+  lSecondsFractionGroup: TGroup;
 begin
-  // TODO implementation
+  if (not (aSource is TJSONString)) then raise EProtobufSchemaViolation.Create('TODO');
+  lSource := TJSONString(aSource);
+  lRegexMatch := JsonRegex.Match(lSource.Value);
+  if (not lRegexMatch.Success) then raise EProtobufSchemaViolation.Create('TODO');
+  // TODO range check
+  FSeconds := StrToInt64(lRegexMatch.Groups['whole_seconds'].Value);
+  lSecondsFractionGroup := lRegexMatch.Groups['seconds_fraction'];
+  if (lSecondsFractionGroup.Success) then
+  begin
+    FSubSecondNanoseconds := StrToInt(lSecondsFractionGroup.Value.PadRight(9, '0'));
+    // NOTE Even if the group is not matched, TGroup.Success returns True for unclear reasons.
+    if (lRegexMatch.Groups['negative_sign'].Length <> 0) then FSubSecondNanoseconds := -FSubSecondNanoseconds;
+  end
+  else FSubSecondNanoseconds := 0;
 end;
+
+initialization
+
+TDuration.JsonRegex.Create('^(?<whole_seconds>(?<negative_sign>-)?[0-9]{1,12})(?:\.(?<seconds_fraction>[0-9]{1,9}))?s$', [roCompiled])
 
 end.
 

@@ -44,9 +44,6 @@ uses
 
 type
   // TODO contract
-  TProtobufMessageType = class of TProtobufMessageBase;
-
-  // TODO contract
   TProtobufTypeRegistry = class sealed(TPersistent)
     private
       // TODO contract
@@ -145,12 +142,12 @@ var
   lSource: TProtobufTypeRegistry;
   lSourceNotWellKnownType: TPair<TProtobufTypeUrl, TProtobufMessageType>;
 begin
-  lSource := aSource as TProtobufTypeRegistry;
-  if (not Assigned(lSource)) then
+  if (not (aSource is TProtobufTypeRegistry)) then
   begin
     inherited;
     Exit;
   end;
+  lSource := TProtobufTypeRegistry(aSource);
   FNotWellKnownTypes.Free;
   FNotWellKnownTypes := TDictionary<TProtobufTypeUrl, TProtobufMessageType>.Create(lSource.FNotWellKnownTypes);
 end;

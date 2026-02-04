@@ -49,7 +49,7 @@ type
   /// The message instance carries transitive ownership of embedded objects in Protobuf field values,
   /// and is responsible for their deallocation.
   /// </remarks>
-  IProtobufNotWellKnownTypeMessage = interface(IProtobufMessage, IProtobuf)
+  IProtobufNotWellKnownTypeMessage = interface(IProtobufMessage)
     ['{60876367-A0DF-4D03-A439-0C94845DBAA3}']
   end;
 

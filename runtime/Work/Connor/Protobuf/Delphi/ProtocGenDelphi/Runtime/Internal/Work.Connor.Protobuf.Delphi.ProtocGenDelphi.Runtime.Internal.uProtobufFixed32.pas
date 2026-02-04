@@ -120,8 +120,9 @@ function DecodeJsonProtobufFixed32(aSource: TJSONValue): UInt32;
 var
   lSource: TJSONString;
 begin
-  lSource := aSource as TJSONString;
-  if (not Assigned(lSource)) then raise EProtobufSchemaViolation.Create('Protobuf fixed32 JSON field has unexpected type: ' + aSource.ClassName);
+  // "JSON value will be a decimal string. Either numbers or strings are accepted."
+  if (not (aSource is TJSONString)) then raise EProtobufSchemaViolation.Create('Protobuf fixed32 JSON field has unexpected type: ' + aSource.ClassName);
+  lSource := TJSONString(aSource);
   // TODO exponent notation support
   // TODO range check
   result := UInt32(aSource.Value.ToInt64);

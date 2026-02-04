@@ -14,6 +14,7 @@
 
 using System.Collections.Generic;
 using System.IO;
+using Work.Connor.Delphi;
 
 namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
 {
@@ -33,5 +34,15 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
             string? line;
             while ((line = reader.ReadLine()) != null) yield return line;
         }
+
+        /// <summary>
+        /// Constructs an <see cref="Work.Connor.Delphi.AnnotationComment"/> from the string.
+        /// </summary>
+        /// <param name="multiLineString">String that contains all lines of the comment text</param>
+        /// <returns>The comment</returns>
+        public static AnnotationComment AnnotationComment(this string multiLineString) => new()
+        { 
+            CommentLines = { multiLineString.Lines() },
+        };
     }
 }

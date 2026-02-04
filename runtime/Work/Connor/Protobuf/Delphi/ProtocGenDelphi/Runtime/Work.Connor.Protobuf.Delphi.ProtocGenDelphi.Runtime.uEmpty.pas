@@ -135,8 +135,8 @@ procedure TEmpty.DecodeJson(aSource: TJSONValue);
 var
   lSource: TJSONObject;
 begin
-  if (aSource.ClassType <> TJSONObject) then raise EProtobufSchemaViolation.Create('google.protobuf.Empty message is not encoded as a JSON object');
-  lSource := aSource as TJSONObject;
+  if (not (aSource is TJSONObject)) then raise EProtobufSchemaViolation.Create('google.protobuf.Empty message is not encoded as a JSON object');
+  lSource := TJSONObject(aSource);
   if (not lSource.IsEmpty) then EProtobufSchemaViolation.Create('google.protobuf.Empty message is not encoded as an empty JSON object');
   Clear;
 end;

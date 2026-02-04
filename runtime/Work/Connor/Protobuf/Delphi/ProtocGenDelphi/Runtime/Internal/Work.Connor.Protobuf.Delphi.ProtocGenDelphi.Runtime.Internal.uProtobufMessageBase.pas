@@ -84,9 +84,12 @@ type
 
     public
       // TODO contract
+      constructor Create; virtual;
+
+      // TODO contract
       destructor Destroy; override;
 
-    // TPersistent implementation
+    // TInterfacedPersistent implementation
     public
       /// <summary>
       /// Copies the data from another message to this one.
@@ -193,12 +196,21 @@ type
       procedure DecodeJson(aSource: TJSONValue); virtual; abstract;
   end;
 
+  // TODO contract
+  TProtobufMessageType = class of TProtobufMessageBase;
+
 implementation
 
 // Implementation of TProtobufMessageBase
 
+constructor TProtobufMessageBase.Create;
+begin
+  // TODO instead of virtual, call createownfields?
+end;
+
 destructor TProtobufMessageBase.Destroy;
 begin
+  // TODO instead of virtual, call destroyownfields?
   FUnknownFields.Free;
   inherited;
 end;
@@ -214,7 +226,7 @@ begin
   FUnknownFields[aTag.FieldNumber].Add(lUnknownField);
 end;
 
-// TPersistent implementation of TProtobufMessageBase
+// TInterfacedPersistent implementation of TProtobufMessageBase
 procedure TProtobufMessageBase.Assign(aSource: TPersistent);
 var
   lSource: TProtobufMessageBase;
@@ -223,12 +235,12 @@ var
   lSourceUnknownFieldRecord: TProtobufEncodedField;
   lUnknownFieldRecord: TProtobufEncodedField;
 begin
-  lSource := aSource as TProtobufMessageBase;
-  if (not Assigned(lSource)) then
+  if (not (lSource is TProtobufMessageBase)) then
   begin
     inherited;
     Exit;
   end;
+  lSource := TProtobufMessageBase(aSource);
   if (not AssignOwnFields(lSource)) then begin
     inherited;
     Exit;

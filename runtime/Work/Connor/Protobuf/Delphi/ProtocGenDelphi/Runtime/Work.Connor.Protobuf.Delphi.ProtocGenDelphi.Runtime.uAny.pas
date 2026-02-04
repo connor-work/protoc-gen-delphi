@@ -251,7 +251,7 @@ begin
   begin
     lMessageClass := TProtobufTypeRegistry.Global.GetType(FInnerTypeUrl);
     if (not Assigned(lMessageClass)) then raise EProtobufUnknownMessageType.Create('Unknown message type: ' + FInnerTypeUrl);
-    FMessage := lMessageClass.Create as IProtobufMessage;
+    FMessage := IProtobufMessage(lMessageClass.Create);
     FMessage.Decode(FValue);
     FValue.Position := 0;
   end
@@ -265,8 +265,8 @@ function TAny.AssignOwnFields(aSource: TProtobufMessageBase): Boolean;
 var
   lSource: TAny;
 begin
-  lSource := aSource as TAny;
-  if (not Assigned(lSource)) then Exit(False);
+  if (not (lSource is TAny)) then Exit(False);
+  lSource := TAny(aSource);
   result := True;
   // Assign FInnerTypeUrl.
   FInnerTypeUrl := lSource.FInnerTypeUrl;
@@ -339,8 +339,7 @@ begin
   if (not Assigned(FMessage)) then UnpackMessage;
   lJsonObject := TJSONObject.Create;
   lJsonObject.AddPair('@type', FMessage.TypeUrl);
-  lMessageWithGenericJsonRepresentation := FMessage as IProtobufMessageWithGenericJsonRepresentation;
-  if (Assigned(lMessageWithGenericJsonRepresentation)) then lMessageWithGenericJsonRepresentation.EncodeJson(lJsonObject)
+  if (Supports(FMessage, IProtobufMessageWithGenericJsonRepresentation, lMessageWithGenericJsonRepresentation)) then lMessageWithGenericJsonRepresentation.EncodeJson(lJsonObject)
   else lJsonObject.AddPair('value', FMessage.EncodeJson);
   result := lJsonObject;
 end;
@@ -348,21 +347,20 @@ end;
 procedure TAny.DecodeJson(aSource: TJSONValue);
 var
   lSource: TJSONObject;
-  lTypeUrl: TJSONString;
+  lTypeUrlValue: TJSONValue;
   lMessageClass: TProtobufMessageType;
   lMessageWithGenericJsonRepresentation: IProtobufMessageWithGenericJsonRepresentation;
   lValue: TJSONValue;
 begin
-  lSource := aSource as TJSONObject;
-  if (not Assigned(lSource)) then raise EProtobufSchemaViolation.Create('TODO');
-  lTypeUrl := lSource.GetValue('@type') as TJSONString;
-  if (not Assigned(lTypeUrl)) then raise EProtobufSchemaViolation.Create('TODO');
-  FInnerTypeUrl := lTypeUrl.Value;
+  if (not (aSource is TJSONObject)) then raise EProtobufSchemaViolation.Create('TODO');
+  lSource := TJSONObject(aSource);
+  lTypeUrlValue := lSource.GetValue('@type');
+  if (not (lTypeUrlValue is TJSONString)) then raise EProtobufSchemaViolation.Create('TODO');
+  FInnerTypeUrl := TJSONString(lTypeUrlValue).Value;
   lMessageClass := TProtobufTypeRegistry.Global.GetType(FInnerTypeUrl);
   if (not Assigned(lMessageClass)) then raise EProtobufUnknownMessageType.Create('Unknown message type: ' + FInnerTypeUrl);
-  FMessage := lMessageClass.Create as IProtobufMessage;
-  lMessageWithGenericJsonRepresentation := FMessage as IProtobufMessageWithGenericJsonRepresentation;
-  if (Assigned(lMessageWithGenericJsonRepresentation)) then lMessageWithGenericJsonRepresentation.DecodeJson(lSource, True)
+  FMessage := IProtobufMessage(lMessageClass.Create);
+  if (Supports(FMessage, IProtobufMessageWithGenericJsonRepresentation, lMessageWithGenericJsonRepresentation)) then lMessageWithGenericJsonRepresentation.DecodeJson(lSource, True)
   else
   begin
     lValue := lSource.GetValue('value');

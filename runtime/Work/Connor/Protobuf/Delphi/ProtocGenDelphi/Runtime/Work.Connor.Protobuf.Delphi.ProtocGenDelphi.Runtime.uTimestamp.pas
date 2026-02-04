@@ -176,8 +176,8 @@ function TTimestamp.AssignOwnFields(aSource: TProtobufMessageBase): Boolean;
 var
   lSource: TTimestamp;
 begin
-  lSource := aSource as TTimestamp;
-  if (not Assigned(lSource)) then Exit(False);
+  if (not (aSource is TTimestamp)) then Exit(False);
+  lSource := TTimestamp(aSource);
   result := True;
   FRtlTimestamp := lSource.FRtlTimestamp;
   FSubMilliNanoseconds := lSource.FSubMilliNanoseconds;
