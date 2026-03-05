@@ -12,6 +12,7 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
+using System.Linq;
 using Work.Connor.Delphi;
 using Binding = Work.Connor.Delphi.MethodInterfaceDeclaration.Types.Binding;
 using Visibility = Work.Connor.Delphi.Visibility;
@@ -21,22 +22,43 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi;
 internal sealed partial class ProtobufMessageTypeSourceCode
 {
     /// <summary>
+    /// Name of the local variable of <see cref="AssignOwnFieldsMethod"/> that holds TODO.
+    /// </summary>
+    internal static string AssignOwnFieldsSourceLocalVariableName => "lSource";
+
+    /// <summary>
     /// TODO
     /// </summary>
-    public DelphiMethodSourceCode AssignOwnFieldsMethod => new()
+    public DelphiMethodSourceCode AssignOwnFieldsMethod
     {
-        Comment = """
-            TODO contract
-            """.AnnotationComment(),
-        Visibility = Visibility.Public,
-        RoutineType = Prototype.Types.Type.Function,
-        Name = "AssignOwnFields",
-        ParameterList = { AssignOwnFieldsMethodSourceParameter },
-        ReturnType = "Boolean",
-        Binding = Binding.Override,
-        // NOTE This method should be a final method, once the Delphi Code Writer supports it.
-        // TODO statements
-    };
+        get
+        {
+            DelphiMethodSourceCode result = new()
+            {
+                Comment = """
+                    TODO contract
+                    """.AnnotationComment(),
+                Visibility = Visibility.Public,
+                RoutineType = Prototype.Types.Type.Function,
+                Name = "AssignOwnFields",
+                ParameterList = { AssignOwnFieldsMethodSourceParameter },
+                ReturnType = "Boolean",
+                Binding = Binding.Override,
+                IsFinal = true,
+                LocalDeclarations =
+                {
+                    $"{AssignOwnFieldsSourceLocalVariableName}: {DelphiClassName};",
+                },
+            };
+            result.Statements.AddRange($"""
+                {AssignOwnFieldsSourceLocalVariableName} := {AssignOwnFieldsMethodSourceParameter.Name} as {DelphiClassName};
+                if (not Assigned({AssignOwnFieldsSourceLocalVariableName})) then Exit(False);
+                result := True;
+                """.Lines());
+            result.Statements.AddRange(FieldsSourceCode.SelectMany(fieldSourceCode => fieldSourceCode.AssignOwnFieldsStatements));
+            return result;
+        }
+    }
 
     /// <summary>
     /// TODO
@@ -44,6 +66,6 @@ internal sealed partial class ProtobufMessageTypeSourceCode
     public Parameter AssignOwnFieldsMethodSourceParameter => new()
     {
         Name = "aSource",
-        Type = "TProtobufMessageBase", // TODO constant
+        Type = AllMessageTypesDelphiClassAncestorName,
     };
 }

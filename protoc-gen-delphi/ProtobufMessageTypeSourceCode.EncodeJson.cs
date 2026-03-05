@@ -12,6 +12,7 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
+using System.Linq;
 using Work.Connor.Delphi;
 using Binding = Work.Connor.Delphi.MethodInterfaceDeclaration.Types.Binding;
 using Visibility = Work.Connor.Delphi.Visibility;
@@ -21,33 +22,45 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi;
 internal sealed partial class ProtobufMessageTypeSourceCode
 {
     /// <summary>
+    /// Name of <see cref="EncodeJsonMethodDestParameter"/>.
+    /// </summary>
+    internal static string EncodeJsonMethodDestParameterName => "aDest";
+    
+    /// <summary>
     /// TODO
     /// </summary>
-    public DelphiMethodSourceCode EncodeJsonMethod => new()
+    public DelphiMethodSourceCode EncodeJsonMethod
     {
-        Comment = """
-            <summary>
-            Encodes the message as a JSON object using the ProtoJSON format and writes it to a <see cref="TJSONObject"/>.
-            </summary>
-            <param name="aDest">The <see cref="TJSONObject"/> that the encoded message is written to</param>
-            """.AnnotationComment(),
-        Visibility = Visibility.Public,
-        RoutineType = Prototype.Types.Type.Procedure,
-        Name = "EncodeJson",
-        ParameterList = {
-            EncodeJsonMethodDestParameter,
-        },
-        Binding = Binding.Override,
-        // NOTE This method should be a final method, once the Delphi Code Writer supports it.
-        // TODO statements
-    };
+        get
+        {
+            DelphiMethodSourceCode result = new()
+            {
+                Comment = $"""
+                    <summary>
+                    Encodes the message as a JSON object using the ProtoJSON format and writes it to a <see cref="TJSONObject"/>.
+                    </summary>
+                    <param name="{EncodeJsonMethodDestParameterName}">The <see cref="TJSONObject"/> that the encoded message is written to</param>
+                    """.AnnotationComment(),
+                Visibility = Visibility.Public,
+                RoutineType = Prototype.Types.Type.Procedure,
+                Name = "EncodeJson",
+                ParameterList = {
+                    EncodeJsonMethodDestParameter,
+                },
+                Binding = Binding.Override,
+                IsFinal = true,
+            };
+            result.Statements.AddRange(FieldsSourceCode.SelectMany(fieldSourceCode => fieldSourceCode.EncodeJsonStatements));
+            return result;
+        }
+    }
 
     /// <summary>
     /// TODO
     /// </summary>
     public Parameter EncodeJsonMethodDestParameter => new()
     {
-        Name = "aDest",
+        Name = EncodeJsonMethodDestParameterName,
         Type = "TJSONObject",
     };
 }

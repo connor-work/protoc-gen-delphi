@@ -12,6 +12,7 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
+using System.Linq;
 using Work.Connor.Delphi;
 using Binding = Work.Connor.Delphi.MethodInterfaceDeclaration.Types.Binding;
 using Visibility = Work.Connor.Delphi.Visibility;
@@ -21,31 +22,61 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi;
 internal sealed partial class ProtobufMessageTypeSourceCode
 {
     /// <summary>
+    /// Name of <see cref="MergeFieldFromJsonSourceParameter"/>.
+    /// </summary>
+    public static string MergeFieldFromJsonSourceParameterName => "aSource";
+    
+    /// <summary>
     /// TODO
     /// </summary>
-    public DelphiMethodSourceCode MergeFieldFromJsonMethod => new()
+    public DelphiMethodSourceCode MergeFieldFromJsonMethod
     {
-        Comment = """
-            TODO contract
-            """.AnnotationComment(),
-        Visibility = Visibility.Public,
-        RoutineType = Prototype.Types.Type.Function,
-        Name = "MergeFieldFromJson",
-        ParameterList = {
-            MergeFieldFromJsonSourceParameter,
-        },
-        ReturnType = "Boolean",
-        Binding = Binding.Override,
-        // NOTE This method should be a final method, once the Delphi Code Writer supports it.
-        // TODO statements
-    };
+        get
+        {
+            DelphiMethodSourceCode result = new()
+            {
+                Comment = """
+                    TODO contract
+                    """.AnnotationComment(),
+                Visibility = Visibility.Public,
+                RoutineType = Prototype.Types.Type.Function,
+                Name = "MergeFieldFromJson",
+                ParameterList = {
+                    MergeFieldFromJsonSourceParameter,
+                },
+                ReturnType = "Boolean",
+                Binding = Binding.Override,
+                IsFinal = true,
+            };
+            if (FieldsSourceCode.Any())
+            {
+                bool first = true;
+                foreach (ProtobufFieldSourceCode fieldSourceCode in FieldsSourceCode)
+                {
+                    if (!first) result.Statements.AddRange($"""
+                        else
+                        """.Lines());
+                    first = false;
+                    result.Statements.AddRange(fieldSourceCode.MergeFieldFromJsonStatements);
+                }
+                result.Statements.AddRange($"""
+                    else Exit(False);
+                    result := True;
+                    """.Lines());
+            }
+            else result.Statements.AddRange($"""
+                result := False;
+                """.Lines());
+            return result;
+        }
+    }
 
     /// <summary>
     /// TODO
     /// </summary>
     public Parameter MergeFieldFromJsonSourceParameter => new()
     {
-        Name = "aSource",
+        Name = MergeFieldFromJsonSourceParameterName,
         Type = "TJSONPair",
     };
 }

@@ -12,22 +12,24 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
-using Work.Connor.Delphi;
-
-// EXTRACT Delphi Code Writer
+using Visibility = Work.Connor.Delphi.Visibility;
 
 namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi;
 
-/// <summary>
-/// Extensions to <see cref="TrueConstDeclaration"/>.
-/// </summary>
-public static class ExtTrueConstDeclaration
+internal sealed partial class ProtobufMessageTypeSourceCode
 {
     /// <summary>
-    /// Declares the constant as a nested constant within a class.
+    /// TODO
     /// </summary>
-    /// <param name="declaration">The declaration of the constant</param>
-    /// <returns>The declaration within the class declaration</returns>
-    public static ClassDeclarationNestedDeclaration InClass(this TrueConstDeclaration declaration, Visibility visibility)
-        => new ConstDeclaration { TrueConstDeclaration = declaration }.InClass(visibility);
+    public DelphiClassConstantSourceCode ProtobufTypeUrlConstant => new()
+    {
+        Comment = """
+            <summary>
+            Protobuf type URL of this message type.
+            </summary>
+            """.AnnotationComment(),
+        Visibility = Visibility.Public,
+        Name = ProtobufTypeUrlDelphiConstantName,
+        Value = $"{ProtocGenDelphi.ProtobufTypeUrlDefaultPrefixDelphiConstantName} + '{MessageType.Name}'"
+    };
 }

@@ -13,7 +13,9 @@
 /// limitations under the License.
 
 using Google.Protobuf.Reflection;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using Work.Connor.Delphi;
 
 namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi;
@@ -31,7 +33,19 @@ internal sealed partial class ProtobufMessageTypeSourceCode
     /// <summary>
     /// TODO
     /// </summary>
-    public string DelphiInterfaceName => "TODO";
+    private IEnumerable<ProtobufFieldSourceCode> FieldsSourceCode
+        => MessageType.Field.Select(@field => new ProtobufFieldSourceCode
+        {
+            MessageType = this,
+            Field = @field,
+        });
+
+    /// <summary>
+    /// TODO
+    /// </summary>
+    public string DelphiInterfaceName => ProtocGenDelphi.ConstructDelphiInterfaceName(MessageType.Name);
+
+    private Guid DelphiInterfaceGuid { get; } = Guid.NewGuid(); // TODO generate v5 UUID
 
     /// <summary>
     /// TODO
@@ -42,19 +56,33 @@ internal sealed partial class ProtobufMessageTypeSourceCode
         {
             DelphiInterfaceSourceCode result = new()
             {
-                Comment = """
-                    /// <summary>
-                    /// TODO contract
-                    /// </summary>
-                    /// <remarks>
-                    /// This interface corresponds to the Protobuf message type <c>MessageY</c>.
-                    /// </remarks>
-                """.AnnotationComment(),
+                Comment = $"""
+                    <summary>
+                    TODO contract
+                    </summary>
+                    <remarks>
+                    This interface corresponds to the Protobuf message type <c>{MessageType.Name}</c>.
+                    </remarks>
+                    """.AnnotationComment(),
                 Name = DelphiInterfaceName,
-                Ancestor = ProtocGenDelphi.MessageTypeDelphiAncestorInterfaceName,
-                Guid = default, // TODO generate v5 UUID
+                Ancestor = GeneratedDelphiInterfaceAncestorName,
+                Guid = DelphiInterfaceGuid,
+                Methods = {
+                    AssignOwnFieldsMethod,
+                    ClearOwnFieldsMethod,
+                    EncodeOwnFieldsMethod,
+                    MergeFieldFromMethod,
+                    CalculateOwnFieldsSizeMethod,
+                    GetTypeUrlMethod,
+                    EncodeJsonMethod,
+                    MergeFieldFromJsonMethod,
+                },
             };
-            // TODO add properties
+            result.Methods.AddRange(FieldsSourceCode.SelectMany<ProtobufFieldSourceCode, DelphiMethodSourceCode>(@field => [
+                @field.DelphiInterfaceGetterMethod,
+                ..@field.DelphiInterfaceSetterMethod.CollectIfPresent(),
+            ]));
+            result.Properties.AddRange(FieldsSourceCode.Select(@field => @field.DelphiInterfaceProperty));
             return result;
         }
     }
@@ -73,18 +101,19 @@ internal sealed partial class ProtobufMessageTypeSourceCode
         {
             DelphiClassSourceCode result = new()
             {
-                Comment = """
-                    /// <summary>
-                    /// TODO contract
-                    /// </summary>
-                    /// <remarks>
-                    /// This class corresponds to the Protobuf message type <c>MessageY</c>.
-                    /// </remarks>
-                """.AnnotationComment(),
+                Comment = $"""
+                    <summary>
+                    TODO contract
+                    </summary>
+                    <remarks>
+                    This class corresponds to the Protobuf message type <c>{MessageType.Name}</c>.
+                    </remarks>
+                    """.AnnotationComment(),
                 Name = DelphiClassName,
-                Ancestor = ProtocGenDelphi.MessageTypeDelphiAncestorClassName,
+                InheritanceModifier = ClassDeclaration.Types.InheritanceModifier.Sealed,
+                Ancestor = GeneratedDelphiClassAncestorName,
                 Constants = {
-
+                    ProtobufTypeUrlConstant,
                 },
                 Methods = {
                     CreateMethod,
@@ -98,11 +127,17 @@ internal sealed partial class ProtobufMessageTypeSourceCode
                     MergeFieldFromJsonMethod,
                 },
             };
-            // TODO add properties
+            result.Methods.AddRange(FieldsSourceCode.SelectMany<ProtobufFieldSourceCode, DelphiMethodSourceCode>(@field => [
+                @field.DelphiClassGetterMethod,
+                ..@field.DelphiClassSetterMethod.CollectIfPresent(),
+                ..@field.DelphiInterfaceGetterImplementationMethod.CollectIfPresent(),
+                ..@field.DelphiInterfaceSetterImplementationMethod.CollectIfPresent(),
+            ]));
+            // TODO emit field name and number constants
+            // TODO emit fields
+            // TODO emit method resolution clauses if required
+            result.Properties.AddRange(FieldsSourceCode.Select(@field => @field.DelphiClassProperty));
             return result;
-
-            // TODO current problem: Does the caller get the messages as classes or interfaces? If they get them as classes, we have to manage transfer of ownership. If they get them as interfaces, we have to make sure that they do not get the classes!
-            // TODO only as interfaces?
         }
     }
 
@@ -111,7 +146,7 @@ internal sealed partial class ProtobufMessageTypeSourceCode
     /// </summary>
     /// <returns></returns>
     public IEnumerable<InterfaceDeclaration> Declare() => [
-        // TODO declare interface type
+        new InterfaceDeclaration { InterfaceTypeDeclaration = DelphiInterface.Declare() },
         new InterfaceDeclaration { ClassDeclaration = DelphiClass.Declare() },
     ];
 
@@ -119,7 +154,17 @@ internal sealed partial class ProtobufMessageTypeSourceCode
     /// TODO
     /// </summary>
     /// <returns></returns>
-    public IEnumerable<MethodDeclaration> Implement() => DelphiClass.Implement();
+    public IEnumerable<ImplementationDeclaration> Implement() => DelphiClass.Implement()
+        .Select(method => new ImplementationDeclaration
+        {
+            MethodDeclaration = method,
+        });
 
-    // TODO Initialize() (Delphi Code Writer needs to support initialization section)
+    /// <summary>
+    /// TODO
+    /// </summary>
+    /// <returns></returns>
+    public IEnumerable<string> Initialize() => [
+        $"{ProtocGenDelphi.ProtobufRuntimeGlobalTypeRegistryDelphiObject}.{ProtocGenDelphi.ProtobufRuntimeRegisterNotWellKnownTypeDelphiMethodName}({DelphiClassName}.{ProtobufTypeUrlConstant.Name}, {DelphiClassName});",
+    ];
 }

@@ -12,20 +12,14 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using Work.Connor.Delphi;
-using Binding = Work.Connor.Delphi.MethodInterfaceDeclaration.Types.Binding;
+using Work.Connor.Delphi.CodeWriter;
 
 namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi;
 
 /// <summary>
 /// Aggregation of Delphi source code elements that are part of a generated Delphi property.
 /// </summary>
-/// <remarks>
-/// Properties with getter methods are currently not supported.
-/// Write-only properties are currently not supported.
-/// </remarks>
 internal sealed class DelphiPropertySourceCode
 {
     /// <summary>
@@ -46,33 +40,27 @@ internal sealed class DelphiPropertySourceCode
     /// <summary>
     /// TODO
     /// </summary>
-    public required bool ReadOnly { get; init; } = false;
+    public bool ReadOnly { get; init; } = false;
 
     /// <summary>
     /// TODO
     /// </summary>
-    public sealed class SetterSourceCode
-    {
-        /// <summary>
-        /// TODO
-        /// </summary>
-        public string? ParameterComment { get; init; } = null;
-
-        /// <summary>
-        /// TODO
-        /// </summary>
-        public IList<string> LocalDeclarations { get; } = [];
-
-        /// <summary>
-        /// TODO
-        /// </summary>
-        public IList<string> Statements { get; } = [];
-    }
+    public bool WriteOnly { get; init; } = false;
 
     /// <summary>
     /// TODO
     /// </summary>
-    public SetterSourceCode? Setter { get; init; } = null;
+    public string? BackingFieldName { get; init; } = null;
+
+    /// <summary>
+    /// TODO
+    /// </summary>
+    public string? GetterName { get; init; } = null;
+
+    /// <summary>
+    /// TODO
+    /// </summary>
+    public string? SetterName { get; init; } = null;
 
     /// <summary>
     /// TODO
@@ -82,115 +70,30 @@ internal sealed class DelphiPropertySourceCode
     /// <summary>
     /// TODO
     /// </summary>
-    public AnnotationComment? BackingFieldComment { get; init; } = null;
-
-    /// <summary>
-    /// TOOD
-    /// </summary>
-    private string BackingFieldName => $"F{Name}";
-
-    /// <summary>
-    /// TODO
-    /// </summary>
-    private AnnotationComment DefaultBackingFieldComment => $"""
-        /// <summary>
-        /// Backing field of <see cref="{Name}"/>.
-        /// </summary>
-        """.AnnotationComment();
-
-    /// <summary>
-    /// TODO
-    /// </summary>
-    private FieldDeclaration BackingFieldDeclaration => new()
-    {
-        Comment = BackingFieldComment ?? DefaultBackingFieldComment,
-        Name = BackingFieldName,
-        Type = Type,
-    };
-
-    /// <summary>
-    /// TODO
-    /// </summary>
-    [MemberNotNullWhen(true, nameof(Setter))]
-    [MemberNotNullWhen(true, nameof(SetterMethod))]
-    private bool HasSetter => !ReadOnly && Setter is not null;
-
-    /// <summary>
-    /// TODO
-    /// </summary>
-    private string SetterMethodName => $"Set{Name}";
-
-    /// <summary>
-    /// TODO
-    /// </summary>
-    private string DefaultSetterParameterComment => $"The new value of <see cref=\"{Name}\"/>";
-
-    /// <summary>
-    /// TODO
-    /// </summary>
-    private Parameter SetterParameter => new()
-    {
-        Name = "aValue",
-        Type = Type,
-    };
-
-    /// <summary>
-    /// TODO
-    /// </summary>
-    private DelphiMethodSourceCode? SetterMethod
-    {
-        get
+    /// <returns></returns>
+    public ClassDeclarationNestedDeclaration DeclareInClass()
+        => new PropertyDeclaration
         {
-            if (!HasSetter) return null;
-            DelphiMethodSourceCode result = new()
-            {
-                Comment = $"""
-                    <summary>
-                    Setter for <see cref="{Name}"/>.
-                    </summary>
-                    /// <param name="aValue">{Setter.ParameterComment ?? DefaultSetterParameterComment}</param>
-                    """.AnnotationComment(),
-                Visibility = Visibility.Private,
-                Name = SetterMethodName,
-                RoutineType = Prototype.Types.Type.Procedure,
-                ParameterList = { SetterParameter },
-                Binding = Binding.Static,
-            };
-            result.LocalDeclarations.AddRange(Setter.LocalDeclarations);
-            result.Statements.AddRange(Setter.Statements);
-            return result;
-        }
-    }
+            Name = Name,
+            Type = Type,
+            ReadSpecifier = WriteOnly ? "" : (GetterName ?? BackingFieldName),
+            WriteSpecifier = ReadOnly ? "" : (SetterName ?? BackingFieldName),
+            Comment = Comment,
+        }.InClass(Visibility);
 
     /// <summary>
     /// TODO
     /// </summary>
-    private PropertyDeclaration PropertyDeclaration => new()
+    /// <returns></returns>
+    public InterfaceMemberDeclaration DeclareInInterface() => new()
     {
-        Comment = Comment,
-        Name = Name,
-        ReadSpecifier = BackingFieldName,
-        WriteSpecifier = ReadOnly ? null
-                                  : (HasSetter ? SetterMethodName : BackingFieldName),
-        Type = Type,
+        PropertyDeclaration = new PropertyDeclaration
+        {
+            Name = Name,
+            Type = Type,
+            ReadSpecifier = WriteOnly ? "" : GetterName,
+            WriteSpecifier = ReadOnly ? "" : SetterName,
+            Comment = Comment,
+        },
     };
-
-    /// <summary>
-    /// TODO
-    /// </summary>
-    /// <returns></returns>
-    public IEnumerable<ClassDeclarationNestedDeclaration> Declare() => [
-        BackingFieldDeclaration.InClass(Visibility.Private),
-        ..(SetterMethod?.Declare()).CollectIfPresent(),
-        PropertyDeclaration.InClass(Visibility),
-    ];
-
-    /// <summary>
-    /// TODO
-    /// </summary>
-    /// <param name="className"></param>
-    /// <returns></returns>
-    public IEnumerable<MethodDeclaration> Implement(string className) => [
-        ..(SetterMethod?.Implement(className)).CollectIfPresent(),
-    ];
 }

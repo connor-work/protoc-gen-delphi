@@ -143,7 +143,7 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         public static string GetPublicDelphiElementType(this Type fieldType) => fieldType.GetPublicDelphiSingleValueType();
 
         /// <summary>
-        /// Determines the Delphi identifier of the subtype of <c>IProtobufRepeatedFieldValues<!<![CDATA[<T>]]></c> that represents repeated fields of
+        /// Determines the Delphi identifier of the subtype of <c>IProtobufRepeatedFieldValues</c> that represents repeated fields of
         /// a specific protobuf field type.
         /// </summary>
         /// <param name="fieldType">The protobuf field descriptor's type field value</param>

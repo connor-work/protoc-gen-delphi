@@ -44,8 +44,9 @@ uses
   SysUtils,
 {$ENDIF}
   Work.Connor.Protobuf.Delphi.ProtocGenDelphi.uProtobuf,
-  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uIProtobufMessage,
-  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uIProtobufRepeatedFieldValues;
+  Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uIProtobufMessage;
+  // TODO
+  //Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uIProtobufRepeatedFieldValues;
 
 const
   /// <summary>

@@ -21,6 +21,11 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi;
 internal sealed partial class ProtobufMessageTypeSourceCode
 {
     /// <summary>
+    /// Name of the Delphi method <see cref="CreateMethod"/>.
+    /// </summary>
+    public static string CreateMethodName => "Create";
+
+    /// <summary>
     /// TODO
     /// </summary>
     public DelphiMethodSourceCode CreateMethod => new()
@@ -30,9 +35,9 @@ internal sealed partial class ProtobufMessageTypeSourceCode
             """.AnnotationComment(),
         Visibility = Visibility.Public,
         RoutineType = Prototype.Types.Type.Constructor,
-        Name = "Create",
+        Name = CreateMethodName,
         Binding = Binding.Override,
-        // NOTE This method should be a final method, once the Delphi Code Writer supports it.
+        IsFinal = true,
         // TODO statements
     };
 }

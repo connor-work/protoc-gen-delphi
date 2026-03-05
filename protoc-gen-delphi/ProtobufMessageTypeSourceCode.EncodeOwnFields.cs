@@ -12,6 +12,7 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
+using System.Linq;
 using Work.Connor.Delphi;
 using Binding = Work.Connor.Delphi.MethodInterfaceDeclaration.Types.Binding;
 using Visibility = Work.Connor.Delphi.Visibility;
@@ -21,30 +22,42 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi;
 internal sealed partial class ProtobufMessageTypeSourceCode
 {
     /// <summary>
+    /// Name of <see cref="EncodeOwnFieldsMethodDestParameter"/>.
+    /// </summary>
+    internal static string EncodeOwnFieldsMethodDestParameterName => "aDest";
+    
+    /// <summary>
     /// TODO
     /// </summary>
-    public DelphiMethodSourceCode EncodeOwnFieldsMethod => new()
+    public DelphiMethodSourceCode EncodeOwnFieldsMethod
     {
-        Comment = """
-            TODO contract
-            """.AnnotationComment(),
-        Visibility = Visibility.Public,
-        RoutineType = Prototype.Types.Type.Procedure,
-        Name = "EncodeOwnFields",
-        ParameterList = {
-            EncodeOwnFieldsMethodDestParameter,
-        },
-        Binding = Binding.Override,
-        // NOTE This method should be a final method, once the Delphi Code Writer supports it.
-        // TODO statements
-    };
+        get
+        {
+            DelphiMethodSourceCode result = new()
+            {
+                Comment = """
+                    TODO contract
+                    """.AnnotationComment(),
+                Visibility = Visibility.Public,
+                RoutineType = Prototype.Types.Type.Procedure,
+                Name = "EncodeOwnFields",
+                ParameterList = {
+                    EncodeOwnFieldsMethodDestParameter,
+                },
+                Binding = Binding.Override,
+                IsFinal = true,
+            };
+            result.Statements.AddRange(FieldsSourceCode.SelectMany(fieldSourceCode => fieldSourceCode.EncodeOwnFieldsStatements));
+            return result;
+        }
+    }
 
     /// <summary>
     /// TODO
     /// </summary>
     public Parameter EncodeOwnFieldsMethodDestParameter => new()
     {
-        Name = "aDest",
+        Name = EncodeOwnFieldsMethodDestParameterName,
         Type = "TStream",
     };
 }

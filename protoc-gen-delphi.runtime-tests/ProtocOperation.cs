@@ -91,7 +91,6 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi.RuntimeTests
             if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) return name;
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) return name;
             throw new NotImplementedException("Unsupported OS");
-            Duration
         }
 
         /// <summary>

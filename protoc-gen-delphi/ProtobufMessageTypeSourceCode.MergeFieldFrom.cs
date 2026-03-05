@@ -12,6 +12,7 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
+using System.Linq;
 using Work.Connor.Delphi;
 using Binding = Work.Connor.Delphi.MethodInterfaceDeclaration.Types.Binding;
 using Visibility = Work.Connor.Delphi.Visibility;
@@ -21,32 +22,66 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi;
 internal sealed partial class ProtobufMessageTypeSourceCode
 {
     /// <summary>
+    /// Name of <see cref="MergeFieldFromSourceParameter"/>.
+    /// </summary>
+    public static string MergeFieldFromSourceParameterName => "aSource";
+
+    /// <summary>
+    /// Name of <see cref="MergeFieldFromTagParameter"/>.
+    /// </summary>
+    public static string MergeFieldFromTagParameterName => "aTag";
+
+    /// <summary>
+    /// Name of <see cref="MergeFieldFromRemainingLengthParameter"/>.
+    /// </summary>
+    public static string MergeFieldFromRemainingLengthParameterName => "aRemainingLength";
+    
+    /// <summary>
     /// TODO
     /// </summary>
-    public DelphiMethodSourceCode MergeFieldFromMethod => new()
+    public DelphiMethodSourceCode MergeFieldFromMethod
     {
-        Comment = """
-            TODO contract
-            """.AnnotationComment(),
-        Visibility = Visibility.Public,
-        RoutineType = Prototype.Types.Type.Procedure,
-        Name = "MergeFieldFrom",
-        ParameterList = {
-            MergeFieldFromSourceParameter,
-            MergeFieldFromTagParameter,
-            MergeFieldFromRemainingLengthParameter,
-        },
-        Binding = Binding.Override,
-        // NOTE This method should be a final method, once the Delphi Code Writer supports it.
-        // TODO statements
-    };
+        get
+        {
+            DelphiMethodSourceCode result = new()
+            {
+                Comment = """
+                    TODO contract
+                    """.AnnotationComment(),
+                Visibility = Visibility.Public,
+                RoutineType = Prototype.Types.Type.Procedure,
+                Name = "MergeFieldFrom",
+                ParameterList = {
+                    MergeFieldFromSourceParameter,
+                    MergeFieldFromTagParameter,
+                    MergeFieldFromRemainingLengthParameter,
+                },
+                Binding = Binding.Override,
+                IsFinal = true,
+            };
+            if (FieldsSourceCode.Any())
+            {
+                result.Statements.AddRange($"""
+                    // TODO is this the correct merge behavior?
+                    case {MergeFieldFromTagParameter.Name}.{ProtocGenDelphi.TagFieldNumberDelphiFieldName} of
+                    """.Lines());
+                result.Statements.AddRange(FieldsSourceCode.SelectMany(
+                    fieldSourceCode => fieldSourceCode.MergeFieldFromStatements.Select(statement => $"  {statement}")));
+                result.Statements.AddRange($"""
+                      else {MergeUnknownFieldFromDelphiMethodName}({MergeFieldFromSourceParameter.Name}, {MergeFieldFromTagParameter.Name}, {MergeFieldFromRemainingLengthParameter.Name})
+                    end;
+                    """.Lines());
+            }
+            return result;
+        }
+    }
 
     /// <summary>
     /// TODO
     /// </summary>
     public Parameter MergeFieldFromSourceParameter => new()
     {
-        Name = "aSource",
+        Name = MergeFieldFromSourceParameterName,
         Type = "TStream",
     };
 
@@ -55,8 +90,8 @@ internal sealed partial class ProtobufMessageTypeSourceCode
     /// </summary>
     public Parameter MergeFieldFromTagParameter => new()
     {
-        Name = "aTag",
-        Type = "TProtobufTag", // TODO constant
+        Name = MergeFieldFromTagParameterName,
+        Type = ProtocGenDelphi.TagDelphiTypeName,
     };
 
     /// <summary>
@@ -64,7 +99,7 @@ internal sealed partial class ProtobufMessageTypeSourceCode
     /// </summary>
     public Parameter MergeFieldFromRemainingLengthParameter => new()
     {
-        Name = "aRemainingLength",
+        Name = MergeFieldFromRemainingLengthParameterName,
         Type = "PUInt32",
     };
 }

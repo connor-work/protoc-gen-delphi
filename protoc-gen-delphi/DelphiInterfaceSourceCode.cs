@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Work.Connor.Delphi;
 
 namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi;
@@ -43,8 +44,6 @@ internal sealed class DelphiInterfaceSourceCode
     /// </summary>
     public required Guid Guid { get; init; }
 
-    // TODO that means we need getter properties without backing field
-
     /// <summary>
     /// TODO
     /// </summary>
@@ -55,5 +54,21 @@ internal sealed class DelphiInterfaceSourceCode
     /// </summary>
     public List<DelphiMethodSourceCode> Methods { get; } = [];
 
-    // TODO declare as interface (Delphi Code Writer needs to support this)
+    /// <summary>
+    /// TODO
+    /// </summary>
+    /// <returns></returns>
+    public InterfaceTypeDeclaration Declare()
+    {
+        InterfaceTypeDeclaration result = new()
+        {
+            Name = Name,
+            Ancestor = Ancestor,
+            Guid = Guid.ToString().ToUpperInvariant(),
+            Comment = Comment,
+        };
+        result.MemberDeclarations.AddRange(Properties.Select(property => property.DeclareInInterface()));
+        result.MemberDeclarations.AddRange(Methods.Select(method => method.DeclareInInterface()));
+        return result;
+    }
 }

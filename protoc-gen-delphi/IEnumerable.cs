@@ -1,4 +1,4 @@
-/// Copyright 2025 Connor Erdmann (connor.work)
+﻿/// Copyright 2025 Connor Erdmann (connor.work)
 /// 
 /// Licensed under the Apache License, Version 2.0 (the "License");
 /// you may not use this file except in compliance with the License.
@@ -12,25 +12,29 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
-using Work.Connor.Delphi;
-
-// EXTRACT Delphi Code Writer
+using System.Collections.Generic;
 
 namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi;
 
 /// <summary>
-/// Extensions to <see cref="ConstDeclaration"/>.
+/// Extensions to <see cref="IEnumerable{T}"/>.
 /// </summary>
-public static class ExtConstDeclaration
+public static class ExtIEnumerable
 {
     /// <summary>
-    /// Declares the constant as a nested constant within a class.
+    /// TODO
     /// </summary>
-    /// <param name="declaration">The declaration of the constant</param>
-    /// <returns>The declaration within the class declaration</returns>
-    public static ClassDeclarationNestedDeclaration InClass(this ConstDeclaration declaration, Visibility visibility) => new()
+    /// <typeparam name="TElement"></typeparam>
+    /// <param name="element"></param>
+    /// <returns></returns>
+    public static IEnumerable<TElement> Intersperse<TElement>(this IEnumerable<TElement> source, TElement separator)
     {
-        Visibility = visibility,
-        NestedConstDeclaration = declaration,
-    };
+        bool first = true;
+        foreach (TElement element in source)
+        {
+            if (!first) yield return separator;
+            first = false;
+            yield return element;
+        }
+    }
 }

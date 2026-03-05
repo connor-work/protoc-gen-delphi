@@ -12,28 +12,26 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
-using Work.Connor.Delphi;
-
-// EXTRACT Delphi Code Writer
+using Google.Protobuf.Reflection;
+using System.Collections.Generic;
 
 namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi;
 
-/// <summary>
-/// Extensions to <see cref="FieldDeclaration"/>.
-/// </summary>
-public static class ExtFieldDeclaration
+internal sealed partial class ProtobufFieldSourceCode
 {
     /// <summary>
-    /// Declares the field within a class.
+    /// TODO
     /// </summary>
-    /// <param name="declaration">The declaration of the field</param>
-    /// <returns>The declaration within the class declaration</returns>
-    public static ClassDeclarationNestedDeclaration InClass(this FieldDeclaration declaration, Visibility visibility) => new()
+    public IEnumerable<string> CalculateOwnFieldsSizeStatements
     {
-        Member = new ClassMemberDeclaration
+        get
         {
-            FieldDeclaration = declaration,
-        },
-        Visibility = visibility,
-    };
+            string calculateFieldSizeDelphiMethodName = Field.Label is FieldDescriptorProto.Types.Label.Repeated
+                ? Field.Type.CalculateRepeatedFieldSizeDelphiMethodName()
+                : Field.Type.CalculateSingularFieldSizeDelphiMethodName();
+            return $"""
+                result := result + {calculateFieldSizeDelphiMethodName}({FieldNumberDelphiConstantName}, {DelphiFieldName});
+                """.Lines();
+        }
+    }
 }

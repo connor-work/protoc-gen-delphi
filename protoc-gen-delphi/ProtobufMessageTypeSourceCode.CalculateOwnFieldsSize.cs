@@ -12,6 +12,7 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
+using System.Linq;
 using Work.Connor.Delphi;
 using Binding = Work.Connor.Delphi.MethodInterfaceDeclaration.Types.Binding;
 using Visibility = Work.Connor.Delphi.Visibility;
@@ -23,17 +24,27 @@ internal sealed partial class ProtobufMessageTypeSourceCode
     /// <summary>
     /// TODO
     /// </summary>
-    public DelphiMethodSourceCode CalculateOwnFieldsSizeMethod => new()
+    public DelphiMethodSourceCode CalculateOwnFieldsSizeMethod
     {
-        Comment = """
-            TODO contract
-            """.AnnotationComment(),
-        Visibility = Visibility.Public,
-        RoutineType = Prototype.Types.Type.Function,
-        Name = "CalculateOwnFieldsSize",
-        ReturnType = "UInt32",
-        Binding = Binding.Override,
-        // NOTE This method should be a final method, once the Delphi Code Writer supports it.
-        // TODO statements
-    };
+        get
+        {
+            DelphiMethodSourceCode result = new()
+            {
+                Comment = """
+                    TODO contract
+                    """.AnnotationComment(),
+                Visibility = Visibility.Public,
+                RoutineType = Prototype.Types.Type.Function,
+                Name = "CalculateOwnFieldsSize",
+                ReturnType = "UInt32",
+                Binding = Binding.Override,
+                IsFinal = true,
+            };
+            result.Statements.AddRange($"""
+                result := 0;
+                """.Lines());
+            result.Statements.AddRange(FieldsSourceCode.SelectMany(fieldSourceCode => fieldSourceCode.CalculateOwnFieldsSizeStatements));
+            return result;
+        }
+    }
 }

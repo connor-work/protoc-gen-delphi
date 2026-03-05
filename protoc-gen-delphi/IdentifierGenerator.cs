@@ -29,11 +29,6 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
     internal abstract class IdentifierGenerator<T>
     {
         /// <summary>
-        /// Human-readable name of the kind of identifier generated, e.g., "variable name"
-        /// </summary>
-        protected abstract string IdentifierType { get; }
-
-        /// <summary>
         /// Generates an identifier for an entity.
         /// </summary>
         /// <param name="entity">The entity</param>
@@ -55,8 +50,6 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// <param name="identifier2">The second identifier</param>
         /// <returns><see langword="true"/> if the identifiers are considered two collide</returns>
         protected abstract bool IdentifiersCollide(string identifier1, string identifier2);
-
-        public override string? ToString() => $"[{IdentifierType} generator]";
 
         /// <summary>
         /// Generates an identifier for an entity.
@@ -133,22 +126,18 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// </summary>
         private Regex IdentifierCaseInsensitiveRegex => new($@"(?i){IdentifierRegex}(?-i)");
 
-        protected override string IdentifierType => Type;
-
         /// <summary>
         /// Constructs a new template-based identifier generation scheme.
         /// </summary>
-        /// <param name="type">Human-readable name of the kind of identifier templated, e.g., "variable name"</param>
         /// <param name="converter">Function producing the identifier core string for a mapped entity</param>
         /// <param name="collisionAvoidanceSuffix">Suffix appended to the identifier core (before applying case style) when a collision needs to be avoided</param>
         /// <param name="case">Identifier case style for the generated identifier</param>
         /// <param name="prefix">Prefix prepended to the case-styled identifier core</param>
         /// <param name="suffix">Suffix appended to the case-styled identifier core</param>
         /// <param name="caseSensitive"><see langword="true"/> if collision avoidance checks shall be case-sensitive</param>
-        public IdentifierTemplate(string type, Func<T, string> converter, string collisionAvoidanceSuffix,
+        public IdentifierTemplate(Func<T, string> converter, string collisionAvoidanceSuffix,
             IdentifierCase @case = IdentifierCase.None, string prefix = "", string suffix = "", bool caseSensitive = true)
         {
-            Type = type;
             Converter = converter;
             CollisionAvoidanceSuffix = collisionAvoidanceSuffix;
             Case = @case;

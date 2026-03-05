@@ -22,7 +22,6 @@ using System.IO;
 using System.Linq;
 using Work.Connor.Delphi;
 using Work.Connor.Delphi.CodeWriter;
-using Work.Connor.Delphi.Commons.CodeWriterExtensions;
 using static Work.Connor.Delphi.CodeWriter.StringExtensions;
 
 namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
@@ -30,32 +29,27 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
     /// <summary>
     /// Plug-in for the protobuf compiler <c>protoc</c> that generates Delphi unit source code files for protobuf schema definitions.
     /// </summary>
-    public class ProtocGenDelphi
+    public partial class ProtocGenDelphi
     {
         /// <summary>
-        /// Name of the Delphi class that is the ancestor of all generated Delphi interfaces that represent Protobuf message types.
+        /// Mapping of Protobuf message type names to identifiers for Delphi interfaces.
         /// </summary>
-        public static string MessageTypeDelphiAncestorInterfaceName => "IProtobufNotWellKnownTypeMessage";
-
-        /// <summary>
-        /// Name of the Delphi class that is the ancestor of all generated Delphi classes that represent Protobuf message types.
-        /// </summary>
-        public static string MessageTypeDelphiAncestorClassName => "TProtobufNotWellKnownTypeMessageBase";
+        private static IdentifierGenerator<string> InterfaceIdentifier => new IdentifierTemplate<string>(x => x, "_ProtobufType", IdentifierCase.Pascal, "I", caseSensitive: false);
 
         /// <summary>
         /// Mapping of protobuf type names to identifiers for Delphi types
         /// </summary>
-        private static IdentifierGenerator<string> TypeIdentifier => new IdentifierTemplate<string>("type", x => x, "_ProtobufType", IdentifierCase.Pascal, "T", caseSensitive: false);
+        private static IdentifierGenerator<string> TypeIdentifier => new IdentifierTemplate<string>(x => x, "_ProtobufType", IdentifierCase.Pascal, "T", caseSensitive: false);
 
         /// <summary>
         /// Mapping of protobuf schema names to identifiers for Delphi units
         /// </summary>
-        private static IdentifierGenerator<string> UnitIdentifier => new IdentifierTemplate<string>("unit", x => x, "_ProtobufSchema", IdentifierCase.Pascal, "u", caseSensitive: false);
+        private static IdentifierGenerator<string> UnitIdentifier => new IdentifierTemplate<string>(x => x, "_ProtobufSchema", IdentifierCase.Pascal, "u", caseSensitive: false);
 
         /// <summary>
         /// Reserved identifiers that shall not be used by generated source code
         /// </summary>
-        internal static IEnumerable<string> ReservedIdentifiers => Enum.GetValues<ReservedWord>().Select(word => word.ToSourceCode());
+        internal static IEnumerable<string> ReservedIdentifiers => System.Enum.GetValues<ReservedWord>().Select(word => word.ToSourceCode());
 
         /// <summary>
         /// File name extension (without leading dot) for protobuf schema definitions
@@ -84,6 +78,101 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
 
         public static void Main(string[] args)
         {
+            ProtobufMessageTypeSourceCode messageTypeSourceCode = new()
+            {
+                MessageType = new DescriptorProto
+                {
+                    Name = "MessageX",
+                    Field =
+                    {
+                        new FieldDescriptorProto
+                        {
+                            Name = "fieldX",
+                            Number = 1,
+                            Type = FieldDescriptorProto.Types.Type.Uint32,
+                        },
+                        new FieldDescriptorProto
+                        {
+                            Name = "fieldZ",
+                            Number = 3,
+                            Type = FieldDescriptorProto.Types.Type.Uint32,
+                            Label = FieldDescriptorProto.Types.Label.Repeated,
+                        }
+                    }
+                },
+            };
+            Unit unit = new()
+            {
+                Heading = new UnitIdentifier
+                {
+                    Unit = "uTest",
+                },
+                Interface = new Interface
+                {
+                    UsesClause =
+                    {
+                        new ConditionalUnitReference
+                        {
+                            Condition = new CompilationCondition
+                            {
+                                Symbol = "WORK_CONNOR_DELPHI_COMPILER_UNIT_SCOPE_NAMES",
+                            },
+                            Element = "System.Classes",
+                            AlternativeElement = "Classes",
+                        },
+                        new ConditionalUnitReference
+                        {
+                            Condition = new CompilationCondition
+                            {
+                                Symbol = "WORK_CONNOR_DELPHI_COMPILER_UNIT_SCOPE_NAMES",
+                            },
+                            Element = "System.JSON",
+                            AlternativeElement = "JSON",
+                        },
+                        new UnitReference
+                        {
+                            Unit = "Work.Connor.Protobuf.Delphi.ProtocGenDelphi.uProtobuf",
+                        },
+                        new UnitReference
+                        {
+                            Unit = "Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uIProtobufNotWellKnownTypeMessage",
+                        },
+                        new UnitReference
+                        {
+                            Unit = "Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.uIProtobufRepeatedFieldValues",
+                        },
+                        new UnitReference
+                        {
+                            Unit = "Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufMessageBase",
+                        },
+                        new UnitReference
+                        {
+                            Unit = "Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufNotWellKnownTypeMessageBase",
+                        },
+                        new UnitReference
+                        {
+                            Unit = "Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufUint32",
+                        },
+                        new UnitReference
+                        {
+                            Unit = "Work.Connor.Protobuf.Delphi.ProtocGenDelphi.Runtime.Internal.uProtobufWireFormat",
+                        },
+                    },
+                    Declarations = { messageTypeSourceCode.Declare() }
+                },
+                Implementation = new Implementation
+                {
+                    Declarations = { messageTypeSourceCode.Implement() }
+                },
+                Initialization = new Initialization
+                {
+                    Statements = { messageTypeSourceCode.Initialize() }
+                },
+            };
+            System.Console.WriteLine(unit.ToSourceCode());
+            return;
+
+
             if (args.Length != 0) throw new ArgumentException("protoc-gen-delphi does not expect program arguments");
             // protoc communicates with the plug-in through stdin and stdout
             using Stream input = Console.OpenStandardInput();
@@ -144,15 +233,30 @@ namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi
         /// <returns>The source code file in the format expected by <c>protoc</c></returns>
         private CodeGeneratorResponse.Types.File GenerateSourceFile(FileDescriptorProto protoFile, Func<string, FileDescriptorProto> lookupProtoFile)
         {
-            SchemaSourceCode schema = new(lookupProtoFile, runtime, protoFile);
-            // Generate a new Delphi unit
-            Unit unit = schema.DelphiUnit;
-            unit.AdaptForDelphiCommons();
-            return new()
-            {
-                Name = string.Join(protoFileNamePathSeparator, unit.ToSourceFilePath()),
-                Content = unit.ToSourceCode()
-            };
+            throw new NotImplementedException();
+            //SchemaSourceCode schema = new(lookupProtoFile, runtime, protoFile);
+            //// Generate a new Delphi unit
+            //Unit unit = schema.DelphiUnit;
+            //unit.AdaptForDelphiCommons();
+            //return new()
+            //{
+            //    Name = string.Join(protoFileNamePathSeparator, unit.ToSourceFilePath()),
+            //    Content = unit.ToSourceCode()
+            //};
+        }
+
+        /// <summary>
+        /// Constructs a name for a Delphi interface that represents a Protobuf message type.
+        /// </summary>
+        /// <param name="typeName">The message type's name</param>
+        /// <returns>The Delphi interface name</returns>
+        internal static string ConstructDelphiInterfaceName(string typeName)
+        {
+            if (!typeName.StartsWith(".")) return InterfaceIdentifier.Generate(typeName, reservedIdentifiers: ReservedIdentifiers);
+            string[] typeNameSegments = typeName.Split(".", StringSplitOptions.RemoveEmptyEntries).ToArray();
+            string unqualifiedName = ConstructDelphiInterfaceName(typeNameSegments[^1]);
+            if (typeNameSegments.Length < 2) return unqualifiedName;
+            return $"{ConstructUnitIdentifier(typeNameSegments[0..^2], typeNameSegments[^2]).ToSourceCode()}.{unqualifiedName}";
         }
 
         /// <summary>

@@ -70,6 +70,7 @@ type
       /// <summary>
       /// TODO contract
       /// TODO position always at 0
+      /// TODO destroy
       /// </summary>
       FValue: TBytesStream;
 

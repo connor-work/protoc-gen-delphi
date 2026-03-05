@@ -35,12 +35,14 @@ internal sealed partial class ProtobufMessageTypeSourceCode
                 Visibility = Visibility.Public,
                 RoutineType = Prototype.Types.Type.Function,
                 Name = "GetTypeUrl",
+                ReturnType = ProtocGenDelphi.TypeUrlDelphiTypeName,
                 Binding = Binding.Override,
-                // NOTE This method should be a final method, once the Delphi Code Writer supports it.
+                IsFinal = true,
             };
             result.Statements.AddRange("""
-                // TODO implementation
+                result := PROTOBUF_TYPE_URL;
                 """.Lines());
             return result;
         }
+    }
 }

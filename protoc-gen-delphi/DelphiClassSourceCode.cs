@@ -39,6 +39,11 @@ internal sealed class DelphiClassSourceCode
     /// <summary>
     /// TODO
     /// </summary>
+    public required ClassDeclaration.Types.InheritanceModifier InheritanceModifier { get; init; }
+
+    /// <summary>
+    /// TODO
+    /// </summary>
     public string? Ancestor { get; init; } = null;
 
     /// <summary>
@@ -65,12 +70,13 @@ internal sealed class DelphiClassSourceCode
         ClassDeclaration result = new()
         {
             Name = Name,
+            InheritanceModifier = InheritanceModifier,
             Ancestor = Ancestor,
             Comment = Comment,
         };
         result.NestedDeclarations.AddRange(Constants.Select(constant => constant.Declare()));
-        result.NestedDeclarations.AddRange(Properties.SelectMany(property => property.Declare()));
-        result.NestedDeclarations.AddRange(Methods.Select(method => method.Declare()));
+		result.NestedDeclarations.AddRange(Methods.Select(method => method.DeclareInClass()));
+		result.NestedDeclarations.AddRange(Properties.Select(property => property.DeclareInClass()));
         return result;
     }
 
@@ -79,7 +85,6 @@ internal sealed class DelphiClassSourceCode
     /// </summary>
     /// <returns></returns>
     public IEnumerable<MethodDeclaration> Implement() => [
-        ..Properties.SelectMany(property => property.Implement(Name)),
-        ..Methods.Select(method => method.Implement(Name)),
+		..Methods.Select(method => method.Implement(Name)),
     ];
 }

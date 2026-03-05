@@ -13,6 +13,7 @@
 /// limitations under the License.
 
 using Work.Connor.Delphi;
+using Work.Connor.Delphi.CodeWriter;
 
 namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi;
 

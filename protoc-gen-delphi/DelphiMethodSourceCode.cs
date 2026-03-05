@@ -14,6 +14,7 @@
 
 using System.Collections.Generic;
 using Work.Connor.Delphi;
+using Work.Connor.Delphi.CodeWriter;
 using Binding = Work.Connor.Delphi.MethodInterfaceDeclaration.Types.Binding;
 
 namespace Work.Connor.Protobuf.Delphi.ProtocGenDelphi;
@@ -58,7 +59,10 @@ internal sealed class DelphiMethodSourceCode
     /// </summary>
     public Binding Binding { get; init; } = Binding.Static;
 
-    // TODO HasImplementation (false for abstract and for interface method)
+    /// <summary>
+    /// TODO
+    /// </summary>
+    public bool IsFinal { get; init; } = false;
 
     /// <summary>
     /// TODO
@@ -85,12 +89,28 @@ internal sealed class DelphiMethodSourceCode
     /// TODO
     /// </summary>
     /// <returns></returns>
-    public ClassDeclarationNestedDeclaration Declare() => new MethodInterfaceDeclaration
+    public ClassDeclarationNestedDeclaration DeclareInClass() => new MethodInterfaceDeclaration
     {
-        Binding = Binding,
         Prototype = Prototype,
+        Binding = Binding,
+        IsFinal = IsFinal,
         Comment = Comment,
     }.InClass(Visibility);
+
+    /// <summary>
+    /// TODO
+    /// </summary>
+    /// <returns></returns>
+    public InterfaceMemberDeclaration DeclareInInterface() => new()
+    {
+        MethodDeclaration = new MethodInterfaceDeclaration
+        {
+            Prototype = Prototype,
+            Binding = Binding.Static,
+            IsFinal = false,
+            Comment = Comment,
+        },
+    };
 
     /// <summary>
     /// TODO
